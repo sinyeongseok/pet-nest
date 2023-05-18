@@ -48,7 +48,7 @@ export class AuthService {
         return { statusCode: 400, data: '닉네임이 이미 존재해요.' };
       }
 
-      return { statusCode: 200, data: process.env.MONGODB_URL };
+      return { statusCode: 200, data: '사용 가능한 닉네임이에요.' };
     } catch (error) {
       return { statusCode: 500, data: '서버 요청 실패.' };
     }
