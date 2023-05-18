@@ -83,16 +83,17 @@ export class AddressService {
   }
 
   getAddress(address: string) {
-    console.log(address);
-    const findAddress = ADDRESS_INFO.filter(
-      (info) => info['읍면동'] == address
+    const findAddress = ADDRESS_INFO.filter((info) =>
+      info['읍면동'].includes(address)
     );
-    const add: string = `${findAddress[0]['시도']} ${
-      findAddress[0]['시군구']
-    } ${findAddress[0]['읍면동']} ${
-      !!findAddress[0]['리'] ? findAddress[0]['리'] : ''
-    }`.trim();
-    const [latitude, longitude] = findAddress[0]['위도,경도'].split(',');
-    return { latitude, longitude, address: add };
+
+    const result = findAddress.map((address) => {
+      const add = `${address['시도']} ${address['시군구']} ${
+        address['읍면동']
+      } ${!!address['리'] ? address['리'] : ''}`.trim();
+      const [latitude, longitude] = address['위도,경도'].split(',');
+      return { latitude, longitude, address: add };
+    });
+    return result;
   }
 }
