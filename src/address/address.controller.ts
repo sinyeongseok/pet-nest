@@ -7,7 +7,8 @@ export class AddressController {
 
   @Get()
   async getAddress(@Query('address') address: string) {
-    return await this.addressService.getAddress(address);
+    const result = await this.addressService.getAddress(address);
+    return { data: result };
   }
 
   @Get('nearby')
@@ -15,6 +16,10 @@ export class AddressController {
     @Query('latitude') latitude: string,
     @Query('longitude') longitude: string
   ) {
-    return await this.addressService.getNearbyAddresses(latitude, longitude);
+    const result = await this.addressService.getNearbyAddresses(
+      latitude,
+      longitude
+    );
+    return { data: result };
   }
 }

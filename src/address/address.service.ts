@@ -79,7 +79,7 @@ export class AddressService {
     try {
       const regExp = new RegExp(`.*${address}.*`);
       const addressList = await this.AddressModel.find({
-        eupMyeonDong: { $regex: regExp },
+        ...(!!address && { eupMyeonDong: { $regex: regExp } }),
       }).lean();
 
       const result = addressList.map((addressInfo) => {
