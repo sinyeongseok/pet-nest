@@ -22,7 +22,6 @@ export class AuthService {
   }
 
   async validateNickname(nickname: string) {
-    console.log(process.env.MONGODB_URL);
     const regex = /^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/;
 
     if (nickname.length < 2) {
@@ -49,7 +48,7 @@ export class AuthService {
         return { statusCode: 400, data: '닉네임이 이미 존재해요.' };
       }
 
-      return { statusCode: 200, data: '사용 가능한 닉네임이에요.' };
+      return { statusCode: 200, data: process.env.MONGODB_URL };
     } catch (error) {
       return { statusCode: 500, data: '서버 요청 실패.' };
     }
