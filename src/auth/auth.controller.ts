@@ -1,15 +1,16 @@
 import { Controller, Get, Post, Body, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
-import { stat } from 'fs';
 
 @Controller('auth')
 export class AuthController {
   constructor(private addressService: AuthService) {}
 
   @Post('login')
-  login(@Body('email') email: string) {
-    return this.addressService.login(email);
+  async login(@Res() res: Response, @Body('email') email: string) {
+    const { statusCode, data } = await this.addressService.login(email);
+
+    return res.status(statusCode).json(data);
   }
 
   @Post('nickname')

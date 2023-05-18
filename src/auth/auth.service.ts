@@ -5,13 +5,20 @@ import { User, UserDocument } from '../schema/user.schema';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectModel(User.name) private orderModel: Model<UserDocument>
-  ) {}
+  constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) {}
 
-  login(email: string) {
-    console.log(email);
-    return 'test';
+  async login(email: string) {
+    try {
+      const user = await this.UserModel.findOne({ email });
+
+      if (!user) {
+        return { statusCode: 202, data: { isNewby: true } };
+      }
+
+      return { statusCode: 200, data: { data: user } };
+    } catch (error) {
+      return { statusCode: 500, data: '서버 요청 실패.' };
+    }
   }
 
   async validateNickname(nickname: string) {
@@ -33,7 +40,7 @@ export class AuthService {
     }
 
     try {
-      const findNickname = await this.orderModel.findOne({
+      const findNickname = await this.UserModel.findOne({
         nickname,
       });
 
@@ -42,6 +49,8 @@ export class AuthService {
       }
 
       return { statusCode: 200, data: '사용 가능한 닉네임이에요.' };
-    } catch (error) {}
+    } catch (error) {
+      return { statusCode: 500, data: '서버 요청 실패.' };
+    }
   }
 }
