@@ -22,6 +22,7 @@ export class AuthService {
   }
 
   async validateNickname(nickname: string) {
+    console.log(process.env.MONGODB_URL);
     const regex = /^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/;
 
     if (nickname.length < 2) {
