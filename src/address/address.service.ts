@@ -83,6 +83,7 @@ export class AddressService {
   }
 
   getAddress(address: string) {
+    console.log(address);
     const findAddress = ADDRESS_INFO.filter(
       (info) => info['읍면동'] == address
     );
