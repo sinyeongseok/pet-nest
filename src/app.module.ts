@@ -4,7 +4,6 @@ import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { KakaoModule } from './kakao/kakao.module';
 
 @Module({
   imports: [
@@ -16,7 +15,6 @@ import { KakaoModule } from './kakao/kakao.module';
     AddressModule,
     AuthModule,
     UserModule,
-    KakaoModule,
   ],
 })
 export class AppModule {}
