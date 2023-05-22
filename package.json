@@ -25,6 +25,7 @@
     "@nestjs/common": "^9.1.4",
     "@nestjs/config": "^2.3.2",
     "@nestjs/core": "^9.1.4",
+    "@nestjs/jwt": "^10.0.3",
     "@nestjs/mongoose": "^9.2.2",
     "@nestjs/platform-express": "^9.1.4",
     "express": "^4.18.2",
