@@ -3,10 +3,25 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private UserModel: Model<UserDocument>,
+    private configService: ConfigService,
+    private readonly jwtService: JwtService
+  ) {}
+
+  generateAccessToken(email: string): string {
+    const payload = { email };
+    return this.jwtService.sign(payload, { expiresIn: '1h' });
+  }
+
+  generateRefreshToken(email: string): string {
+    const payload = { email };
+    return this.jwtService.sign(payload, { expiresIn: '7d' });
+  }
 
   async login(email: string) {
     try {
@@ -16,8 +31,15 @@ export class AuthService {
         return { statusCode: 202, data: { isNewby: true } };
       }
 
-      return { statusCode: 200, data: { data: user } };
+      const accessToken = this.generateAccessToken(email);
+      const refreshToken = this.generateRefreshToken(email);
+
+      return {
+        statusCode: 200,
+        data: { data: user, accessToken, refreshToken },
+      };
     } catch (error) {
+      console.log(error);
       return { statusCode: 500, data: '서버 요청 실패.' };
     }
   }
