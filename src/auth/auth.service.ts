@@ -15,12 +15,12 @@ export class AuthService {
 
   generateAccessToken(email: string): string {
     const payload = { email };
-    return this.jwtService.sign(payload, { expiresIn: '1h' });
+    return this.jwtService.sign(payload, { expiresIn: '5m' });
   }
 
   generateRefreshToken(email: string): string {
     const payload = { email };
-    return this.jwtService.sign(payload, { expiresIn: '7d' });
+    return this.jwtService.sign(payload, { expiresIn: '1d' });
   }
 
   async login(email: string) {
