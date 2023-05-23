@@ -23,6 +23,14 @@ export class AuthService {
     return this.jwtService.sign(payload, { expiresIn: '1d' });
   }
 
+  formatForLogin(user: UserDocument) {
+    return {
+      email: user.email,
+      nickname: user.nickname,
+      profileImage: user.profileImage,
+    };
+  }
+
   async login(email: string) {
     try {
       const user = await this.UserModel.findOne({ email });
@@ -33,10 +41,12 @@ export class AuthService {
 
       const accessToken = this.generateAccessToken(email);
       const refreshToken = this.generateRefreshToken(email);
+      await this.UserModel.updateOne({ email }, { refreshToken });
+      const formattedLoginData = this.formatForLogin(user);
 
       return {
         statusCode: 200,
-        data: { data: user, accessToken, refreshToken },
+        data: { data: formattedLoginData, accessToken, refreshToken },
       };
     } catch (error) {
       console.log(error);
