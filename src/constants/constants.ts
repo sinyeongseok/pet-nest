@@ -1,3 +1,1 @@
-export const jwtConstants = {
-  secret: 'petMily',
-};
+export const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
