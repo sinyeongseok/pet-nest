@@ -15,10 +15,17 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class UserController {
   constructor(private addressService: UserService) {}
 
-  @Post('profile')
-  @UseInterceptors(FileInterceptor('profileImage'))
-  createProfile(@UploadedFile() file: Express.Multer.File, @Body() body) {
-    console.log(file);
-    console.log(body);
+  // @Post('profile')
+  // @UseInterceptors(FileInterceptor('profileImage'))
+  // createProfile(@UploadedFile() file: Express.Multer.File, @Body() body) {
+  //   const result = this.addressService.test(file, body);
+
+  //   return result;
+  // }
+
+  @Get('random-nickname')
+  async getRandomNickname() {
+    const result = await this.addressService.getRandomNickname();
+    return { nickname: result };
   }
 }
