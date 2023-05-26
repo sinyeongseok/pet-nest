@@ -59,9 +59,11 @@ export class AddressService {
       const result = nearbyAddressList
         .sort((a, b) => a.distance - b.distance)
         .map((addressInfo) => {
-          const address = `${addressInfo['siDo']} ${addressInfo['siGunGu']} ${
-            addressInfo['eupMyeonDong']
-          } ${!!addressInfo['ri'] ? addressInfo['ri'] : ''}`.trim();
+          const address = `${addressInfo['siDo']}${
+            !!addressInfo['siGunGu'] ? ` ${addressInfo['siGunGu']}` : ''
+          } ${addressInfo['eupMyeonDong']} ${
+            !!addressInfo['ri'] ? addressInfo['ri'] : ''
+          }`.trim();
           const [latitude, longitude] = addressInfo['coordinate'].split(',');
           return {
             address,
@@ -83,9 +85,11 @@ export class AddressService {
       }).lean();
 
       const result = addressList.map((addressInfo) => {
-        const address = `${addressInfo['siDo']} ${addressInfo['siGunGu']} ${
-          addressInfo['eupMyeonDong']
-        } ${!!addressInfo['ri'] ? addressInfo['ri'] : ''}`.trim();
+        const address = `${addressInfo['siDo']}${
+          !!addressInfo['siGunGu'] ? ` ${addressInfo['siGunGu']}` : ''
+        } ${addressInfo['eupMyeonDong']} ${
+          !!addressInfo['ri'] ? addressInfo['ri'] : ''
+        }`.trim();
         const [latitude, longitude] = addressInfo['coordinate'].split(',');
 
         return { address, latitude, longitude };
