@@ -28,6 +28,7 @@ export class AuthService {
       email: user.email,
       nickname: user.nickname,
       profileImage: user.profileImage,
+      petType: user.petType,
     };
   }
 
@@ -46,7 +47,7 @@ export class AuthService {
 
       return {
         statusCode: 200,
-        data: { data: formattedLoginData, accessToken, refreshToken },
+        data: { data: { ...formattedLoginData, accessToken, refreshToken } },
       };
     } catch (error) {
       console.log(error);
