@@ -13,6 +13,10 @@ export class UserService {
     @InjectModel(User.name) private UserModel: Model<UserDocument>
   ) {}
 
+  async createProfile(file, body) {
+    return 1;
+  }
+
   async getRandomNickname() {
     const nickname = `${
       adjective[Math.floor(Math.random() * adjective.length)]
