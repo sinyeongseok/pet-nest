@@ -4,6 +4,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { User, UserSchema } from '../schema/user.schema';
 import { Address, AddressSchema } from '../schema/address.schema';
+import { AwsService } from '../utils/s3';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { Address, AddressSchema } from '../schema/address.schema';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, AwsService],
 })
 export class UserModule {}
