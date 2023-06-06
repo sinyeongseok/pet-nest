@@ -26,6 +26,6 @@ export class UserController {
   @Get('random-nickname')
   async getRandomNickname() {
     const result = await this.addressService.getRandomNickname();
-    return { nickname: result };
+    return { data: { randomNickname: result } };
   }
 }
