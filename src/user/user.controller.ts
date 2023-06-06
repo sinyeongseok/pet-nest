@@ -17,10 +17,21 @@ export class UserController {
 
   @Post('profile')
   @UseInterceptors(FileInterceptor('profileImage'))
-  createProfile(@UploadedFile() file, @Body() body) {
-    const result = this.addressService.createProfile(file, body);
+  async createProfile(
+    @UploadedFile() file,
+    @Body('email') email: string,
+    @Body('nickname') nickname: string,
+    @Body('petType') petType: string,
+    @Body('address') address: string
+  ) {
+    const result = await this.addressService.createProfile(file, {
+      email,
+      nickname,
+      petType,
+      address,
+    });
 
-    return result;
+    return { data: result };
   }
 
   @Get('random-nickname')
