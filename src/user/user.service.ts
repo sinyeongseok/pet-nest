@@ -6,7 +6,7 @@ import { User, UserDocument } from '../schema/user.schema';
 import { fakerKO as faker } from '@faker-js/faker';
 import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
-import { JwtService } from '@nestjs/jwt';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
@@ -14,18 +14,8 @@ export class UserService {
     @InjectModel(Address.name) private AddressModel: Model<AddressDocument>,
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
     private awsService: AwsService,
-    private readonly jwtService: JwtService
+    private authService: AuthService
   ) {}
-
-  generateAccessToken(email: string): string {
-    const payload = { email };
-    return this.jwtService.sign(payload, { expiresIn: '5m' });
-  }
-
-  generateRefreshToken(email: string): string {
-    const payload = { email };
-    return this.jwtService.sign(payload, { expiresIn: '1d' });
-  }
 
   async createProfile(file, { email, nickname, petType, address }) {
     const profileImage = await (async () => {
@@ -41,8 +31,8 @@ export class UserService {
       return undefined;
     })();
     const userAddress = JSON.parse(address);
-    const accessToken = this.generateAccessToken(email);
-    const refreshToken = this.generateRefreshToken(email);
+    const accessToken = this.authService.generateAccessToken(email);
+    const refreshToken = this.authService.generateRefreshToken(email);
     const createUser = new this.UserModel({
       email,
       nickname,
