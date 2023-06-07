@@ -27,8 +27,8 @@ export class AuthService {
     return {
       email: user.email,
       nickname: user.nickname,
-      profileImage: user.profileImage,
       petType: user.petType,
+      ...(!!user.profileImage && { profileImage: user.profileImage }),
     };
   }
 
