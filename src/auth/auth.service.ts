@@ -2,14 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
+import { UserAddress, UserAddressDocument } from '../schema/userAddress.schema';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
-    private configService: ConfigService,
+    @InjectModel(UserAddress.name)
+    private UserAddressModel: Model<UserAddressDocument>,
     private readonly jwtService: JwtService
   ) {}
 
@@ -23,11 +24,12 @@ export class AuthService {
     return this.jwtService.sign(payload, { expiresIn: '1d' });
   }
 
-  formatForLogin(user: UserDocument) {
+  formatForLogin(user: UserDocument, userAddress: UserAddressDocument) {
     return {
       email: user.email,
       nickname: user.nickname,
       petType: user.petType,
+      address: userAddress.detail,
       ...(!!user.profileImage && { profileImage: user.profileImage }),
     };
   }
@@ -43,7 +45,11 @@ export class AuthService {
       const accessToken = this.generateAccessToken(email);
       const refreshToken = this.generateRefreshToken(email);
       await this.UserModel.updateOne({ email }, { refreshToken });
-      const formattedLoginData = this.formatForLogin(user);
+      const userAddress = await this.UserAddressModel.findOne({
+        userEmail: email,
+        isLastSelected: true,
+      });
+      const formattedLoginData = this.formatForLogin(user, userAddress);
 
       return {
         statusCode: 200,
