@@ -3,12 +3,6 @@ import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
 
-type Address = {
-  detail: string;
-  longitude: string;
-  latitude: string;
-};
-
 @Schema({ timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } })
 export class User {
   @Prop()
@@ -25,9 +19,6 @@ export class User {
 
   @Prop()
   petType: string;
-
-  @Prop({ type: Object })
-  address: Address;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
