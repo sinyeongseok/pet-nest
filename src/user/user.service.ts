@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Address, AddressDocument } from '../schema/address.schema';
 import { User, UserDocument } from '../schema/user.schema';
+import { UserAddress, UserAddressDocument } from '../schema/userAddress.schema';
 import { fakerKO as faker } from '@faker-js/faker';
 import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
@@ -11,8 +11,9 @@ import { AuthService } from 'src/auth/auth.service';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(Address.name) private AddressModel: Model<AddressDocument>,
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
+    @InjectModel(UserAddress.name)
+    private UserAddressModel: Model<UserAddressDocument>,
     private awsService: AwsService,
     private authService: AuthService
   ) {}
@@ -38,10 +39,16 @@ export class UserService {
       nickname,
       petType,
       refreshToken,
-      address: userAddress,
       ...(!!profileImage && { profileImage }),
     });
-    await createUser.save();
+    const neighborhoodRegistration = new this.UserAddressModel({
+      userEmail: email,
+      isLastSelected: true,
+      isAuth: false,
+      ...userAddress,
+    });
+
+    await Promise.all([createUser.save(), neighborhoodRegistration.save()]);
 
     const result = {
       email,
