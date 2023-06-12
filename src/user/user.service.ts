@@ -22,7 +22,7 @@ export class UserService {
     const profileImage = await (async () => {
       if (!!file) {
         const result = await this.awsService.uploadFileToS3(
-          `${email}/${email}.jpeg`,
+          `profileImages/${email}/${email}.jpeg`,
           file
         );
 
