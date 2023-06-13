@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { AddressService } from './address.service';
-import { DATE_FORMAT } from '../constants/constants';
+import { DATE_FORMAT } from '../constants';
 import * as dayjs from 'dayjs';
 
 @Controller('address')
