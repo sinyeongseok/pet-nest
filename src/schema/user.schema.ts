@@ -15,9 +15,6 @@ export class User {
   profileImage: string;
 
   @Prop()
-  refreshToken: string;
-
-  @Prop()
   petType: string;
 }
 

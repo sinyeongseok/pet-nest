@@ -44,7 +44,6 @@ export class AuthService {
 
       const accessToken = this.generateAccessToken(email);
       const refreshToken = this.generateRefreshToken(email);
-      await this.UserModel.updateOne({ email }, { refreshToken });
       const userAddress = await this.UserAddressModel.findOne({
         userEmail: email,
         isLastSelected: true,

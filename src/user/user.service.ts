@@ -38,7 +38,6 @@ export class UserService {
       email,
       nickname,
       petType,
-      refreshToken,
       ...(!!profileImage && { profileImage }),
     });
     const neighborhoodRegistration = new this.UserAddressModel({
