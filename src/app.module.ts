@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { WebModule } from './web/web.module';
 import { JwtModule } from '@nestjs/jwt';
+import { BoardModule } from './board/board.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -24,6 +25,7 @@ import configuration from './config/configuration';
     AuthModule,
     UserModule,
     WebModule,
+    BoardModule,
   ],
 })
 export class AppModule {}
