@@ -9,16 +9,16 @@ export class AddressService {
     @InjectModel(Address.name) private AddressModel: Model<AddressDocument>
   ) {}
 
-  formatAddressDetail({ siDo, eupMyeonDong, siGunGu = '', ri = '' }) {
+  combineAddress({ siDo, eupMyeonDong, siGunGu = '', ri = '' }) {
     return [siDo, siGunGu, eupMyeonDong, ri]
       .join(' ')
       .replaceAll('  ', ' ')
       .trim();
   }
 
-  formatAddressList(addressList: AddressDocument[]) {
+  convertAddressList(addressList: AddressDocument[]) {
     return addressList.map(({ coordinate, ...addressInfo }) => {
-      const address = this.formatAddressDetail(addressInfo);
+      const address = this.combineAddress(addressInfo);
       const [latitude, longitude] = coordinate.split(',');
       return {
         address,
@@ -75,7 +75,7 @@ export class AddressService {
       const sortArray = nearbyAddressList.sort(
         (a, b) => a.distance - b.distance
       );
-      const result = this.formatAddressList(sortArray);
+      const result = this.convertAddressList(sortArray);
 
       return result;
     } catch (error) {
@@ -89,7 +89,7 @@ export class AddressService {
       const addressList = await this.AddressModel.find({
         ...(!!address && { eupMyeonDong: { $regex: regExp } }),
       }).lean();
-      const result = this.formatAddressList(addressList);
+      const result = this.convertAddressList(addressList);
 
       return result;
     } catch (error) {
