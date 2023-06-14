@@ -15,7 +15,7 @@ export class User {
   profileImage: string;
 
   @Prop()
-  petType: string;
+  petType: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
