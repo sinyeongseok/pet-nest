@@ -29,7 +29,7 @@ export class AuthService {
       email: user.email,
       nickname: user.nickname,
       petType: user.petType,
-      address: userAddress.detail,
+      address: userAddress.eupMyeonDong,
       ...(!!user.profileImage && { profileImage: user.profileImage }),
     };
   }

@@ -3,13 +3,28 @@ import { Document } from 'mongoose';
 
 export type UserAddressDocument = UserAddress & Document;
 
-@Schema({ timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } })
+@Schema({
+  timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
+  versionKey: false,
+})
 export class UserAddress {
   @Prop()
   userEmail: string;
 
   @Prop()
   detail: string;
+
+  @Prop()
+  siDo: string;
+
+  @Prop()
+  siGunGu: string;
+
+  @Prop()
+  eupMyeonDong: string;
+
+  @Prop()
+  ri: string;
 
   @Prop()
   longitude: string;

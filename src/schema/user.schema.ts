@@ -3,7 +3,10 @@ import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
 
-@Schema({ timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } })
+@Schema({
+  timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
+  versionKey: false,
+})
 export class User {
   @Prop()
   email: string;
@@ -15,7 +18,7 @@ export class User {
   profileImage: string;
 
   @Prop()
-  petType: number;
+  petType: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

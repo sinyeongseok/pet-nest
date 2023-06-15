@@ -3,6 +3,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
 import { UserAddress, UserAddressDocument } from '../schema/userAddress.schema';
+import { Address, AddressDocument } from '../schema/Address.schema';
 import { fakerKO as faker } from '@faker-js/faker';
 import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
@@ -14,6 +15,8 @@ export class UserService {
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
     @InjectModel(UserAddress.name)
     private UserAddressModel: Model<UserAddressDocument>,
+    @InjectModel(Address.name)
+    private addressModel: Model<AddressDocument>,
     private awsService: AwsService,
     private authService: AuthService
   ) {}
@@ -32,6 +35,10 @@ export class UserService {
       return undefined;
     })();
     const userAddress = JSON.parse(address);
+    const addressInfo = await this.addressModel.findOne({
+      coordinate: `${userAddress.longitude},${userAddress.latitude}`,
+    });
+    console.log(addressInfo);
     const accessToken = this.authService.generateAccessToken(email);
     const refreshToken = this.authService.generateRefreshToken(email);
     const createUser = new this.UserModel({
@@ -44,6 +51,10 @@ export class UserService {
       userEmail: email,
       isLastSelected: true,
       isAuth: false,
+      siDo: addressInfo.siDo,
+      siGunGu: addressInfo.siGunGu,
+      eupMyeonDong: addressInfo.eupMyeonDong,
+      ri: addressInfo.ri,
       ...userAddress,
     });
 
@@ -55,7 +66,7 @@ export class UserService {
       petType,
       accessToken,
       refreshToken,
-      address: userAddress.detail,
+      address: addressInfo.eupMyeonDong,
     };
 
     return result;
