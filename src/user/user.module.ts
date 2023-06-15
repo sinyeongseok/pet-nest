@@ -9,8 +9,8 @@ import { AuthService } from '../auth/auth.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
       { name: UserAddress.name, schema: UserAddressSchema },
     ]),
   ],

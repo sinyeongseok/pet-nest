@@ -7,8 +7,8 @@ import { UserAddress, UserAddressSchema } from '../schema/userAddress.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
       { name: UserAddress.name, schema: UserAddressSchema },
     ]),
   ],
