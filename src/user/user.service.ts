@@ -7,7 +7,6 @@ import { fakerKO as faker } from '@faker-js/faker';
 import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
 import { AuthService } from 'src/auth/auth.service';
-import { PET_TYPE } from '../constants/index';
 
 @Injectable()
 export class UserService {
@@ -38,7 +37,7 @@ export class UserService {
     const createUser = new this.UserModel({
       email,
       nickname,
-      petType: PET_TYPE[petType],
+      petType: petType,
       ...(!!profileImage && { profileImage }),
     });
     const neighborhoodRegistration = new this.UserAddressModel({

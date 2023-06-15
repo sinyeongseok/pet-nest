@@ -4,7 +4,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
 import { UserAddress, UserAddressDocument } from '../schema/userAddress.schema';
 import { JwtService } from '@nestjs/jwt';
-import { PET_TYPE } from '../constants/index';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +28,7 @@ export class AuthService {
     return {
       email: user.email,
       nickname: user.nickname,
-      petType: PET_TYPE[user.petType],
+      petType: user.petType,
       address: userAddress.detail,
       ...(!!user.profileImage && { profileImage: user.profileImage }),
     };
