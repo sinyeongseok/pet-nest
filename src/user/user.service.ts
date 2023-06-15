@@ -3,7 +3,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
 import { UserAddress, UserAddressDocument } from '../schema/userAddress.schema';
-import { Address, AddressDocument } from '../schema/Address.schema';
+import { Address, AddressDocument } from '../schema/address.schema';
 import { fakerKO as faker } from '@faker-js/faker';
 import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
