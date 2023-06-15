@@ -36,7 +36,7 @@ export class UserService {
     })();
     const userAddress = JSON.parse(address);
     const addressInfo = await this.addressModel.findOne({
-      coordinate: `${userAddress.longitude},${userAddress.latitude}`,
+      coordinate: `${userAddress.latitude},${userAddress.longitude}`,
     });
     console.log(addressInfo);
     const accessToken = this.authService.generateAccessToken(email);
