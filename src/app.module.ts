@@ -7,15 +7,9 @@ import { ConfigModule } from '@nestjs/config';
 import { WebModule } from './web/web.module';
 import { JwtModule } from '@nestjs/jwt';
 import { BoardModule } from './board/board.module';
-import configuration from './config/configuration';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      cache: true,
-      isGlobal: true,
-      load: [configuration],
-    }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
