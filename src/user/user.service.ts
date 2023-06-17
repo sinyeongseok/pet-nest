@@ -7,7 +7,7 @@ import { Address, AddressDocument } from '../schema/address.schema';
 import { fakerKO as faker } from '@faker-js/faker';
 import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
-import { AuthService } from 'src/auth/auth.service';
+import { TokenService } from 'src/token/token.service';
 
 @Injectable()
 export class UserService {
@@ -18,7 +18,7 @@ export class UserService {
     @InjectModel(Address.name)
     private addressModel: Model<AddressDocument>,
     private awsService: AwsService,
-    private authService: AuthService
+    private tokenService: TokenService
   ) {}
 
   async createProfile(file, { email, nickname, petType, address }) {
@@ -39,8 +39,8 @@ export class UserService {
       coordinate: `${userAddress.latitude},${userAddress.longitude}`,
     });
     console.log(addressInfo);
-    const accessToken = this.authService.generateAccessToken(email);
-    const refreshToken = this.authService.generateRefreshToken(email);
+    const accessToken = this.tokenService.generateAccessToken(email);
+    const refreshToken = this.tokenService.generateRefreshToken(email);
     const createUser = new this.UserModel({
       email,
       nickname,

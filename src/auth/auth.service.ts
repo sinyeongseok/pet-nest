@@ -3,7 +3,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
 import { UserAddress, UserAddressDocument } from '../schema/userAddress.schema';
-import { JwtService } from '@nestjs/jwt';
+import { TokenService } from '../token/token.service';
 
 @Injectable()
 export class AuthService {
@@ -11,18 +11,8 @@ export class AuthService {
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
     @InjectModel(UserAddress.name)
     private UserAddressModel: Model<UserAddressDocument>,
-    private readonly jwtService: JwtService
+    private tokenService: TokenService
   ) {}
-
-  generateAccessToken(email: string): string {
-    const payload = { email };
-    return this.jwtService.sign(payload, { expiresIn: '5m' });
-  }
-
-  generateRefreshToken(email: string): string {
-    const payload = { email };
-    return this.jwtService.sign(payload, { expiresIn: '1d' });
-  }
 
   formatForLogin(user: UserDocument, userAddress: UserAddressDocument) {
     return {
@@ -42,8 +32,8 @@ export class AuthService {
         return { statusCode: 202, data: { isNewby: true } };
       }
 
-      const accessToken = this.generateAccessToken(email);
-      const refreshToken = this.generateRefreshToken(email);
+      const accessToken = this.tokenService.generateAccessToken(email);
+      const refreshToken = this.tokenService.generateRefreshToken(email);
       const userAddress = await this.UserAddressModel.findOne({
         userEmail: email,
         isLastSelected: true,
