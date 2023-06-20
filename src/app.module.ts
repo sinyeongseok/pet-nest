@@ -33,6 +33,8 @@ import { TokenModule } from './token/token.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(VerifyTokenMiddleware).forRoutes('token/refresh-token');
+    consumer
+      .apply(VerifyTokenMiddleware)
+      .forRoutes('board/used-item', 'token/refresh-token');
   }
 }
