@@ -2,6 +2,13 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response, NextFunction } from 'express';
 
+interface TokenInterface {
+  email: string;
+  type: string;
+  iat: number;
+  exp: number;
+}
+
 @Injectable()
 export class VerifyTokenMiddleware implements NestMiddleware {
   constructor(private readonly jwtService: JwtService) {}
@@ -13,11 +20,17 @@ export class VerifyTokenMiddleware implements NestMiddleware {
     } else {
       try {
         const data = this.jwtService.verify(req.headers.authorization);
-        res.locals.email = data.email;
+        console.log(data);
+        // res.locals.email = data.email;
         next();
       } catch (error) {
         if (error.message === 'jwt expired') {
-          return res.status(401).json({ message: '만료된 토큰입니다.' });
+          const decodedToken: TokenInterface = this.jwtService.decode(
+            req.headers.authorization
+          ) as TokenInterface;
+          return res
+            .status(419)
+            .json({ message: `만료된 ${decodedToken.type} 토큰입니다.` });
         }
 
         return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });

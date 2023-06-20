@@ -16,12 +16,12 @@ export class TokenService {
   ) {}
 
   generateAccessToken(email: string): string {
-    const payload = { email };
+    const payload = { email, type: 'access' };
     return this.jwtService.sign(payload, { expiresIn: '5m' });
   }
 
   generateRefreshToken(email: string): string {
-    const payload = { email };
+    const payload = { email, type: 'refresh' };
     return this.jwtService.sign(payload, { expiresIn: '1d' });
   }
 
