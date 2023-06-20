@@ -97,6 +97,7 @@ export class BoardService {
       timeDelta: this.computeTimeDifference(usedItemBoardInfo.createdAt),
       image: usedItemBoardInfo.images[0],
       address: usedItemBoardInfo.address,
+      salesStatus: usedItemBoardInfo.salesStatus,
       likeCount: usedItemBoardInfo.likeCount,
       chatCount: 0,
     };
