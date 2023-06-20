@@ -20,8 +20,7 @@ export class VerifyTokenMiddleware implements NestMiddleware {
     } else {
       try {
         const data = this.jwtService.verify(req.headers.authorization);
-        console.log(data);
-        // res.locals.email = data.email;
+        res.locals.email = data.email;
         next();
       } catch (error) {
         if (error.message === 'jwt expired') {
