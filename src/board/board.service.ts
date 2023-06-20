@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { UsedItemBoard, UsedItemBoardDocument } from '../schema/Board.schema';
+import { UsedItemBoard, UsedItemBoardDocument } from '../schema/board.schema';
 import { AwsService } from '../utils/s3';
 import { v4 as uuid } from 'uuid';
 import * as dayjs from 'dayjs';
