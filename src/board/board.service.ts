@@ -131,10 +131,10 @@ export class BoardService {
         $and: [
           { topCategory },
           { isVisible: false },
+          { $or: findQuery },
           ...(!!subCategory ? [{ subCategory }] : []),
         ],
         $or: [
-          ...findQuery,
           { topCategory: '전체' },
           { salesStatus: '판매중' },
           { salesStatus: '예약중' },
