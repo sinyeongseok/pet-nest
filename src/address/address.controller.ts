@@ -7,6 +7,11 @@ import * as dayjs from 'dayjs';
 export class AddressController {
   constructor(private addressService: AddressService) {}
 
+  @Get('test')
+  async test() {
+    return this.addressService.test();
+  }
+
   @Get()
   async getAddress(@Query('address') address: string) {
     const result = await this.addressService.getAddress(address);

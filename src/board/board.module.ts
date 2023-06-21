@@ -5,15 +5,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsedItemBoard, UsedItemBoardSchema } from '../schema/board.schema';
 import { AwsService } from '../utils/s3';
 import { UserAddress, UserAddressSchema } from 'src/schema/userAddress.schema';
-import { Address, AddressSchema } from 'src/schema/address.schema';
 import { AddressService } from 'src/address/address.service';
+import { CityAddress, CityAddressSchema } from 'src/schema/cityAddress.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: UsedItemBoard.name, schema: UsedItemBoardSchema },
       { name: UserAddress.name, schema: UserAddressSchema },
-      { name: Address.name, schema: AddressSchema },
+      { name: CityAddress.name, schema: CityAddressSchema },
     ]),
   ],
   controllers: [BoardController],

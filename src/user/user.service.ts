@@ -3,7 +3,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
 import { UserAddress, UserAddressDocument } from '../schema/userAddress.schema';
-import { Address, AddressDocument } from '../schema/address.schema';
+import { CityAddress, CityAddressDocument } from '../schema/cityAddress.schema';
 import { fakerKO as faker } from '@faker-js/faker';
 import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
@@ -15,8 +15,8 @@ export class UserService {
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
     @InjectModel(UserAddress.name)
     private UserAddressModel: Model<UserAddressDocument>,
-    @InjectModel(Address.name)
-    private addressModel: Model<AddressDocument>,
+    @InjectModel(CityAddress.name)
+    private CityAddressModel: Model<CityAddressDocument>,
     private awsService: AwsService,
     private tokenService: TokenService
   ) {}
@@ -35,10 +35,9 @@ export class UserService {
       return undefined;
     })();
     const userAddress = JSON.parse(address);
-    const addressInfo = await this.addressModel.findOne({
-      coordinate: `${userAddress.latitude},${userAddress.longitude}`,
+    const addressInfo = await this.CityAddressModel.findOne({
+      detail: userAddress.detail,
     });
-    console.log(addressInfo);
     const accessToken = this.tokenService.generateAccessToken(email);
     const refreshToken = this.tokenService.generateRefreshToken(email);
     const createUser = new this.UserModel({
