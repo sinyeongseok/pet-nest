@@ -10,26 +10,6 @@ export class AddressService {
     private CityAddressModel: Model<CityAddressDocument>
   ) {}
 
-  async test() {
-    const address = await this.CityAddressModel.aggregate([
-      {
-        $geoNear: {
-          maxDistance: 2000,
-          near: {
-            type: 'Point',
-            coordinates: [126.861616, 37.702135],
-          },
-          distanceField: 'distance',
-          key: 'location',
-        },
-      },
-    ]);
-
-    console.log(address);
-
-    return address;
-  }
-
   convertAddressList(addressList) {
     return addressList.map(({ location, detail }) => {
       const [longitude, latitude] = location.coordinates;
