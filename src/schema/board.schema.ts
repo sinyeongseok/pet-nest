@@ -42,7 +42,7 @@ export class UsedItemBoard {
   viewCount: number;
 
   @Prop({ default: '판매중' })
-  salesStatus: string;
+  salesStatus: '판매중' | '예약중' | '판매완료';
 
   @Prop({ default: false })
   isVisible: boolean;
