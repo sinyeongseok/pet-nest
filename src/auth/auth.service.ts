@@ -2,16 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
-import { UserAddress, UserAddressDocument } from '../schema/userAddress.schema';
+import { UserAddressDocument } from '../schema/userAddress.schema';
 import { TokenService } from '../token/token.service';
+import { UtilService } from 'src/utils/util.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
-    @InjectModel(UserAddress.name)
-    private UserAddressModel: Model<UserAddressDocument>,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private utilService: UtilService
   ) {}
 
   formatForLogin(user: UserDocument, userAddress: UserAddressDocument) {
@@ -34,10 +34,7 @@ export class AuthService {
 
       const accessToken = this.tokenService.generateAccessToken(email);
       const refreshToken = this.tokenService.generateRefreshToken(email);
-      const userAddress = await this.UserAddressModel.findOne({
-        userEmail: email,
-        isLastSelected: true,
-      });
+      const userAddress = await this.utilService.getUserRecentAddress(email);
       const formattedLoginData = this.formatForLogin(user, userAddress);
 
       return {

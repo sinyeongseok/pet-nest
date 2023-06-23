@@ -7,6 +7,7 @@ import { AwsService } from '../utils/s3';
 import { UserAddress, UserAddressSchema } from 'src/schema/userAddress.schema';
 import { AddressService } from 'src/address/address.service';
 import { CityAddress, CityAddressSchema } from 'src/schema/cityAddress.schema';
+import { UtilService } from 'src/utils/util.service';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { CityAddress, CityAddressSchema } from 'src/schema/cityAddress.schema';
     ]),
   ],
   controllers: [BoardController],
-  providers: [BoardService, AwsService, AddressService],
+  providers: [BoardService, AwsService, AddressService, UtilService],
 })
 export class BoardModule {}

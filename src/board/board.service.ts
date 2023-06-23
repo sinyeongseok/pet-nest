@@ -5,21 +5,17 @@ import { UsedItemBoard, UsedItemBoardDocument } from '../schema/board.schema';
 import { AwsService } from '../utils/s3';
 import { v4 as uuid } from 'uuid';
 import * as dayjs from 'dayjs';
-import {
-  UserAddress,
-  UserAddressDocument,
-} from 'src/schema/userAddress.schema';
 import { AddressService } from 'src/address/address.service';
+import { UtilService } from 'src/utils/util.service';
 
 @Injectable()
 export class BoardService {
   constructor(
     @InjectModel(UsedItemBoard.name)
     private UsedItemBoardModel: Model<UsedItemBoardDocument>,
-    @InjectModel(UserAddress.name)
-    private UserAddressModel: Model<UserAddressDocument>,
     private awsService: AwsService,
-    private addressService: AddressService
+    private addressService: AddressService,
+    private utilService: UtilService
   ) {}
 
   async generateUsedItemsBoard(
@@ -28,10 +24,9 @@ export class BoardService {
     { topCategory, subCategory, title, description, price }
   ) {
     try {
-      const userAddressInfo = await this.UserAddressModel.findOne({
-        userEmail: email,
-        isLastSelected: true,
-      });
+      const userAddressInfo = await this.utilService.getUserRecentAddress(
+        email
+      );
       const createUsedItemBoard = new this.UsedItemBoardModel({
         title,
         description,
@@ -117,10 +112,9 @@ export class BoardService {
     email: string
   ) {
     try {
-      const userAddressInfo = await this.UserAddressModel.findOne({
-        userEmail: email,
-        isLastSelected: true,
-      });
+      const userAddressInfo = await this.utilService.getUserRecentAddress(
+        email
+      );
       const nearbyNeighborhoods = await this.addressService.getNearbyAddresses(
         userAddressInfo.latitude,
         userAddressInfo.longitude

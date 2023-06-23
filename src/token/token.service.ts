@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserDocument } from '../schema/user.schema';
-import { UserAddress, UserAddressDocument } from '../schema/userAddress.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { UtilService } from 'src/utils/util.service';
 
 @Injectable()
 export class TokenService {
@@ -11,8 +11,7 @@ export class TokenService {
     private readonly jwtService: JwtService,
     @InjectModel(User.name)
     private UserModel: Model<UserDocument>,
-    @InjectModel(UserAddress.name)
-    private UserAddressModel: Model<UserAddressDocument>
+    private utilService: UtilService
   ) {}
 
   generateAccessToken(email: string): string {
@@ -28,10 +27,9 @@ export class TokenService {
   async refreshToken(email: string) {
     try {
       const userInfo = await this.UserModel.findOne({ email });
-      const userAddressInfo = await this.UserAddressModel.findOne({
-        userEmail: email,
-        isLastSelected: true,
-      });
+      const userAddressInfo = await this.utilService.getUserRecentAddress(
+        email
+      );
       const accessToken = this.generateAccessToken(email);
       const result = {
         email,

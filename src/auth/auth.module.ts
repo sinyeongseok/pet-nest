@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { TokenService } from '../token/token.service';
 import { User, UserSchema } from '../schema/user.schema';
 import { UserAddress, UserAddressSchema } from '../schema/userAddress.schema';
+import { UtilService } from 'src/utils/util.service';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { UserAddress, UserAddressSchema } from '../schema/userAddress.schema';
     ]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, TokenService],
+  providers: [AuthService, TokenService, UtilService],
 })
 export class AuthModule {}
