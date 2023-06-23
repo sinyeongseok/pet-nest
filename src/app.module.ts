@@ -14,6 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { BoardModule } from './board/board.module';
 import { VerifyTokenMiddleware } from './common/middlewares/verifyToken.middleware';
 import { TokenModule } from './token/token.module';
+import { UtilModule } from './utils/util.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { TokenModule } from './token/token.module';
     WebModule,
     BoardModule,
     TokenModule,
+    UtilModule,
   ],
 })
 export class AppModule implements NestModule {
