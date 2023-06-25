@@ -7,6 +7,7 @@ import { UserAddress, UserAddressSchema } from '../schema/userAddress.schema';
 import { CityAddress, CityAddressSchema } from '../schema/cityAddress.schema';
 import { AwsService } from '../utils/s3';
 import { TokenService } from '../token/token.service';
+import { UtilService } from 'src/utils/util.service';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { TokenService } from '../token/token.service';
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService, AwsService, TokenService],
+  providers: [UserService, AwsService, TokenService, UtilService],
 })
 export class UserModule {}
