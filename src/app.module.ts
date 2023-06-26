@@ -37,10 +37,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(VerifyTokenMiddleware)
-      .forRoutes(
-        'board/used-item',
-        'token/refresh-token',
-        'user/verified/local-area'
-      );
+      .forRoutes('board/used-item', 'token/refresh-token', 'auth/local-area');
   }
 }

@@ -73,54 +73,6 @@ export class UserService {
     return result;
   }
 
-  async verifyLocalArea(
-    email: string,
-    { latitude, longitude }: { latitude: number; longitude: number }
-  ) {
-    console.log(email);
-    try {
-      const userAddress = await this.utilService.getUserRecentAddress(email);
-
-      if (userAddress.isAuth) {
-        return { statusCode: 200, data: { isVerified: true } };
-      }
-
-      const findAddress = await this.CityAddressModel.aggregate([
-        {
-          $geoNear: {
-            maxDistance: 2000,
-            near: {
-              type: 'Point',
-              coordinates: [longitude, latitude],
-            },
-            query: { detail: userAddress.detail },
-            distanceField: 'distance',
-            key: 'location',
-          },
-        },
-      ]);
-
-      if (!findAddress.length) {
-        return {
-          statusCode: 400,
-          data: { message: '인증 지역을 확인해주세요.' },
-        };
-      }
-
-      await this.UserAddressModel.updateOne(
-        { _id: userAddress._id },
-        {
-          isAuth: true,
-        }
-      );
-
-      return { statusCode: 200, data: { isVerified: true } };
-    } catch (error) {
-      console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패' } };
-    }
-  }
-
   async getRandomNickname() {
     const nickname = `${
       adjective[Math.floor(Math.random() * adjective.length)]

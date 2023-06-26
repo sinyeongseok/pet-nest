@@ -34,20 +34,6 @@ export class UserController {
     return { data: result };
   }
 
-  @Post('verified/local-area')
-  async verifyLocalArea(
-    @Res() res,
-    @Body('longitude') longitude: number,
-    @Body('latitude') latitude: number
-  ) {
-    const email = res.locals.email;
-    const result = await this.userService.verifyLocalArea(email, {
-      latitude,
-      longitude,
-    });
-    return res.status(result.statusCode).json(result.data);
-  }
-
   @Get('random-nickname')
   async getRandomNickname() {
     const result = await this.userService.getRandomNickname();
