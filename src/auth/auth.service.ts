@@ -88,16 +88,26 @@ export class AuthService {
     }
   }
 
-  async verifyLocalArea(
-    email: string,
-    { latitude, longitude }: { latitude: number; longitude: number }
-  ) {
+  async checkLocalArea(email: string) {
     try {
       const userAddress = await this.utilService.getUserRecentAddress(email);
 
       if (userAddress.isAuth) {
         return { statusCode: 200, data: { isVerified: true } };
       }
+
+      return { statusCode: 400, data: { isVerified: false } };
+    } catch (error) {
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
+
+  async verifyLocalArea(
+    email: string,
+    { latitude, longitude }: { latitude: number; longitude: number }
+  ) {
+    try {
+      const userAddress = await this.utilService.getUserRecentAddress(email);
 
       const findAddress = await this.CityAddressModel.aggregate([
         {
