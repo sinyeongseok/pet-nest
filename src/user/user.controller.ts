@@ -8,6 +8,7 @@ import {
   UseInterceptors,
   Query,
   Param,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Express, Response } from 'express';
@@ -51,6 +52,14 @@ export class UserController {
       longitude,
       isChanged,
     });
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Patch('addresses/:id')
+  async updateAddressLastSelected(@Res() res, @Param('id') id: string) {
+    const email = res.locals.email;
+    const result = await this.userService.updateAddressLastSelected(email, id);
 
     return res.status(result.statusCode).json(result.data);
   }

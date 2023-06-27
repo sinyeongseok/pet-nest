@@ -103,6 +103,26 @@ export class UserService {
     }
   }
 
+  async updateAddressLastSelected(email: string, id: string) {
+    try {
+      await this.UserAddressModel.updateMany(
+        { userEmail: email },
+        { isLastSelected: false }
+      );
+      await this.UserAddressModel.updateOne(
+        {
+          userEmail: email,
+          _id: id,
+        },
+        { isLastSelected: true }
+      );
+
+      return { statusCode: 200, data: { isPatched: true } };
+    } catch (error) {
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
+
   async createUserAddress(
     email: string,
     {
