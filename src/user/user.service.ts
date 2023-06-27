@@ -103,6 +103,16 @@ export class UserService {
     }
   }
 
+  async deleteAddress(email: string, id: string) {
+    try {
+      await this.UserAddressModel.deleteOne({ userEmail: email, _id: id });
+
+      return { statusCode: 200, data: { isDeleted: true } };
+    } catch (error) {
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
+
   async updateAddressLastSelected(email: string, id: string) {
     try {
       await this.UserAddressModel.updateMany(

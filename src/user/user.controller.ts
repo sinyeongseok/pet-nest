@@ -9,6 +9,7 @@ import {
   Query,
   Param,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Express, Response } from 'express';
@@ -60,6 +61,14 @@ export class UserController {
   async updateAddressLastSelected(@Res() res, @Param('id') id: string) {
     const email = res.locals.email;
     const result = await this.userService.updateAddressLastSelected(email, id);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Delete('addresses/:id')
+  async deleteAddress(@Res() res, @Param('id') id: string) {
+    const email = res.locals.email;
+    const result = await this.userService.deleteAddress(email, id);
 
     return res.status(result.statusCode).json(result.data);
   }
