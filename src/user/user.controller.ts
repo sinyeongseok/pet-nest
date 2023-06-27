@@ -36,6 +36,25 @@ export class UserController {
     return { data: result };
   }
 
+  @Post('addresses')
+  async createUserAddress(
+    @Res() res,
+    @Body('detail') detail: string,
+    @Body('latitude') latitude: number,
+    @Body('longitude') longitude: number,
+    @Body('isChanged') isChanged: boolean
+  ) {
+    const email = res.locals.email;
+    const result = await this.userService.createUserAddress(email, {
+      detail,
+      latitude,
+      longitude,
+      isChanged,
+    });
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Get('addresses')
   async getUserAddresses(@Res() res) {
     const email = res.locals.email;

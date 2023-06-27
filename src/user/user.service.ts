@@ -103,6 +103,69 @@ export class UserService {
     }
   }
 
+  async createUserAddress(
+    email: string,
+    {
+      detail,
+      latitude,
+      longitude,
+      isChanged = false,
+    }: {
+      detail: string;
+      latitude: number;
+      longitude: number;
+      isChanged: boolean;
+    }
+  ) {
+    try {
+      const userAddresses = await this.UserAddressModel.find({
+        userEmail: email,
+      }).lean();
+
+      if (userAddresses.length >= 2) {
+        return {
+          statusCode: 400,
+          data: { message: '최대 2개까지 설정할 수 있어요.' },
+        };
+      }
+
+      const addressInfo = await this.CityAddressModel.findOne({
+        detail,
+      });
+      const neighborhoodRegistration = new this.UserAddressModel({
+        detail,
+        latitude,
+        longitude,
+        userEmail: email,
+        isLastSelected: false,
+        isAuth: false,
+        siDo: addressInfo.siDo,
+        siGunGu: addressInfo.siGunGu,
+        eupMyeonDong: addressInfo.eupMyeonDong,
+        ri: addressInfo.ri,
+      });
+
+      await neighborhoodRegistration.save();
+
+      if (isChanged) {
+        await this.UserAddressModel.updateMany(
+          { userEmail: email },
+          { isLastSelected: false }
+        );
+
+        await this.UserAddressModel.updateOne(
+          { detail, userEmail: email },
+          { isLastSelected: true }
+        );
+      }
+
+      return { statusCode: 201, data: { isPosted: true } };
+    } catch (error) {
+      console.log(error);
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
+
   async getRandomNickname() {
     const nickname = `${
       adjective[Math.floor(Math.random() * adjective.length)]
