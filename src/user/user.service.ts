@@ -106,6 +106,10 @@ export class UserService {
   async deleteAddress(email: string, id: string) {
     try {
       await this.UserAddressModel.deleteOne({ userEmail: email, _id: id });
+      await this.UserAddressModel.updateOne(
+        { userEmail: email },
+        { isLastSelected: true }
+      );
 
       return { statusCode: 200, data: { isDeleted: true } };
     } catch (error) {
