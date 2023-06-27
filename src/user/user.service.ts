@@ -4,11 +4,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
 import { UserAddress, UserAddressDocument } from '../schema/userAddress.schema';
 import { CityAddress, CityAddressDocument } from '../schema/cityAddress.schema';
-import { fakerKO as faker } from '@faker-js/faker';
+import { de, fakerKO as faker } from '@faker-js/faker';
 import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
 import { TokenService } from 'src/token/token.service';
 import { UtilService } from 'src/utils/util.service';
+import { isSet } from 'util/types';
 
 @Injectable()
 export class UserService {
@@ -71,6 +72,35 @@ export class UserService {
     };
 
     return result;
+  }
+
+  async getUserAddresses(email: string, option: string) {
+    try {
+      const userAddresses: UserAddressDocument[] =
+        await this.UserAddressModel.find({
+          userEmail: email,
+        }).lean();
+
+      const result = userAddresses.map((address: UserAddressDocument) => {
+        const data = {
+          id: address._id,
+          address: address.eupMyeonDong,
+        };
+
+        if (option === 'settings') {
+          data.address = `${
+            !!address.siGunGu ? address.siGunGu : address.siDo
+          } ${address.eupMyeonDong}`;
+        }
+
+        return data;
+      });
+
+      return { statusCode: 200, data: { addressInfoList: result } };
+    } catch (error) {
+      console.log(error);
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
   }
 
   async getRandomNickname() {

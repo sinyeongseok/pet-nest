@@ -6,6 +6,8 @@ import {
   Res,
   UploadedFile,
   UseInterceptors,
+  Query,
+  Param,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Express, Response } from 'express';
@@ -32,6 +34,22 @@ export class UserController {
     });
 
     return { data: result };
+  }
+
+  @Get('addresses')
+  async getUserAddresses(@Res() res) {
+    const email = res.locals.email;
+    const result = await this.userService.getUserAddresses(email, null);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Get('addresses/settings')
+  async getUserAddressesSettings(@Res() res) {
+    const email = res.locals.email;
+    const result = await this.userService.getUserAddresses(email, 'settings');
+
+    return res.status(result.statusCode).json(result.data);
   }
 
   @Get('random-nickname')
