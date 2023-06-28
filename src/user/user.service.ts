@@ -85,6 +85,9 @@ export class UserService {
         const data = {
           id: address._id,
           address: address.eupMyeonDong,
+          ...(!!address.isLastSelected && {
+            isLastSelected: address.isLastSelected,
+          }),
         };
 
         if (option === 'settings') {
@@ -111,7 +114,9 @@ export class UserService {
         { isLastSelected: true }
       );
 
-      return { statusCode: 200, data: { isDeleted: true } };
+      const result = await this.getUserAddresses(email, 'settings');
+
+      return result;
     } catch (error) {
       return { statusCode: 500, data: { message: '서버요청 실패.' } };
     }
@@ -131,7 +136,9 @@ export class UserService {
         { isLastSelected: true }
       );
 
-      return { statusCode: 200, data: { isPatched: true } };
+      const result = await this.getUserAddresses(email, null);
+
+      return result;
     } catch (error) {
       return { statusCode: 500, data: { message: '서버요청 실패.' } };
     }
