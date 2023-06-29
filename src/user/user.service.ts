@@ -108,6 +108,17 @@ export class UserService {
 
   async deleteAddress(email: string, id: string) {
     try {
+      const userAddresses = await this.UserAddressModel.find({
+        userEmail: email,
+      }).lean();
+
+      if (userAddresses.length === 1) {
+        return {
+          statusCode: 400,
+          data: { message: '남은 동네가 1개 입니다.' },
+        };
+      }
+
       await this.UserAddressModel.deleteOne({ userEmail: email, _id: id });
       await this.UserAddressModel.updateOne(
         { userEmail: email },
