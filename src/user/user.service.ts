@@ -80,8 +80,13 @@ export class UserService {
         await this.UserAddressModel.find({
           userEmail: email,
         }).lean();
+      let pickAddress = '';
 
       const result = userAddresses.map((address: UserAddressDocument) => {
+        if (address.isLastSelected) {
+          pickAddress = address.eupMyeonDong;
+        }
+
         const data = {
           id: address._id,
           address: address.eupMyeonDong,
@@ -91,15 +96,18 @@ export class UserService {
         };
 
         if (option === 'settings') {
-          data.address = `${
-            !!address.siGunGu ? address.siGunGu : address.siDo
-          } ${address.eupMyeonDong}`;
+          data.address = `${address.eupMyeonDong} ${
+            !!address.ri ? address.ri : ''
+          }`.trim();
         }
 
         return data;
       });
 
-      return { statusCode: 200, data: { addressInfoList: result } };
+      return {
+        statusCode: 200,
+        data: { pickAddress, addressInfoList: result },
+      };
     } catch (error) {
       console.log(error);
       return { statusCode: 500, data: { message: '서버요청 실패.' } };
