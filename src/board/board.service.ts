@@ -131,8 +131,7 @@ export class BoardService {
         ],
         $or: [
           { topCategory: '전체' },
-          { salesStatus: '판매중' },
-          { salesStatus: '예약중' },
+          { salesStatus: { $in: ['판매중', '예약중'] } },
         ],
       })
         .skip(page * limit)
