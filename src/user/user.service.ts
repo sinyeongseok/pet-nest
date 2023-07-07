@@ -82,27 +82,29 @@ export class UserService {
         }).lean();
       let pickAddress = '';
 
-      const result = userAddresses.map((address: UserAddressDocument) => {
-        if (address.isLastSelected) {
-          pickAddress = address.eupMyeonDong;
-        }
+      const result = userAddresses
+        .map((address: UserAddressDocument) => {
+          if (address.isLastSelected) {
+            pickAddress = address.eupMyeonDong;
+          }
 
-        const data = {
-          id: address._id,
-          address: address.eupMyeonDong,
-          ...(!!address.isLastSelected && {
-            isLastSelected: address.isLastSelected,
-          }),
-        };
+          const data = {
+            id: address._id,
+            address: address.eupMyeonDong,
+            ...(!!address.isLastSelected && {
+              isLastSelected: address.isLastSelected,
+            }),
+          };
 
-        if (option === 'settings') {
-          data.address = `${address.eupMyeonDong} ${
-            !!address.ri ? address.ri : ''
-          }`.trim();
-        }
+          if (option === 'settings') {
+            data.address = `${address.eupMyeonDong} ${
+              !!address.ri ? address.ri : ''
+            }`.trim();
+          }
 
-        return data;
-      });
+          return data;
+        })
+        .sort((_, b) => (b.isLastSelected ? 1 : -1));
 
       return {
         statusCode: 200,
