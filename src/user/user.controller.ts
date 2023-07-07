@@ -43,15 +43,13 @@ export class UserController {
     @Res() res,
     @Body('detail') detail: string,
     @Body('latitude') latitude: number,
-    @Body('longitude') longitude: number,
-    @Body('isChanged') isChanged: boolean
+    @Body('longitude') longitude: number
   ) {
     const email = res.locals.email;
     const result = await this.userService.createUserAddress(email, {
       detail,
       latitude,
       longitude,
-      isChanged,
     });
 
     return res.status(result.statusCode).json(result.data);

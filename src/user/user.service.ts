@@ -169,12 +169,10 @@ export class UserService {
       detail,
       latitude,
       longitude,
-      isChanged = false,
     }: {
       detail: string;
       latitude: number;
       longitude: number;
-      isChanged: boolean;
     }
   ) {
     try {
@@ -206,18 +204,6 @@ export class UserService {
       });
 
       await neighborhoodRegistration.save();
-
-      if (isChanged) {
-        await this.UserAddressModel.updateMany(
-          { userEmail: email },
-          { isLastSelected: false }
-        );
-
-        await this.UserAddressModel.updateOne(
-          { detail, userEmail: email },
-          { isLastSelected: true }
-        );
-      }
 
       return { statusCode: 201, data: { isPosted: true } };
     } catch (error) {
