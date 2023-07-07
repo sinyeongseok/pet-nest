@@ -215,7 +215,7 @@ export class UserService {
         ri: addressInfo.ri,
       });
 
-      // await neighborhoodRegistration.save();
+      await neighborhoodRegistration.save();
 
       return { statusCode: 201, data: { isPosted: true } };
     } catch (error) {
