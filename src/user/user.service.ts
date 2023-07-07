@@ -163,6 +163,13 @@ export class UserService {
     }
   }
 
+  checkDuplicateAddress(userAddressList, longitude, latitude) {
+    return userAddressList.some(
+      (address) =>
+        address.longitude == longitude && address.latitude == latitude
+    );
+  }
+
   async createUserAddress(
     email: string,
     {
@@ -180,8 +187,15 @@ export class UserService {
 
       if (userAddresses.length >= 2) {
         return {
-          statusCode: 400,
+          statusCode: 412,
           data: { message: '최대 2개까지 설정할 수 있어요.' },
+        };
+      }
+
+      if (this.checkDuplicateAddress(userAddresses, longitude, latitude)) {
+        return {
+          statusCode: 400,
+          data: { message: '이미 설정되어 있는 동네입니다.' },
         };
       }
 
@@ -201,7 +215,7 @@ export class UserService {
         ri: addressInfo.ri,
       });
 
-      await neighborhoodRegistration.save();
+      // await neighborhoodRegistration.save();
 
       return { statusCode: 201, data: { isPosted: true } };
     } catch (error) {
