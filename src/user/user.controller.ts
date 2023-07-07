@@ -41,13 +41,11 @@ export class UserController {
   @Post('addresses')
   async createUserAddress(
     @Res() res,
-    @Body('detail') detail: string,
     @Body('latitude') latitude: number,
     @Body('longitude') longitude: number
   ) {
     const email = res.locals.email;
     const result = await this.userService.createUserAddress(email, {
-      detail,
       latitude,
       longitude,
     });

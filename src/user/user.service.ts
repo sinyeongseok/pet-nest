@@ -166,11 +166,9 @@ export class UserService {
   async createUserAddress(
     email: string,
     {
-      detail,
       latitude,
       longitude,
     }: {
-      detail: string;
       latitude: number;
       longitude: number;
     }
@@ -188,12 +186,12 @@ export class UserService {
       }
 
       const addressInfo = await this.CityAddressModel.findOne({
-        detail,
+        'location.coordinates': [longitude, latitude],
       });
       const neighborhoodRegistration = new this.UserAddressModel({
-        detail,
         latitude,
         longitude,
+        detail: addressInfo.detail,
         userEmail: email,
         isLastSelected: false,
         isAuth: false,
