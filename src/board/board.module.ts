@@ -8,6 +8,7 @@ import { UserAddress, UserAddressSchema } from 'src/schema/userAddress.schema';
 import { AddressService } from 'src/address/address.service';
 import { CityAddress, CityAddressSchema } from 'src/schema/cityAddress.schema';
 import { UtilService } from 'src/utils/util.service';
+import { User, UserSchema } from 'src/schema/user.schema';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UtilService } from 'src/utils/util.service';
       { name: UsedItemBoard.name, schema: UsedItemBoardSchema },
       { name: UserAddress.name, schema: UserAddressSchema },
       { name: CityAddress.name, schema: CityAddressSchema },
+      { name: User.name, schema: UserSchema },
     ]),
   ],
   controllers: [BoardController],
