@@ -70,7 +70,7 @@ export class BoardService {
 
   computeTimeDifference(date) {
     const diffMillisecond = dayjs().diff(date);
-    const diffMonth = dayjs().diff(date, 'm');
+    const diffMonth = dayjs().diff(date, 'M');
     const diffYear = dayjs().diff(date, 'y');
 
     if (diffMillisecond < 1000 * 60) {
@@ -103,7 +103,7 @@ export class BoardService {
       salesStatus: usedItemBoardInfo.salesStatus,
       likeCount: usedItemBoardInfo.likeCount,
       chatCount: 0,
-      ...(usedItemBoardInfo.seller === email && { isMe: true }),
+      ...(usedItemBoardInfo.seller.email === email && { isMe: true }),
     };
   }
 
@@ -150,6 +150,53 @@ export class BoardService {
       const result = this.formatUsedItemBoardList(usedItemBoardList, email);
 
       return { statusCode: 200, data: { usedItemBoardList: result } };
+    } catch (error) {
+      console.log(error);
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
+
+  formatDetailUsedItemBoard(usedItemBoardInfo) {
+    return {
+      sellerNickname: usedItemBoardInfo.seller.nickname,
+      title: usedItemBoardInfo.title,
+      address: usedItemBoardInfo.address,
+      subCategory: usedItemBoardInfo.subCategory,
+      timeDelta: this.computeTimeDifference(usedItemBoardInfo.createdAt),
+      description: usedItemBoardInfo.description,
+      likeCount: usedItemBoardInfo.likeCount,
+      chatCount: 0,
+      viewCount: usedItemBoardInfo.viewCount,
+      salesStatus: usedItemBoardInfo.salesStatus,
+      images: usedItemBoardInfo.images,
+      ...(!!usedItemBoardInfo.seller.profileImage && {
+        sellerProfileImage: usedItemBoardInfo.seller.profileImage,
+      }),
+    };
+  }
+
+  async getDetailUsedItemBoard(id: string, email: string) {
+    try {
+      const usedItemBoardInfo = await (async () => {
+        const usedItemBoard = await this.usedItemBoardModel.findOne({
+          _id: id,
+        });
+
+        if (!usedItemBoard.viewedUsers.includes(email)) {
+          return await this.usedItemBoardModel
+            .findByIdAndUpdate(
+              { _id: id },
+              { $inc: { viewCount: 1 }, $push: { viewedUsers: email } },
+              { new: true }
+            )
+            .exec();
+        }
+
+        return usedItemBoard;
+      })();
+      const result = this.formatDetailUsedItemBoard(usedItemBoardInfo);
+
+      return { statusCode: 200, data: { usedItemBoardInfo: result } };
     } catch (error) {
       console.log(error);
       return { statusCode: 500, data: { message: '서버요청 실패.' } };

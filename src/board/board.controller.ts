@@ -7,6 +7,7 @@ import {
   UploadedFiles,
   UseInterceptors,
   Res,
+  Param,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -49,5 +50,13 @@ export class BoardController {
       email
     );
     return res.status(result.statusCode).json({ data: result.data });
+  }
+
+  @Get('used-item/:id')
+  async getDetailUsedItemBoard(@Res() res, @Param('id') id: string) {
+    const email = res.locals.email;
+    const result = await this.boardService.getDetailUsedItemBoard(id, email);
+
+    return res.status(result.statusCode).json(result.data);
   }
 }
