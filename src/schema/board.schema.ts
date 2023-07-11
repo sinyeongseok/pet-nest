@@ -29,7 +29,7 @@ export class UsedItemBoard {
   @Prop()
   subCategory: string;
 
-  @Prop()
+  @Prop({ type: Object })
   seller: Seller;
 
   @Prop()
