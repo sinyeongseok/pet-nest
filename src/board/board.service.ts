@@ -84,7 +84,7 @@ export class BoardService {
     return `${diffYear}년 전`;
   }
 
-  formatUsedItemBoard(usedItemBoardInfo) {
+  formatUsedItemBoard(usedItemBoardInfo, email) {
     return {
       id: usedItemBoardInfo._id,
       title: usedItemBoardInfo.title,
@@ -95,12 +95,13 @@ export class BoardService {
       salesStatus: usedItemBoardInfo.salesStatus,
       likeCount: usedItemBoardInfo.likeCount,
       chatCount: 0,
+      ...(usedItemBoardInfo.seller === email && { isMe: true }),
     };
   }
 
-  formatUsedItemBoardList(usedItemBoardList) {
+  formatUsedItemBoardList(usedItemBoardList, email) {
     return usedItemBoardList.map((usedItemBoard) =>
-      this.formatUsedItemBoard(usedItemBoard)
+      this.formatUsedItemBoard(usedItemBoard, email)
     );
   }
 
@@ -137,7 +138,7 @@ export class BoardService {
         .skip(page * limit)
         .limit(limit)
         .sort({ createdAt: 'desc' });
-      const result = this.formatUsedItemBoardList(usedItemBoardList);
+      const result = this.formatUsedItemBoardList(usedItemBoardList, email);
 
       return { statusCode: 200, data: { usedItemBoardList: result } };
     } catch (error) {
