@@ -41,6 +41,9 @@ export class UsedItemBoard {
   @Prop({ default: 0 })
   viewCount: number;
 
+  @Prop([String])
+  viewedUsers: string[];
+
   @Prop({ default: '판매중' })
   salesStatus: '판매중' | '예약중' | '판매완료';
 
