@@ -3,6 +3,12 @@ import { Document } from 'mongoose';
 
 export type UsedItemBoardDocument = UsedItemBoard & Document;
 
+interface Seller {
+  email: string;
+  nickname: string;
+  profileImage: string;
+}
+
 @Schema({
   timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
   versionKey: false,
@@ -24,7 +30,7 @@ export class UsedItemBoard {
   subCategory: string;
 
   @Prop()
-  seller: string;
+  seller: Seller;
 
   @Prop()
   address: string;

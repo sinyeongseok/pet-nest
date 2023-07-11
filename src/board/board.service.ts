@@ -7,12 +7,15 @@ import { v4 as uuid } from 'uuid';
 import * as dayjs from 'dayjs';
 import { AddressService } from 'src/address/address.service';
 import { UtilService } from 'src/utils/util.service';
+import { User, UserDocument } from 'src/schema/user.schema';
 
 @Injectable()
 export class BoardService {
   constructor(
     @InjectModel(UsedItemBoard.name)
-    private UsedItemBoardModel: Model<UsedItemBoardDocument>,
+    private usedItemBoardModel: Model<UsedItemBoardDocument>,
+    @InjectModel(User.name)
+    private userModel: Model<UserDocument>,
     private awsService: AwsService,
     private addressService: AddressService,
     private utilService: UtilService
@@ -27,13 +30,18 @@ export class BoardService {
       const userAddressInfo = await this.utilService.getUserRecentAddress(
         email
       );
-      const createUsedItemBoard = new this.UsedItemBoardModel({
+      const userInfo = await this.userModel.findOne({ email });
+      const createUsedItemBoard = new this.usedItemBoardModel({
         title,
         description,
         price,
         topCategory,
         subCategory,
-        seller: email,
+        seller: {
+          email,
+          nickname: userInfo.nickname,
+          profileImage: userInfo.profileImage,
+        },
         address: userAddressInfo.eupMyeonDong,
         addressDetail: userAddressInfo.detail,
       });
@@ -48,7 +56,7 @@ export class BoardService {
       });
       const imageUploadResults = await Promise.all(imageUploaded);
       const images = imageUploadResults.map((result) => result.url);
-      await this.UsedItemBoardModel.updateOne(
+      await this.usedItemBoardModel.updateOne(
         { _id: saveResult._id },
         { images }
       );
@@ -123,18 +131,19 @@ export class BoardService {
       const findQuery = nearbyNeighborhoods.map((nearbyNeighborhood) => {
         return { addressDetail: nearbyNeighborhood.address };
       });
-      const usedItemBoardList = await this.UsedItemBoardModel.find({
-        $and: [
-          { topCategory },
-          { isVisible: false },
-          { $or: findQuery },
-          ...(!!subCategory ? [{ subCategory }] : []),
-        ],
-        $or: [
-          { topCategory: '전체' },
-          { salesStatus: { $in: ['판매중', '예약중'] } },
-        ],
-      })
+      const usedItemBoardList = await this.usedItemBoardModel
+        .find({
+          $and: [
+            { topCategory },
+            { isVisible: false },
+            { $or: findQuery },
+            ...(!!subCategory ? [{ subCategory }] : []),
+          ],
+          $or: [
+            { topCategory: '전체' },
+            { salesStatus: { $in: ['판매중', '예약중'] } },
+          ],
+        })
         .skip(page * limit)
         .limit(limit)
         .sort({ createdAt: 'desc' });
