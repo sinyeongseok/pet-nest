@@ -182,6 +182,7 @@ export class BoardService {
       likeCount: usedItemBoardInfo.likeCount,
       chatCount: 0,
       viewCount: usedItemBoardInfo.viewCount,
+      price: usedItemBoardInfo.price,
       salesStatus: usedItemBoardInfo.salesStatus,
       images: usedItemBoardInfo.images,
       ...(!!usedItemBoardInfo.seller.profileImage && {
