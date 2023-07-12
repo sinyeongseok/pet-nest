@@ -116,7 +116,6 @@ export class BoardService {
       salesStatus: usedItemBoardInfo.salesStatus,
       likeCount: usedItemBoardInfo.likeCount,
       chatCount: 0,
-      ...(usedItemBoardInfo.seller.email === email && { isMe: true }),
     };
   }
 
@@ -188,6 +187,7 @@ export class BoardService {
       ...(!!usedItemBoardInfo.seller.profileImage && {
         sellerProfileImage: usedItemBoardInfo.seller.profileImage,
       }),
+      ...(usedItemBoardInfo.seller.email === email && { isMe: true }),
     };
   }
 
