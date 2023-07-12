@@ -362,4 +362,20 @@ export class BoardService {
       return { statusCode: 500, data: { message: '서버요청 실패.' } };
     }
   }
+
+  async changeBoardStatus(id: string, salesStatus: string) {
+    try {
+      await this.usedItemBoardModel
+        .findByIdAndUpdate(id, { salesStatus })
+        .exec();
+
+      return {
+        statusCode: 200,
+        data: { salesStatus },
+      };
+    } catch (error) {
+      console.log(error);
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
 }

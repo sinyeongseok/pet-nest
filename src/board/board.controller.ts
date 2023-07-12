@@ -9,6 +9,7 @@ import {
   Res,
   Param,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -100,6 +101,17 @@ export class BoardController {
   async deleteBoard(@Res() res, @Param('id') id: string) {
     const email = res.locals.email;
     const result = await this.boardService.deleteBoard(email, id);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Patch('used-item/:id/status')
+  async changeBoardStatus(
+    @Res() res,
+    @Param('id') id: string,
+    @Body('salesStatus') salesStatus: string
+  ) {
+    const result = await this.boardService.changeBoardStatus(id, salesStatus);
 
     return res.status(result.statusCode).json(result.data);
   }
