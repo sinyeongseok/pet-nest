@@ -207,7 +207,7 @@ export class BoardService {
     }
   }
 
-  formatSimilarUsedItemBoardList(similarUsedItemBoardList) {
+  formatUsedItemBoardListResult(similarUsedItemBoardList) {
     return similarUsedItemBoardList.map((similarUsedItemBoard) => {
       console.log(similarUsedItemBoard);
       return {
@@ -235,13 +235,41 @@ export class BoardService {
         })
         .limit(6)
         .sort({ createdAt: 'desc' });
-      const result = this.formatSimilarUsedItemBoardList(similarUsedItemBoards);
+      const result = this.formatUsedItemBoardListResult(similarUsedItemBoards);
 
       return {
         statusCode: 200,
         data: { similarUsedItemBoardList: result },
       };
     } catch (error) {
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
+
+  async getOtherUsedItemBoardList(email: string, id: string) {
+    try {
+      const usedItemBoardInfo = await this.usedItemBoardModel.findOne({
+        _id: id,
+      });
+      const findQuery = await this.getNearbyPostsQueryBasedOnUserAddress(email);
+      const otherUsedItemBoards = await this.usedItemBoardModel
+        .find({
+          $and: [
+            { 'seller.email': usedItemBoardInfo.seller.email },
+            { _id: { $ne: usedItemBoardInfo._id } },
+            { $or: findQuery },
+          ],
+        })
+        .limit(6)
+        .sort({ createdAt: 'desc' });
+      const result = this.formatUsedItemBoardListResult(otherUsedItemBoards);
+
+      return {
+        statusCode: 200,
+        data: { otherUsedItemBoardList: result },
+      };
+    } catch (error) {
+      console.log(error);
       return { statusCode: 500, data: { message: '서버요청 실패.' } };
     }
   }

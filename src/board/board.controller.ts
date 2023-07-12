@@ -60,6 +60,14 @@ export class BoardController {
     return res.status(result.statusCode).json(result.data);
   }
 
+  @Get('used-item/:id/other-posts')
+  async getOtherUsedItemBoardList(@Res() res, @Param('id') id: string) {
+    const email = res.locals.email;
+    const result = await this.boardService.getOtherUsedItemBoardList(email, id);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Get('used-item/similar-posts/:id')
   async getSimilarUsedBoardList(@Res() res, @Param('id') id: string) {
     const email = res.locals.email;
