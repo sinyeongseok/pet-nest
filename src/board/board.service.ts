@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UsedItemBoard, UsedItemBoardDocument } from '../schema/board.schema';
 import { AwsService } from '../utils/s3';
@@ -160,8 +160,20 @@ export class BoardService {
     }
   }
 
-  formatDetailUsedItemBoard(usedItemBoardInfo) {
+  async isBoardLikedByUser(email: string, id: Types.ObjectId) {
+    const user = await this.userModel.findOne({ email: email }).exec();
+
+    if (!user) {
+      return false;
+    }
+
+    return user.likedBoards.includes(id);
+  }
+
+  async formatDetailUsedItemBoard(usedItemBoardInfo, email) {
+    const isLike = await this.isBoardLikedByUser(email, usedItemBoardInfo._id);
     return {
+      isLike,
       sellerNickname: usedItemBoardInfo.seller.nickname,
       title: usedItemBoardInfo.title,
       address: usedItemBoardInfo.address,
@@ -198,7 +210,10 @@ export class BoardService {
 
         return usedItemBoard;
       })();
-      const result = this.formatDetailUsedItemBoard(usedItemBoardInfo);
+      const result = await this.formatDetailUsedItemBoard(
+        usedItemBoardInfo,
+        email
+      );
 
       return { statusCode: 200, data: { usedItemBoardInfo: result } };
     } catch (error) {
@@ -209,7 +224,6 @@ export class BoardService {
 
   formatUsedItemBoardListResult(similarUsedItemBoardList) {
     return similarUsedItemBoardList.map((similarUsedItemBoard) => {
-      console.log(similarUsedItemBoard);
       return {
         id: similarUsedItemBoard._id,
         image: similarUsedItemBoard.images[0],
@@ -267,6 +281,59 @@ export class BoardService {
       return {
         statusCode: 200,
         data: { otherUsedItemBoardList: result },
+      };
+    } catch (error) {
+      console.log(error);
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
+
+  async likeBoard(email: string, id: string) {
+    try {
+      await this.userModel.updateOne(
+        { email },
+        {
+          $addToSet: { likedBoards: id },
+        }
+      );
+
+      const updateData = await this.usedItemBoardModel.findByIdAndUpdate(
+        { _id: id },
+        {
+          $inc: { likeCount: 1 },
+        },
+        { new: true }
+      );
+
+      return {
+        statusCode: 200,
+        data: { isLike: true, likeCount: updateData.likeCount },
+      };
+    } catch (error) {
+      console.log(error);
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
+
+  async dislikeBoard(email: string, id: string) {
+    try {
+      await this.userModel.updateOne(
+        { email },
+        {
+          $pull: { likedBoards: id },
+        }
+      );
+      const updateData = await this.usedItemBoardModel.findByIdAndUpdate(
+        { _id: id },
+        {
+          $inc: { likeCount: -1 },
+        },
+        { new: true }
+      );
+
+      return {
+        statusCode: 200,
+        data: { isLike: false, likeCount: updateData.likeCount },
       };
     } catch (error) {
       console.log(error);

@@ -8,6 +8,7 @@ import {
   UseInterceptors,
   Res,
   Param,
+  Delete,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -75,6 +76,22 @@ export class BoardController {
       email,
       id
     );
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Post('used-item/like/:id')
+  async likeBoard(@Res() res, @Param('id') id: string) {
+    const email = res.locals.email;
+    const result = await this.boardService.likeBoard(email, id);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Delete('used-item/like/:id')
+  async dislikeBoard(@Res() res, @Param('id') id: string) {
+    const email = res.locals.email;
+    const result = await this.boardService.dislikeBoard(email, id);
 
     return res.status(result.statusCode).json(result.data);
   }
