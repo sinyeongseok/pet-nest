@@ -288,6 +288,28 @@ export class BoardService {
     }
   }
 
+  async deleteBoard(email: string, id: string) {
+    try {
+      const usedItemBoardInfo = await this.usedItemBoardModel.findOne({
+        _id: id,
+      });
+
+      if (usedItemBoardInfo.seller.email !== email) {
+        return {
+          statusCode: 400,
+          data: { message: '본인의 게시글이 아닙니다.' },
+        };
+      }
+
+      await this.usedItemBoardModel.deleteOne({ _id: id });
+
+      return { statusCode: 204, data: { isDeleted: true } };
+    } catch (error) {
+      console.log(error);
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
+
   async likeBoard(email: string, id: string) {
     try {
       await this.userModel.updateOne(

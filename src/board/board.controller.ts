@@ -95,4 +95,12 @@ export class BoardController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Delete('used-item/:id')
+  async deleteBoard(@Res() res, @Param('id') id: string) {
+    const email = res.locals.email;
+    const result = await this.boardService.deleteBoard(email, id);
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
