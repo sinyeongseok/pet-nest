@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type UserDocument = User & Document;
 
@@ -19,6 +19,9 @@ export class User {
 
   @Prop()
   petType: string;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'UsedItemBoard' }] })
+  likedBoards: Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
