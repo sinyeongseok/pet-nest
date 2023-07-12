@@ -21,6 +21,19 @@ export class BoardService {
     private utilService: UtilService
   ) {}
 
+  async getNearbyPostsQueryBasedOnUserAddress(email: string) {
+    const userAddressInfo = await this.utilService.getUserRecentAddress(email);
+    const nearbyNeighborhoods = await this.addressService.getNearbyAddresses(
+      userAddressInfo.latitude,
+      userAddressInfo.longitude
+    );
+    const findQuery = nearbyNeighborhoods.map((nearbyNeighborhood) => {
+      return { addressDetail: nearbyNeighborhood.address };
+    });
+
+    return findQuery;
+  }
+
   async generateUsedItemsBoard(
     files: Array<Express.Multer.File>,
     email: string,
@@ -121,16 +134,7 @@ export class BoardService {
     email: string
   ) {
     try {
-      const userAddressInfo = await this.utilService.getUserRecentAddress(
-        email
-      );
-      const nearbyNeighborhoods = await this.addressService.getNearbyAddresses(
-        userAddressInfo.latitude,
-        userAddressInfo.longitude
-      );
-      const findQuery = nearbyNeighborhoods.map((nearbyNeighborhood) => {
-        return { addressDetail: nearbyNeighborhood.address };
-      });
+      const findQuery = await this.getNearbyPostsQueryBasedOnUserAddress(email);
       const usedItemBoardList = await this.usedItemBoardModel
         .find({
           $and: [
@@ -199,6 +203,45 @@ export class BoardService {
       return { statusCode: 200, data: { usedItemBoardInfo: result } };
     } catch (error) {
       console.log(error);
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
+
+  formatSimilarUsedItemBoardList(similarUsedItemBoardList) {
+    return similarUsedItemBoardList.map((similarUsedItemBoard) => {
+      console.log(similarUsedItemBoard);
+      return {
+        id: similarUsedItemBoard._id,
+        image: similarUsedItemBoard.images[0],
+        title: similarUsedItemBoard.title,
+        price: similarUsedItemBoard.price,
+      };
+    });
+  }
+
+  async getSimilarUsedItemBoardList(email: string, id: string) {
+    try {
+      const usedItemBoardInfo = await this.usedItemBoardModel.findOne({
+        _id: id,
+      });
+      const findQuery = await this.getNearbyPostsQueryBasedOnUserAddress(email);
+      const similarUsedItemBoards = await this.usedItemBoardModel
+        .find({
+          $and: [
+            { subCategory: usedItemBoardInfo.subCategory },
+            { _id: { $ne: usedItemBoardInfo._id } },
+            { $or: findQuery },
+          ],
+        })
+        .limit(6)
+        .sort({ createdAt: 'desc' });
+      const result = this.formatSimilarUsedItemBoardList(similarUsedItemBoards);
+
+      return {
+        statusCode: 200,
+        data: { similarUsedItemBoardList: result },
+      };
+    } catch (error) {
       return { statusCode: 500, data: { message: '서버요청 실패.' } };
     }
   }
