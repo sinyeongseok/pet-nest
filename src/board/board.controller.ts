@@ -10,6 +10,7 @@ import {
   Param,
   Delete,
   Patch,
+  Put,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -62,7 +63,7 @@ export class BoardController {
     return res.status(result.statusCode).json(result.data);
   }
 
-  @Get('used-item/:id/other-posts')
+  @Get('used-item/other-posts/:id')
   async getOtherUsedItemBoardList(@Res() res, @Param('id') id: string) {
     const email = res.locals.email;
     const result = await this.boardService.getOtherUsedItemBoardList(email, id);
@@ -105,7 +106,7 @@ export class BoardController {
     return res.status(result.statusCode).json(result.data);
   }
 
-  @Patch('used-item/:id/status')
+  @Patch('used-item/status/:id')
   async changeBoardStatus(
     @Res() res,
     @Param('id') id: string,
