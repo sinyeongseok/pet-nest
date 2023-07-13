@@ -10,6 +10,7 @@ import {
   Param,
   Delete,
   Patch,
+  Put,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -112,6 +113,24 @@ export class BoardController {
     @Body('salesStatus') salesStatus: string
   ) {
     const result = await this.boardService.changeBoardStatus(id, salesStatus);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Put('used-item/:id')
+  @UseInterceptors(FilesInterceptor('newItemImages', 5))
+  async updateBoard(
+    @Res() res,
+    @Param('id') id: string,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Body() usedItemBoardInfo
+  ) {
+    const email = res.locals.email;
+    const result = await this.boardService.updateBoardInfo(
+      files,
+      email,
+      usedItemBoardInfo
+    );
 
     return res.status(result.statusCode).json(result.data);
   }
