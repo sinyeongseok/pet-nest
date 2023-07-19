@@ -139,6 +139,7 @@ export class UserService {
 
       return result;
     } catch (error) {
+      console.log(error);
       return { statusCode: 500, data: { message: '서버요청 실패.' } };
     }
   }
@@ -161,6 +162,7 @@ export class UserService {
 
       return result;
     } catch (error) {
+      console.log(error);
       return { statusCode: 500, data: { message: '서버요청 실패.' } };
     }
   }
