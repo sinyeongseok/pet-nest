@@ -234,13 +234,13 @@ export class BoardService {
     });
   }
 
-  async getSimilarUsedItemBoardList(email: string, id: string) {
+  async getSimilarUsedItemBoardList(email: string, id: string, limit: string) {
     try {
       const usedItemBoardInfo = await this.usedItemBoardModel.findOne({
         _id: id,
       });
       const findQuery = await this.getNearbyPostsQueryBasedOnUserAddress(email);
-      const similarUsedItemBoards = await this.usedItemBoardModel
+      const similarUsedItemBoardsQuery = this.usedItemBoardModel
         .find({
           $and: [
             { subCategory: usedItemBoardInfo.subCategory },
@@ -248,8 +248,13 @@ export class BoardService {
             { $or: findQuery },
           ],
         })
-        .limit(6)
         .sort({ createdAt: 'desc' });
+
+      if (!!limit) {
+        similarUsedItemBoardsQuery.limit(Number(limit));
+      }
+
+      const similarUsedItemBoards = await similarUsedItemBoardsQuery;
       const result = this.formatUsedItemBoardListResult(similarUsedItemBoards);
 
       return {
@@ -257,17 +262,18 @@ export class BoardService {
         data: { similarUsedItemBoardList: result },
       };
     } catch (error) {
+      console.log(error);
       return { statusCode: 500, data: { message: '서버요청 실패.' } };
     }
   }
 
-  async getOtherUsedItemBoardList(email: string, id: string) {
+  async getOtherUsedItemBoardList(email: string, id: string, limit: string) {
     try {
       const usedItemBoardInfo = await this.usedItemBoardModel.findOne({
         _id: id,
       });
       const findQuery = await this.getNearbyPostsQueryBasedOnUserAddress(email);
-      const otherUsedItemBoards = await this.usedItemBoardModel
+      const otherUsedItemBoardsQuery = this.usedItemBoardModel
         .find({
           $and: [
             { 'seller.email': usedItemBoardInfo.seller.email },
@@ -275,8 +281,13 @@ export class BoardService {
             { $or: findQuery },
           ],
         })
-        .limit(6)
         .sort({ createdAt: 'desc' });
+
+      if (!!limit) {
+        otherUsedItemBoardsQuery.limit(Number(limit));
+      }
+
+      const otherUsedItemBoards = await otherUsedItemBoardsQuery;
       const result = this.formatUsedItemBoardListResult(otherUsedItemBoards);
 
       return {

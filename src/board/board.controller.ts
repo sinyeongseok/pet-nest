@@ -64,19 +64,32 @@ export class BoardController {
   }
 
   @Get('used-item/other-posts/:id')
-  async getOtherUsedItemBoardList(@Res() res, @Param('id') id: string) {
+  async getOtherUsedItemBoardList(
+    @Res() res,
+    @Param('id') id: string,
+    @Query('limit') limit: string
+  ) {
     const email = res.locals.email;
-    const result = await this.boardService.getOtherUsedItemBoardList(email, id);
+    const result = await this.boardService.getOtherUsedItemBoardList(
+      email,
+      id,
+      limit
+    );
 
     return res.status(result.statusCode).json(result.data);
   }
 
   @Get('used-item/similar-posts/:id')
-  async getSimilarUsedBoardList(@Res() res, @Param('id') id: string) {
+  async getSimilarUsedBoardList(
+    @Res() res,
+    @Param('id') id: string,
+    @Query('limit') limit: string
+  ) {
     const email = res.locals.email;
     const result = await this.boardService.getSimilarUsedItemBoardList(
       email,
-      id
+      id,
+      limit
     );
 
     return res.status(result.statusCode).json(result.data);
