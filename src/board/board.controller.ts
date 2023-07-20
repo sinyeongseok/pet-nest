@@ -116,4 +116,23 @@ export class BoardController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Put('used-item/:id')
+  @UseInterceptors(FilesInterceptor('newItemImages', 5))
+  async updateBoard(
+    @Res() res,
+    @Param('id') id: string,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Body() usedItemBoardInfo
+  ) {
+    const email = res.locals.email;
+    const result = await this.boardService.updateBoardInfo(
+      files,
+      email,
+      id,
+      usedItemBoardInfo
+    );
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }

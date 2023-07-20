@@ -379,4 +379,58 @@ export class BoardService {
       return { statusCode: 500, data: { message: '서버요청 실패.' } };
     }
   }
+
+  async deleteUnusedImage(images, newImages) {
+    const isSameArray =
+      images.length === newImages.length &&
+      images.every((value, idx) => value === newImages[idx]);
+
+    if (isSameArray) {
+      return;
+    }
+
+    for await (const image of images) {
+      if (!newImages.includes(image)) {
+        await this.awsService.deleteS3Object(image);
+      }
+    }
+  }
+
+  async updateBoardInfo(
+    files: Array<Express.Multer.File>,
+    email: string,
+    boardId: string,
+    { topCategory, subCategory, title, description, price, images }
+  ) {
+    try {
+      const boardInfo = await this.usedItemBoardModel.findOne({ _id: boardId });
+      await this.deleteUnusedImage(boardInfo.images, JSON.parse(images));
+      const imageUploaded = files.map(async (file) => {
+        return await this.awsService.uploadFileToS3(
+          `usedItemImages/${boardId}/${uuid()}${dayjs().format(
+            'YYYYMMDDHHmmss'
+          )}`,
+          file
+        );
+      });
+      const imageUploadResults = await Promise.all(imageUploaded);
+      const newImages = imageUploadResults.map((result) => result.url);
+      await this.usedItemBoardModel.updateOne(
+        { _id: boardId },
+        {
+          topCategory,
+          subCategory,
+          title,
+          description,
+          price,
+          images: [...JSON.parse(images), ...newImages],
+        }
+      );
+
+      return { statusCode: 200, data: { isUpdated: true } };
+    } catch (error) {
+      console.log(error);
+      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+    }
+  }
 }
