@@ -105,7 +105,7 @@ export class BoardService {
     return `${diffYear}년 전`;
   }
 
-  formatUsedItemBoard(usedItemBoardInfo, email) {
+  formatUsedItemBoard(usedItemBoardInfo) {
     return {
       id: usedItemBoardInfo._id,
       title: usedItemBoardInfo.title,
@@ -119,9 +119,9 @@ export class BoardService {
     };
   }
 
-  formatUsedItemBoardList(usedItemBoardList, email) {
+  formatUsedItemBoardList(usedItemBoardList) {
     return usedItemBoardList.map((usedItemBoard) =>
-      this.formatUsedItemBoard(usedItemBoard, email)
+      this.formatUsedItemBoard(usedItemBoard)
     );
   }
 
@@ -150,7 +150,7 @@ export class BoardService {
         .skip(page * limit)
         .limit(limit)
         .sort({ createdAt: 'desc' });
-      const result = this.formatUsedItemBoardList(usedItemBoardList, email);
+      const result = this.formatUsedItemBoardList(usedItemBoardList);
 
       return { statusCode: 200, data: { usedItemBoardList: result } };
     } catch (error) {
