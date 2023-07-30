@@ -8,6 +8,15 @@ import * as dayjs from 'dayjs';
 import { AddressService } from 'src/address/address.service';
 import { UtilService } from 'src/utils/util.service';
 import { User, UserDocument } from 'src/schema/user.schema';
+import {
+  ONE_MINUTE,
+  ONE_HOUR,
+  DAY_HOURS,
+  ONE_WEEK,
+  TWO_WEEK,
+  ONE_MONTH,
+  ONE_YEAR,
+} from '../config/constants/index';
 
 @Injectable()
 export class BoardService {
@@ -89,19 +98,19 @@ export class BoardService {
     const diffMonth = dayjs().diff(date, 'M');
     const diffYear = dayjs().diff(date, 'y');
 
-    if (diffMillisecond < 1000 * 60) {
+    if (diffMillisecond < ONE_MINUTE) {
       return '방금 전';
-    } else if (diffMillisecond < 1000 * 60 * 60) {
+    } else if (diffMillisecond < ONE_HOUR) {
       return `${dayjs().diff(date, 'm')}분 전`;
-    } else if (diffMillisecond < 1000 * 60 * 60 * 24) {
+    } else if (diffMillisecond < DAY_HOURS) {
       return `${dayjs().diff(date, 'h')}시간 전`;
-    } else if (diffMillisecond < 1000 * 60 * 60 * 24 * 7) {
+    } else if (diffMillisecond < ONE_WEEK) {
       return `${dayjs().diff(date, 'd')}일 전`;
-    } else if (diffMillisecond < 1000 * 60 * 60 * 24 * 7 * 2) {
+    } else if (diffMillisecond < TWO_WEEK) {
       return '지난 주';
-    } else if (diffMonth < 1) {
+    } else if (diffMonth < ONE_MONTH) {
       return `${dayjs().diff(date, 'w')}주 전`;
-    } else if (diffYear < 1) {
+    } else if (diffYear < ONE_YEAR) {
       return `${diffMonth}달 전`;
     }
 
