@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UsedItemBoard, UsedItemBoardDocument } from '../schema/board.schema';
@@ -77,7 +77,10 @@ export class BoardService {
       return { statusCode: 201, data: { isPosted: true } };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -155,7 +158,10 @@ export class BoardService {
       return { statusCode: 200, data: { usedItemBoardList: result } };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -219,7 +225,10 @@ export class BoardService {
       return { statusCode: 200, data: { usedItemBoardInfo: result } };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -263,7 +272,10 @@ export class BoardService {
       };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -296,7 +308,10 @@ export class BoardService {
       };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -307,10 +322,10 @@ export class BoardService {
       });
 
       if (usedItemBoardInfo.seller.email !== email) {
-        return {
-          statusCode: 400,
-          data: { message: '본인의 게시글이 아닙니다.' },
-        };
+        throw new HttpException(
+          '본인의 게시글이 아닙니다.',
+          HttpStatus.BAD_REQUEST
+        );
       }
 
       await this.usedItemBoardModel.deleteOne({ _id: id });
@@ -318,7 +333,10 @@ export class BoardService {
       return { statusCode: 204, data: { isDeleted: true } };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -345,7 +363,10 @@ export class BoardService {
       };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -371,7 +392,10 @@ export class BoardService {
       };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -387,7 +411,10 @@ export class BoardService {
       };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -441,7 +468,10 @@ export class BoardService {
       return { statusCode: 200, data: { isUpdated: true } };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 }
