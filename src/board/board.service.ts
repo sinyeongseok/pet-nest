@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Model, Types } from 'mongoose';
+import { Model, Query, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UsedItemBoard, UsedItemBoardDocument } from '../schema/board.schema';
 import { AwsService } from '../utils/s3';
@@ -232,6 +232,43 @@ export class BoardService {
       );
 
       return { statusCode: 200, data: { usedItemBoardInfo: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  formatEditUsedItemBoard(usedItemBoard: UsedItemBoardDocument) {
+    return {
+      id: usedItemBoard._id,
+      topCategory: usedItemBoard.topCategory,
+      subCategory: usedItemBoard.subCategory,
+      title: usedItemBoard.title,
+      images: usedItemBoard.images,
+      description: usedItemBoard.description,
+      price: usedItemBoard.price,
+    };
+  }
+
+  async getEditUsedItemBoard(id: string, email: string) {
+    try {
+      const boardInfo: UsedItemBoardDocument =
+        await this.usedItemBoardModel.findOne({
+          _id: id,
+        });
+
+      if (boardInfo.seller.email !== email) {
+        throw new HttpException(
+          '본인의 게시물이 아닙니다.',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      const result = this.formatEditUsedItemBoard(boardInfo);
+
+      return { statusCode: 200, data: { editUsedItemBoardInfo: result } };
     } catch (error) {
       console.log(error);
       throw new HttpException(

@@ -63,6 +63,14 @@ export class BoardController {
     return res.status(result.statusCode).json(result.data);
   }
 
+  @Get('used-item/edit/:id')
+  async getEditUsedItemBoard(@Res() res, @Param('id') id: string) {
+    const email = res.locals.email;
+    const result = await this.boardService.getEditUsedItemBoard(id, email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Get('used-item/other-posts/:id')
   async getOtherUsedItemBoardList(
     @Res() res,
