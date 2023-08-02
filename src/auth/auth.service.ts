@@ -108,7 +108,6 @@ export class AuthService {
   ) {
     try {
       const userAddress = await this.utilService.getUserRecentAddress(email);
-
       const findAddress = await this.CityAddressModel.aggregate([
         {
           $geoNear: {
@@ -138,7 +137,10 @@ export class AuthService {
         }
       );
 
-      return { statusCode: 200, data: { isVerified: true } };
+      return {
+        statusCode: 200,
+        data: { verifiedLocalArea: userAddress.eupMyeonDong },
+      };
     } catch (error) {
       console.log(error);
       return { statusCode: 500, data: { message: '서버요청 실패' } };
