@@ -300,6 +300,7 @@ export class BoardService {
           $and: [
             { subCategory: usedItemBoardInfo.subCategory },
             { _id: { $ne: usedItemBoardInfo._id } },
+            { 'seller.email': { $ne: email } },
             { $or: findQuery },
           ],
         })
