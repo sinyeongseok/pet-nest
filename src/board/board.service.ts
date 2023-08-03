@@ -129,13 +129,15 @@ export class BoardService {
     return {
       id: usedItemBoardInfo._id,
       title: usedItemBoardInfo.title,
-      price: usedItemBoardInfo.price.toLocaleString(),
       timeDelta: this.computeTimeDifference(usedItemBoardInfo.createdAt),
       image: usedItemBoardInfo.images[0],
       address: usedItemBoardInfo.address,
       salesStatus: usedItemBoardInfo.salesStatus,
       likeCount: usedItemBoardInfo.likeCount,
       chatCount: 0,
+      price: !!usedItemBoardInfo.price
+        ? `${usedItemBoardInfo.price.toLocaleString()}원`
+        : '무료나눔',
     };
   }
 
@@ -205,9 +207,11 @@ export class BoardService {
       likeCount: usedItemBoardInfo.likeCount,
       chatCount: 0,
       viewCount: usedItemBoardInfo.viewCount,
-      price: usedItemBoardInfo.price,
       salesStatus: usedItemBoardInfo.salesStatus,
       images: usedItemBoardInfo.images,
+      price: !!usedItemBoardInfo.price
+        ? `${usedItemBoardInfo.price.toLocaleString()}원`
+        : '무료나눔',
       ...(!!usedItemBoardInfo.seller.profileImage && {
         sellerProfileImage: usedItemBoardInfo.seller.profileImage,
       }),
@@ -292,7 +296,9 @@ export class BoardService {
         id: similarUsedItemBoard._id,
         image: similarUsedItemBoard.images[0],
         title: similarUsedItemBoard.title,
-        price: similarUsedItemBoard.price,
+        price: !!similarUsedItemBoard.price
+          ? `${similarUsedItemBoard.price.toLocaleString()}원`
+          : '무료나눔',
       };
     });
   }
