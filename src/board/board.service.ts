@@ -48,12 +48,24 @@ export class BoardService {
     email: string,
     { topCategory, subCategory, title, description, price }
   ) {
-    console.log(price);
-    if (!title || !topCategory || !subCategory || !(price >= 0)) {
-      throw new HttpException(
-        '카테고리, 상품명, 가격은 필수로 입력해주세요.',
-        HttpStatus.BAD_REQUEST
-      );
+    const requiredFields = {
+      title: '상품명',
+      topCategory: '카테고리',
+      subCategory: '서브카테고리',
+      price: '가격',
+      description: '내용',
+    };
+
+    const emptyFields = Object.keys(requiredFields).reduce((res, field) => {
+      if (!arguments[2][field]) res.push(requiredFields[field]);
+      return res;
+    }, []);
+
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(
+        ', '
+      )}은(는) 필수로 입력해주세요.`;
+      throw new HttpException(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
     try {
