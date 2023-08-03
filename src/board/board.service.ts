@@ -48,9 +48,10 @@ export class BoardService {
     email: string,
     { topCategory, subCategory, title, description, price }
   ) {
-    if (!title || !description || !topCategory || !subCategory) {
+    console.log(price);
+    if (!title || !topCategory || !subCategory || !(price >= 0)) {
       throw new HttpException(
-        '카테고리, 상품명, 내용은 필수로 입력해주세요.',
+        '카테고리, 상품명, 가격은 필수로 입력해주세요.',
         HttpStatus.BAD_REQUEST
       );
     }
