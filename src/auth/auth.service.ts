@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
@@ -51,7 +51,10 @@ export class AuthService {
       };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: '서버 요청 실패.' };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -59,18 +62,24 @@ export class AuthService {
     const regex = /^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/;
 
     if (nickname.length < 2) {
-      return { statusCode: 400, data: '두글자 이상 작성해주세요.' };
+      throw new HttpException(
+        '두글자 이상 작성해주세요.',
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     if (nickname.length > 10) {
-      return { statusCode: 400, data: '닉네임은 10자까지만 가능해요.' };
+      throw new HttpException(
+        '닉네임은 10자까지만 가능해요.',
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     if (!regex.test(nickname)) {
-      return {
-        statusCode: 400,
-        data: '닉네임은 띄어쓰기 없이 한글, 영문, 숫자만 가능해요.',
-      };
+      throw new HttpException(
+        '닉네임은 띄어쓰기 없이 한글, 영문, 숫자만 가능해요.',
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     try {
@@ -79,12 +88,19 @@ export class AuthService {
       });
 
       if (!!findNickname) {
-        return { statusCode: 400, data: '닉네임이 이미 존재해요.' };
+        throw new HttpException(
+          '닉네임이 이미 존재해요.',
+          HttpStatus.BAD_REQUEST
+        );
       }
 
       return { statusCode: 200, data: '사용 가능한 닉네임이에요.' };
     } catch (error) {
-      return { statusCode: 500, data: '서버 요청 실패.' };
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -98,7 +114,11 @@ export class AuthService {
 
       return { statusCode: 400, data: { isVerified: false } };
     } catch (error) {
-      return { statusCode: 500, data: { message: '서버요청 실패.' } };
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -124,10 +144,10 @@ export class AuthService {
       ]);
 
       if (!findAddress.length) {
-        return {
-          statusCode: 400,
-          data: { message: '인증 지역을 확인해주세요.' },
-        };
+        throw new HttpException(
+          '인증 지역을 확인해주세요.',
+          HttpStatus.BAD_REQUEST
+        );
       }
 
       await this.UserAddressModel.updateOne(
@@ -143,7 +163,10 @@ export class AuthService {
       };
     } catch (error) {
       console.log(error);
-      return { statusCode: 500, data: { message: '서버요청 실패' } };
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 }
