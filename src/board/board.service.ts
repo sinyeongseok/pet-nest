@@ -297,6 +297,10 @@ export class BoardService {
       return { statusCode: 200, data: { editUsedItemBoardInfo: result } };
     } catch (error) {
       console.log(error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException(
         '서버요청 실패.',
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -409,6 +413,10 @@ export class BoardService {
       return { statusCode: 204, data: { isDeleted: true } };
     } catch (error) {
       console.log(error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException(
         '서버요청 실패.',
         HttpStatus.INTERNAL_SERVER_ERROR

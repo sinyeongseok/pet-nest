@@ -97,6 +97,10 @@ export class AuthService {
       return { statusCode: 200, data: '사용 가능한 닉네임이에요.' };
     } catch (error) {
       console.log(error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException(
         '서버요청 실패.',
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -163,6 +167,10 @@ export class AuthService {
       };
     } catch (error) {
       console.log(error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException(
         '서버요청 실패.',
         HttpStatus.INTERNAL_SERVER_ERROR
