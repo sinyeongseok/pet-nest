@@ -13,8 +13,6 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'access') {
   }
 
   validate(payload) {
-    return {
-      email: payload.email,
-    };
+    return payload;
   }
 }
