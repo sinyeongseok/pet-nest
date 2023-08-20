@@ -1,6 +1,16 @@
-import { Controller, Get, Post, Body, Res, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Res,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
+import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -26,20 +36,23 @@ export class AuthController {
   }
 
   @Get('local-area')
-  async checkLocalArea(@Res() res) {
-    const email = res.locals.email;
+  @UseGuards(JwtAccessAuthGuard)
+  async checkLocalArea(@Res() res, @Req() req) {
+    const email = req.user.email;
     const result = await this.authService.checkLocalArea(email);
 
     return res.status(result.statusCode).json(result.data);
   }
 
   @Post('local-area')
+  @UseGuards(JwtAccessAuthGuard)
   async verifyLocalArea(
     @Res() res,
+    @Req() req,
     @Body('latitude') latitude: number,
     @Body('longitude') longitude: number
   ) {
-    const email = res.locals.email;
+    const email = req.user.email;
     const result = await this.authService.verifyLocalArea(email, {
       latitude,
       longitude,

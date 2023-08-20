@@ -10,10 +10,13 @@ import {
   Param,
   Patch,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Express, Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
 
 @Controller('user')
 export class UserController {
@@ -39,12 +42,14 @@ export class UserController {
   }
 
   @Post('addresses')
+  @UseGuards(JwtAccessAuthGuard)
   async createUserAddress(
     @Res() res,
+    @Req() req,
     @Body('latitude') latitude: number,
     @Body('longitude') longitude: number
   ) {
-    const email = res.locals.email;
+    const email = req.user.email;
     const result = await this.userService.createUserAddress(email, {
       latitude,
       longitude,
@@ -54,32 +59,40 @@ export class UserController {
   }
 
   @Patch('addresses/:id')
-  async updateAddressLastSelected(@Res() res, @Param('id') id: string) {
-    const email = res.locals.email;
+  @UseGuards(JwtAccessAuthGuard)
+  async updateAddressLastSelected(
+    @Res() res,
+    @Req() req,
+    @Param('id') id: string
+  ) {
+    const email = req.user.email;
     const result = await this.userService.updateAddressLastSelected(email, id);
 
     return res.status(result.statusCode).json(result.data);
   }
 
   @Delete('addresses/:id')
-  async deleteAddress(@Res() res, @Param('id') id: string) {
-    const email = res.locals.email;
+  @UseGuards(JwtAccessAuthGuard)
+  async deleteAddress(@Res() res, @Req() req, @Param('id') id: string) {
+    const email = req.user.email;
     const result = await this.userService.deleteAddress(email, id);
 
     return res.status(result.statusCode).json(result.data);
   }
 
   @Get('addresses')
-  async getUserAddresses(@Res() res) {
-    const email = res.locals.email;
+  @UseGuards(JwtAccessAuthGuard)
+  async getUserAddresses(@Res() res, @Req() req) {
+    const email = req.user.email;
     const result = await this.userService.getUserAddresses(email, null);
 
     return res.status(result.statusCode).json(result.data);
   }
 
   @Get('addresses/settings')
-  async getUserAddressesSettings(@Res() res) {
-    const email = res.locals.email;
+  @UseGuards(JwtAccessAuthGuard)
+  async getUserAddressesSettings(@Res() res, @Req() req) {
+    const email = req.user.email;
     const result = await this.userService.getUserAddresses(email, 'settings');
 
     return res.status(result.statusCode).json(result.data);
