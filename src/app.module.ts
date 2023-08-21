@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { BoardModule } from './board/board.module';
 import { TokenModule } from './token/token.module';
 import { CommonModule } from './common/common.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CommonModule } from './common/common.module';
     BoardModule,
     TokenModule,
     CommonModule,
+    ChatModule,
   ],
 })
 export class AppModule {}
