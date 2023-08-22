@@ -13,10 +13,10 @@ export class ChatRoomSetting {
   @Prop()
   userId: string;
 
-  @Prop()
+  @Prop({ default: true })
   isAllam: boolean;
 
-  @Prop()
+  @Prop({ default: false })
   isPinned: boolean;
 }
 
