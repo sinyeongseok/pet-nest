@@ -7,7 +7,7 @@ export type ChatRoomSettingDocument = ChatRoomSetting & Document;
   versionKey: false,
 })
 export class ChatRoomSetting {
-  @Prop()
+  @Prop({ type: 'ObjectId', ref: 'ChatRoom' })
   chatRoomId: string;
 
   @Prop()
