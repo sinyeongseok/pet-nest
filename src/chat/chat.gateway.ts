@@ -20,14 +20,13 @@ export class ChatGateway {
   constructor(private readonly chatService: ChatService) {}
   @WebSocketServer() nsp: Namespace;
 
-  @SubscribeMessage('create-room-used-item')
+  @SubscribeMessage('create-room/used-item')
   @UseGuards(JwtAccessAuthGuard)
   async handleCreateRoom(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody() { sellerEmail, usedItemBoardId },
-    @Req() req
+    @ConnectedSocket() socket,
+    @MessageBody() { sellerEmail, usedItemBoardId }
   ) {
-    const email = req.user.email;
+    const email = socket.user.email;
 
     const createChatRoomResult = await this.chatService.createChatRoom(
       [email, sellerEmail],
@@ -35,7 +34,9 @@ export class ChatGateway {
     );
 
     socket.join(createChatRoomResult.id);
-    this.nsp.emit('create-room', createChatRoomResult.id);
+    this.nsp.emit('create-room/used-item', {
+      chatRoomId: createChatRoomResult.id,
+    });
 
     return { success: true, data: { chatRoomId: createChatRoomResult.id } };
   }
