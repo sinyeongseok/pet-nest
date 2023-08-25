@@ -46,4 +46,28 @@ export class ChatService {
       );
     }
   }
+
+  async getProvideUsedTradingInfo(chatRoomId) {
+    try {
+      const chatRoomInfo = await this.chatRoomModel.findOne({
+        _id: chatRoomId,
+      });
+      const usedItemBoardInfo = await this.usedItemBoardModel.findOne({
+        _id: chatRoomInfo.boardId,
+      });
+
+      return {
+        title: usedItemBoardInfo.title,
+        price: `${usedItemBoardInfo.price.toLocaleString()}원`,
+        status: usedItemBoardInfo.salesStatus,
+        image: usedItemBoardInfo.images[0],
+      };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }

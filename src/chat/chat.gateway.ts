@@ -40,4 +40,19 @@ export class ChatGateway {
 
     return { success: true, data: { chatRoomId: createChatRoomResult.id } };
   }
+
+  @SubscribeMessage('get-chat/used-item')
+  @UseGuards(JwtAccessAuthGuard)
+  async handleGetProvideUsedTradingInfo(
+    @ConnectedSocket() socket,
+    @MessageBody() { chatRoomId }
+  ) {
+    const result = await this.chatService.getProvideUsedTradingInfo(chatRoomId);
+
+    this.nsp.emit('get-chat/used-item', {
+      usedItemInfo: result,
+    });
+
+    return { success: true, data: { usedItemInfo: result } };
+  }
 }
