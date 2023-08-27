@@ -32,6 +32,10 @@ export class ChatGateway {
       return;
     }
 
+    if (socket.id !== email) {
+      socket.id = email;
+    }
+
     socket.join(chatRoomId);
 
     return;
