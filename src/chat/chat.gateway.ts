@@ -76,4 +76,15 @@ export class ChatGateway {
 
     return { success: true, data: { usedItemInfo: result } };
   }
+
+  @SubscribeMessage('room-list')
+  @UseGuards(JwtAccessAuthGuard)
+  async handleRoomList(@ConnectedSocket() socket) {
+    const email = socket.user.email;
+
+    const result = await this.chatService.getChatRoomList(email);
+    this.nsp.emit('get-room-list', { chatRoomList: result });
+
+    return result;
+  }
 }
