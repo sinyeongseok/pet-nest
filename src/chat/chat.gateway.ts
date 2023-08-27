@@ -20,6 +20,23 @@ export class ChatGateway {
   constructor(private readonly chatService: ChatService) {}
   @WebSocketServer() nsp: Namespace;
 
+  @SubscribeMessage('join-room')
+  @UseGuards(JwtAccessAuthGuard)
+  async handlejoinRoom(
+    @ConnectedSocket() socket,
+    @MessageBody() { chatRoomId }
+  ) {
+    const email = socket.user.email;
+
+    if (socket.rooms.has(chatRoomId)) {
+      return;
+    }
+
+    socket.join(chatRoomId);
+
+    return;
+  }
+
   @SubscribeMessage('create-room/used-item')
   @UseGuards(JwtAccessAuthGuard)
   async handleCreateRoom(
