@@ -8,15 +8,6 @@ import * as dayjs from 'dayjs';
 import { AddressService } from 'src/address/address.service';
 import { UtilService } from 'src/utils/util.service';
 import { User, UserDocument } from 'src/schema/user.schema';
-import {
-  ONE_MINUTE,
-  ONE_HOUR,
-  DAY_HOURS,
-  ONE_WEEK,
-  TWO_WEEK,
-  ONE_MONTH,
-  ONE_YEAR,
-} from '../config/constants/index';
 
 @Injectable()
 export class BoardService {
@@ -113,35 +104,13 @@ export class BoardService {
     }
   }
 
-  computeTimeDifference(date) {
-    const diffMillisecond = dayjs().diff(date);
-    const diffMonth = dayjs().diff(date, 'M');
-    const diffYear = dayjs().diff(date, 'y');
-
-    if (diffMillisecond < ONE_MINUTE) {
-      return '방금 전';
-    } else if (diffMillisecond < ONE_HOUR) {
-      return `${dayjs().diff(date, 'm')}분 전`;
-    } else if (diffMillisecond < DAY_HOURS) {
-      return `${dayjs().diff(date, 'h')}시간 전`;
-    } else if (diffMillisecond < ONE_WEEK) {
-      return `${dayjs().diff(date, 'd')}일 전`;
-    } else if (diffMillisecond < TWO_WEEK) {
-      return '지난 주';
-    } else if (diffMonth < ONE_MONTH) {
-      return `${dayjs().diff(date, 'w')}주 전`;
-    } else if (diffYear < ONE_YEAR) {
-      return `${diffMonth}달 전`;
-    }
-
-    return `${diffYear}년 전`;
-  }
-
   formatUsedItemBoard(usedItemBoardInfo) {
     return {
       id: usedItemBoardInfo._id,
       title: usedItemBoardInfo.title,
-      timeDelta: this.computeTimeDifference(usedItemBoardInfo.createdAt),
+      timeDelta: this.utilService.computeTimeDifference(
+        usedItemBoardInfo.createdAt
+      ),
       image: usedItemBoardInfo.images[0],
       address: usedItemBoardInfo.address,
       salesStatus: usedItemBoardInfo.salesStatus,
@@ -215,7 +184,9 @@ export class BoardService {
       title: usedItemBoardInfo.title,
       address: usedItemBoardInfo.address,
       subCategory: usedItemBoardInfo.subCategory,
-      timeDelta: this.computeTimeDifference(usedItemBoardInfo.createdAt),
+      timeDelta: this.utilService.computeTimeDifference(
+        usedItemBoardInfo.createdAt
+      ),
       description: usedItemBoardInfo.description,
       likeCount: usedItemBoardInfo.likeCount,
       chatCount: 0,
