@@ -7,8 +7,10 @@ import {
   ChatRoomSetting,
   ChatRoomSettingDocument,
 } from 'src/schema/chatRoomSetting.schema';
+import { Message, MessageDocument } from 'src/schema/message.schema';
 import { User, UserDocument } from 'src/schema/user.schema';
 import { UtilService } from 'src/utils/util.service';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class ChatService {
@@ -21,6 +23,8 @@ export class ChatService {
     private chatRoomModel: Model<ChatRoomDocument>,
     @InjectModel(ChatRoomSetting.name)
     private chatRoomSettingModel: Model<ChatRoomSettingDocument>,
+    @InjectModel(Message.name)
+    private messageModel: Model<MessageDocument>,
     private utilService: UtilService
   ) {}
 
@@ -144,6 +148,42 @@ export class ChatService {
       const result = await this.formatChatRoomList(chatRoomAndSettings, email);
 
       return result;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async createMessage({ chatRoomId, sender, message }) {
+    try {
+      const timestamp = dayjs();
+      const createMessageQuery = new this.messageModel({
+        chatRoomId,
+        sender,
+        timestamp,
+        content: message,
+      });
+      const updateChatRoomQuery = this.chatRoomModel.updateOne(
+        {
+          _id: chatRoomId,
+        },
+        {
+          lastChat: message,
+          lastChatAt: timestamp,
+        }
+      );
+
+      await Promise.all([createMessageQuery.save(), updateChatRoomQuery]);
+
+      return {
+        sender,
+        message,
+        timestamp: timestamp.format('H:mm'),
+        timeOfDay: timestamp.hour() < 12 ? '오전' : '오후',
+      };
     } catch (error) {
       console.log(error);
       throw new HttpException(

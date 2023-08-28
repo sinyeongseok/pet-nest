@@ -32,10 +32,6 @@ export class ChatGateway {
       return;
     }
 
-    if (socket.id !== email) {
-      socket.id = email;
-    }
-
     socket.join(chatRoomId);
 
     return;
@@ -84,6 +80,24 @@ export class ChatGateway {
 
     const result = await this.chatService.getChatRoomList(email);
     this.nsp.emit('get-room-list', { chatRoomList: result });
+
+    return result;
+  }
+
+  @SubscribeMessage('message')
+  @UseGuards(JwtAccessAuthGuard)
+  async handleSendMessage(
+    @ConnectedSocket() socket,
+    @MessageBody() { message, chatRoomId }
+  ) {
+    const email = socket.user.email;
+    const result = await this.chatService.createMessage({
+      chatRoomId,
+      message,
+      sender: email,
+    });
+
+    this.nsp.to(chatRoomId).emit('message', result);
 
     return result;
   }
