@@ -7,7 +7,7 @@ export type MessageDocument = Message & Document;
   versionKey: false,
 })
 export class Message {
-  @Prop()
+  @Prop({ type: 'ObjectId', ref: 'ChatRoom' })
   chatRoomId: string;
 
   @Prop({ required: true })
