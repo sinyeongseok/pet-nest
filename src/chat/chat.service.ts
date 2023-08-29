@@ -11,11 +11,6 @@ import { Message, MessageDocument } from 'src/schema/message.schema';
 import { User, UserDocument } from 'src/schema/user.schema';
 import { UtilService } from 'src/utils/util.service';
 import * as dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 @Injectable()
 export class ChatService {
@@ -164,7 +159,9 @@ export class ChatService {
 
   async createMessage({ chatRoomId, sender, message }) {
     try {
-      const timestamp = dayjs().utcOffset(9);
+      const timestamp = dayjs(
+        new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
+      );
       const createMessageQuery = new this.messageModel({
         chatRoomId,
         sender,
