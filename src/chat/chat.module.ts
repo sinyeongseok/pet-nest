@@ -12,6 +12,7 @@ import {
 } from 'src/schema/chatRoomSetting.schema';
 import { Message, MessageSchema } from 'src/schema/message.schema';
 import { UtilService } from 'src/utils/util.service';
+import { TokenService } from 'src/token/token.service';
 
 @Module({
   imports: [
@@ -24,6 +25,6 @@ import { UtilService } from 'src/utils/util.service';
       { name: Message.name, schema: MessageSchema },
     ]),
   ],
-  providers: [ChatGateway, ChatService, UtilService],
+  providers: [ChatGateway, ChatService, UtilService, TokenService],
 })
 export class ChatModule {}
