@@ -7,8 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Socket, Namespace } from 'socket.io';
 import { ChatService } from './chat.service';
-import { Req, UseGuards } from '@nestjs/common';
-import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
+import { TokenService } from 'src/token/token.service';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -17,18 +16,38 @@ import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
   },
 })
 export class ChatGateway {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private tokenService: TokenService
+  ) {}
   @WebSocketServer() nsp: Namespace;
 
   @SubscribeMessage('join-room')
-  @UseGuards(JwtAccessAuthGuard)
   async handlejoinRoom(
     @ConnectedSocket() socket,
-    @MessageBody() { chatRoomId }
+    @MessageBody() { chatRoomId, token }
   ) {
-    const email = socket.user.email;
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      this.nsp.emit('error', {
+        ...validateTokenResult,
+        url: 'join-room',
+        data: { chatRoomId, token },
+      });
+
+      return;
+    }
+
+    const email = validateTokenResult.user.email;
 
     socket.id = email;
+
+    this.nsp.emit('join-room', {
+      statusCode: 200,
+      message: '성공',
+      data: { isJoinRoom: true },
+    });
 
     if (socket.rooms.has(chatRoomId)) {
       return;
@@ -40,12 +59,27 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('create-room/used-item')
-  @UseGuards(JwtAccessAuthGuard)
   async handleCreateRoom(
     @ConnectedSocket() socket,
-    @MessageBody() { sellerEmail, usedItemBoardId }
+    @MessageBody() { sellerEmail, usedItemBoardId, token }
   ) {
-    const email = socket.user.email;
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      this.nsp.emit('error', {
+        ...validateTokenResult,
+        url: 'create-room/used-item',
+        data: {
+          sellerEmail,
+          usedItemBoardId,
+          token,
+        },
+      });
+
+      return;
+    }
+
+    const email = validateTokenResult.user.email;
 
     const createChatRoomResult = await this.chatService.createChatRoom(
       [email, sellerEmail],
@@ -54,52 +88,97 @@ export class ChatGateway {
 
     socket.join(createChatRoomResult.id);
     this.nsp.emit('create-room/used-item', {
-      chatRoomId: createChatRoomResult.id,
+      statusCode: 201,
+      message: '성공',
+      data: { chatRoomId: createChatRoomResult.id },
     });
 
     return { success: true, data: { chatRoomId: createChatRoomResult.id } };
   }
 
   @SubscribeMessage('get-chat/used-item')
-  @UseGuards(JwtAccessAuthGuard)
   async handleGetProvideUsedTradingInfo(
     @ConnectedSocket() socket,
-    @MessageBody() { chatRoomId }
+    @MessageBody() { chatRoomId, token }
   ) {
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      this.nsp.emit('error', {
+        ...validateTokenResult,
+        url: 'get-chat/used-item',
+        data: { chatRoomId, token },
+      });
+
+      return;
+    }
+
     const result = await this.chatService.getProvideUsedTradingInfo(chatRoomId);
 
     this.nsp.emit('get-chat/used-item', {
-      usedItemInfo: result,
+      statusCode: 200,
+      message: '성공',
+      data: { usedItemInfo: result },
     });
 
     return { success: true, data: { usedItemInfo: result } };
   }
 
   @SubscribeMessage('room-list')
-  @UseGuards(JwtAccessAuthGuard)
-  async handleRoomList(@ConnectedSocket() socket) {
-    const email = socket.user.email;
+  async handleRoomList(@ConnectedSocket() socket, @MessageBody() { token }) {
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      this.nsp.emit('error', {
+        ...validateTokenResult,
+        url: 'room-list',
+        data: { token },
+      });
+
+      return;
+    }
+
+    const email = validateTokenResult.user.email;
 
     const result = await this.chatService.getChatRoomList(email);
-    this.nsp.emit('get-room-list', { chatRoomList: result });
+    this.nsp.emit('room-list', {
+      statusCode: 200,
+      message: '성공',
+      data: { chatRoomList: result },
+    });
 
     return { success: true, data: { chatRoomList: result } };
   }
 
   @SubscribeMessage('message')
-  @UseGuards(JwtAccessAuthGuard)
   async handleSendMessage(
     @ConnectedSocket() socket,
-    @MessageBody() { message, chatRoomId }
+    @MessageBody() { message, chatRoomId, token }
   ) {
-    const email = socket.user.email;
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      this.nsp.emit('error', {
+        ...validateTokenResult,
+        url: 'message',
+        data: { message, chatRoomId, token },
+      });
+
+      return;
+    }
+
+    const email = validateTokenResult.user.email;
     const result = await this.chatService.createMessage({
       chatRoomId,
       message,
       sender: email,
     });
 
-    this.nsp.to(chatRoomId).emit('message', { messageInfo: result });
+    this.nsp.to(chatRoomId).emit('message', {
+      statusCode: 200,
+      message: '성공',
+      data: { messageInfo: result },
+    });
 
     return { success: true, data: { messageInfo: result } };
   }
