@@ -28,6 +28,8 @@ export class ChatGateway {
   ) {
     const email = socket.user.email;
 
+    socket.id = email;
+
     if (socket.rooms.has(chatRoomId)) {
       return;
     }
