@@ -81,7 +81,7 @@ export class ChatGateway {
     const result = await this.chatService.getChatRoomList(email);
     this.nsp.emit('get-room-list', { chatRoomList: result });
 
-    return result;
+    return { success: true, data: { chatRoomList: result } };
   }
 
   @SubscribeMessage('message')
@@ -97,8 +97,8 @@ export class ChatGateway {
       sender: email,
     });
 
-    this.nsp.to(chatRoomId).emit('message', result);
+    this.nsp.to(chatRoomId).emit('message', { messageInfo: result });
 
-    return result;
+    return { success: true, data: { messageInfo: result } };
   }
 }
