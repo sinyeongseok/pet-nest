@@ -181,6 +181,7 @@ export class BoardService {
     return {
       isLike,
       sellerNickname: usedItemBoardInfo.seller.nickname,
+      sellerEmail: usedItemBoardInfo.seller.email,
       title: usedItemBoardInfo.title,
       address: usedItemBoardInfo.address,
       subCategory: usedItemBoardInfo.subCategory,
