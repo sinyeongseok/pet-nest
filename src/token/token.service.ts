@@ -24,6 +24,21 @@ export class TokenService {
     return this.jwtService.sign(payload, { expiresIn: '1d' });
   }
 
+  async validateToken(token: string) {
+    try {
+      const decodedToken = this.jwtService.verify(token);
+      if (decodedToken) {
+        return { statusCode: 200, message: '유효한 토큰', user: decodedToken };
+      }
+    } catch (error) {
+      if (error?.message === 'jwt expired') {
+        return { statusCode: 419, message: 'jwt expired' };
+      }
+
+      return { statusCode: 401, message: '유효하지 않은 토큰' };
+    }
+  }
+
   async refreshToken(email: string) {
     try {
       const userInfo = await this.UserModel.findOne({ email });
