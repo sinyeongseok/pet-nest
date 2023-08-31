@@ -13,6 +13,7 @@ import {
 import { Message, MessageSchema } from 'src/schema/message.schema';
 import { UtilService } from 'src/utils/util.service';
 import { TokenService } from 'src/token/token.service';
+import { ChatController } from './chat.controller';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TokenService } from 'src/token/token.service';
       { name: Message.name, schema: MessageSchema },
     ]),
   ],
+  controllers: [ChatController],
   providers: [ChatGateway, ChatService, UtilService, TokenService],
 })
 export class ChatModule {}
