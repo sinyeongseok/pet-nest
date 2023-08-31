@@ -202,4 +202,40 @@ export class ChatService {
       );
     }
   }
+
+  formatChatList(email, chatList) {
+    return chatList.reduce((res, acc) => {
+      if (!res[dayjs(acc.timestamp).format('YYYY년 M월 D일')]) {
+        res[dayjs(acc.timestamp).format('YYYY년 M월 D일')] = [];
+      }
+
+      res[dayjs(acc.timestamp).format('YYYY년 M월 D일')].push({
+        id: acc._id,
+        sender: acc.sender,
+        content: acc.content,
+        timestamp: dayjs(acc.timestamp).format('H:mm'),
+        timeOfDay: dayjs(acc.timestamp).hour() < 12 ? '오전' : '오후',
+        ...(acc.sender === email && { isMe: true }),
+      });
+
+      return res;
+    }, {});
+  }
+
+  async getChatList(email, chatRoomId: string) {
+    try {
+      const chatList = await this.messageModel
+        .find({ chatRoomId })
+        .sort({ timestamp: 1 });
+      const result = this.formatChatList(email, chatList);
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }

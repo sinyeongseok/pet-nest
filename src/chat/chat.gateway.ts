@@ -112,6 +112,37 @@ export class ChatGateway {
     return { success: true, data: { chatRoomList: result } };
   }
 
+  @SubscribeMessage('chat-list')
+  async handleGetChatList(
+    @ConnectedSocket() socket,
+    @MessageBody() { chatRoomId, token }
+  ) {
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      socket.emit('error', {
+        ...validateTokenResult,
+        url: 'chat-list',
+        data: { chatRoomId, token },
+      });
+
+      return;
+    }
+
+    const result = await this.chatService.getChatList(
+      validateTokenResult.user.email,
+      chatRoomId
+    );
+
+    socket.emit('chat-list', {
+      statusCode: 200,
+      message: '성공',
+      data: { chatList: result },
+    });
+
+    return { success: true, data: { chatList: result } };
+  }
+
   @SubscribeMessage('message')
   async handleSendMessage(
     @ConnectedSocket() socket,
