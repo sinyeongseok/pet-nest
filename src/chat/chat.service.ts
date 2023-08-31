@@ -88,6 +88,7 @@ export class ChatService {
       lastChatAt: this.utilService.computeTimeDifference(chatRoom.lastChatAt),
       isAllam: chatRoom.isAllam,
       isPinned: chatRoom.isPinned,
+      ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
     };
   }
 
