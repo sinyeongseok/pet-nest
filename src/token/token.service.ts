@@ -16,7 +16,7 @@ export class TokenService {
 
   generateAccessToken(email: string): string {
     const payload = { email, type: 'access' };
-    return this.jwtService.sign(payload, { expiresIn: '5m' });
+    return this.jwtService.sign(payload, { expiresIn: '10s' });
   }
 
   generateRefreshToken(email: string): string {
