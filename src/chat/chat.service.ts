@@ -209,6 +209,21 @@ export class ChatService {
         res[dayjs(acc.timestamp).format('YYYY년 M월 D일')] = [];
       }
 
+      if (res[dayjs(acc.timestamp).format('YYYY년 M월 D일')].length > 0) {
+        const length =
+          res[dayjs(acc.timestamp).format('YYYY년 M월 D일')].length;
+
+        if (
+          res[dayjs(acc.timestamp).format('YYYY년 M월 D일')][length - 1]
+            .timestamp == dayjs(acc.timestamp).format('H:mm')
+        ) {
+          delete res[dayjs(acc.timestamp).format('YYYY년 M월 D일')][length - 1]
+            .timestamp;
+          delete res[dayjs(acc.timestamp).format('YYYY년 M월 D일')][length - 1]
+            .timeOfDay;
+        }
+      }
+
       res[dayjs(acc.timestamp).format('YYYY년 M월 D일')].push({
         id: acc._id,
         content: acc.content,
@@ -227,6 +242,7 @@ export class ChatService {
         .find({ chatRoomId })
         .sort({ timestamp: 1 });
       const result = this.formatChatList(email, chatList);
+
       return result;
     } catch (error) {
       console.log(error);
