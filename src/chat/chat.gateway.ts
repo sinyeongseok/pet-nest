@@ -58,44 +58,6 @@ export class ChatGateway {
     return;
   }
 
-  @SubscribeMessage('create-room/used-item')
-  async handleCreateRoom(
-    @ConnectedSocket() socket,
-    @MessageBody() { sellerEmail, usedItemBoardId, token }
-  ) {
-    const validateTokenResult = await this.tokenService.validateToken(token);
-
-    if (validateTokenResult.statusCode !== 200) {
-      socket.emit('error', {
-        ...validateTokenResult,
-        url: 'create-room/used-item',
-        data: {
-          sellerEmail,
-          usedItemBoardId,
-          token,
-        },
-      });
-
-      return;
-    }
-
-    const email = validateTokenResult.user.email;
-
-    const createChatRoomResult = await this.chatService.createChatRoom(
-      [email, sellerEmail],
-      usedItemBoardId
-    );
-
-    socket.join(createChatRoomResult.id);
-    socket.emit('create-room/used-item', {
-      statusCode: 201,
-      message: '성공',
-      data: { chatRoomId: createChatRoomResult.id },
-    });
-
-    return { success: true, data: { chatRoomId: createChatRoomResult.id } };
-  }
-
   @SubscribeMessage('get-chat/used-item')
   async handleGetProvideUsedTradingInfo(
     @ConnectedSocket() socket,

@@ -28,14 +28,18 @@ export class ChatService {
     private utilService: UtilService
   ) {}
 
-  async createChatRoom(users, usedItemBoardId) {
+  async createChatRoom(email, boardId) {
     try {
+      const usedItemBoardInfo = await this.usedItemBoardModel.findOne({
+        _id: boardId,
+      });
       const createChatRoomQuery = new this.chatRoomModel({
-        users,
-        boardId: usedItemBoardId,
+        users: [email, usedItemBoardInfo.seller.email],
+        boardId: boardId,
       });
       const createChatRoomResult = await createChatRoomQuery.save();
-      for await (const user of users) {
+
+      for await (const user of [email, usedItemBoardInfo.seller.email]) {
         const createChatRoomSettingQuery = new this.chatRoomSettingModel({
           chatRoomId: createChatRoomResult._id,
           userId: user,
@@ -43,7 +47,10 @@ export class ChatService {
         await createChatRoomSettingQuery.save();
       }
 
-      return { id: createChatRoomResult._id };
+      return {
+        statusCode: 201,
+        data: { chatRoomId: createChatRoomResult._id },
+      };
     } catch (error) {
       console.log(error);
       throw new HttpException(
