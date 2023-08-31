@@ -30,7 +30,7 @@ export class ChatGateway {
     const validateTokenResult = await this.tokenService.validateToken(token);
 
     if (validateTokenResult.statusCode !== 200) {
-      this.nsp.emit('error', {
+      socket.emit('error', {
         ...validateTokenResult,
         url: 'join-room',
         data: { chatRoomId, token },
@@ -43,7 +43,7 @@ export class ChatGateway {
 
     socket.id = email;
 
-    this.nsp.emit('join-room', {
+    socket.emit('join-room', {
       statusCode: 200,
       message: '성공',
       data: { isJoinRoom: true },
@@ -66,7 +66,7 @@ export class ChatGateway {
     const validateTokenResult = await this.tokenService.validateToken(token);
 
     if (validateTokenResult.statusCode !== 200) {
-      this.nsp.emit('error', {
+      socket.emit('error', {
         ...validateTokenResult,
         url: 'create-room/used-item',
         data: {
@@ -87,7 +87,7 @@ export class ChatGateway {
     );
 
     socket.join(createChatRoomResult.id);
-    this.nsp.emit('create-room/used-item', {
+    socket.emit('create-room/used-item', {
       statusCode: 201,
       message: '성공',
       data: { chatRoomId: createChatRoomResult.id },
@@ -104,7 +104,7 @@ export class ChatGateway {
     const validateTokenResult = await this.tokenService.validateToken(token);
 
     if (validateTokenResult.statusCode !== 200) {
-      this.nsp.emit('error', {
+      socket.emit('error', {
         ...validateTokenResult,
         url: 'get-chat/used-item',
         data: { chatRoomId, token },
@@ -115,7 +115,7 @@ export class ChatGateway {
 
     const result = await this.chatService.getProvideUsedTradingInfo(chatRoomId);
 
-    this.nsp.emit('get-chat/used-item', {
+    socket.emit('get-chat/used-item', {
       statusCode: 200,
       message: '성공',
       data: { usedItemInfo: result },
@@ -129,7 +129,7 @@ export class ChatGateway {
     const validateTokenResult = await this.tokenService.validateToken(token);
 
     if (validateTokenResult.statusCode !== 200) {
-      this.nsp.emit('error', {
+      socket.emit('error', {
         ...validateTokenResult,
         url: 'room-list',
         data: { token },
@@ -141,7 +141,7 @@ export class ChatGateway {
     const email = validateTokenResult.user.email;
 
     const result = await this.chatService.getChatRoomList(email);
-    this.nsp.emit('room-list', {
+    socket.emit('room-list', {
       statusCode: 200,
       message: '성공',
       data: { chatRoomList: result },
@@ -158,7 +158,7 @@ export class ChatGateway {
     const validateTokenResult = await this.tokenService.validateToken(token);
 
     if (validateTokenResult.statusCode !== 200) {
-      this.nsp.emit('error', {
+      socket.emit('error', {
         ...validateTokenResult,
         url: 'message',
         data: { message, chatRoomId, token },
