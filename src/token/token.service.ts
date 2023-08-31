@@ -31,8 +31,13 @@ export class TokenService {
         return { statusCode: 200, message: '유효한 토큰', user: decodedToken };
       }
     } catch (error) {
-      if (error?.message === 'jwt expired') {
-        return { statusCode: 419, message: 'jwt expired' };
+      const tokenInfo = await this.jwtService.decode(token);
+
+      if (typeof tokenInfo === 'object' && 'email' in tokenInfo) {
+        if (error?.message === 'jwt expired') {
+          const refreshToken = this.generateRefreshToken(tokenInfo.email);
+          return { statusCode: 419, message: 'jwt expired', refreshToken };
+        }
       }
 
       return { statusCode: 401, message: '유효하지 않은 토큰' };
