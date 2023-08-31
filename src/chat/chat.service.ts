@@ -211,7 +211,6 @@ export class ChatService {
 
       res[dayjs(acc.timestamp).format('YYYY년 M월 D일')].push({
         id: acc._id,
-        sender: acc.sender,
         content: acc.content,
         timestamp: dayjs(acc.timestamp).format('H:mm'),
         timeOfDay: dayjs(acc.timestamp).hour() < 12 ? '오전' : '오후',
@@ -228,7 +227,6 @@ export class ChatService {
         .find({ chatRoomId })
         .sort({ timestamp: 1 });
       const result = this.formatChatList(email, chatList);
-      console.log(result);
       return result;
     } catch (error) {
       console.log(error);
