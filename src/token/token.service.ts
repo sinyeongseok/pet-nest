@@ -35,8 +35,8 @@ export class TokenService {
 
       if (typeof tokenInfo === 'object' && 'email' in tokenInfo) {
         if (error?.message === 'jwt expired') {
-          const refreshToken = this.generateRefreshToken(tokenInfo.email);
-          return { statusCode: 419, message: 'jwt expired', refreshToken };
+          const accessToken = this.generateAccessToken(tokenInfo.email);
+          return { statusCode: 419, message: 'jwt expired', accessToken };
         }
       }
 
