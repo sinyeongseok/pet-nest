@@ -188,12 +188,7 @@ export class ChatService {
 
       await Promise.all([createMessageQuery.save(), updateChatRoomQuery]);
 
-      return {
-        sender,
-        message,
-        timestamp: timestamp.format('H:mm'),
-        timeOfDay: timestamp.hour() < 12 ? '오전' : '오후',
-      };
+      return;
     } catch (error) {
       console.log(error);
       throw new HttpException(
