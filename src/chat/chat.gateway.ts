@@ -160,6 +160,12 @@ export class ChatGateway {
       return;
     }
 
+    await this.chatService.createMessage({
+      chatRoomId,
+      message,
+      sender: validateTokenResult.user.email,
+    });
+
     const room = this.nsp.adapter.rooms.get(chatRoomId);
     const sockets = Array.from(room);
 
