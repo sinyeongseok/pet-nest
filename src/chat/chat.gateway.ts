@@ -169,7 +169,7 @@ export class ChatGateway {
         chatRoomId
       );
 
-      userSocket.emit('message', {
+      userSocket.emit('chat-list', {
         statusCode: 200,
         message: '성공',
         data: { chatList: result },
