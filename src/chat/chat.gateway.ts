@@ -148,7 +148,6 @@ export class ChatGateway {
     @ConnectedSocket() socket,
     @MessageBody() { message, chatRoomId, token }
   ) {
-    console.log(message, chatRoomId, token);
     const validateTokenResult = await this.tokenService.validateToken(token);
 
     if (validateTokenResult.statusCode !== 200) {
@@ -161,9 +160,10 @@ export class ChatGateway {
       return;
     }
 
-    const sockets = this.nsp.adapter.rooms.get(chatRoomId);
+    const room = this.nsp.adapter.rooms.get(chatRoomId);
+    const sockets = Array.from(room);
 
-    for (const socket of sockets) {
+    for await (const socket of sockets) {
       const userSocket: any = this.nsp.sockets.get(socket);
       const result = await this.chatService.getChatList(
         userSocket.userEmail,
