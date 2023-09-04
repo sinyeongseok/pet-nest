@@ -103,6 +103,11 @@ export class ChatGateway {
     const email = validateTokenResult.user.email;
 
     const result = await this.chatService.getChatRoomList(email);
+
+    result.forEach((res) => {
+      socket.join(String(res.id));
+    });
+
     socket.emit('room-list', {
       statusCode: 200,
       message: '성공',
