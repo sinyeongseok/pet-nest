@@ -101,7 +101,7 @@ export class ChatGateway {
     }
 
     const email = validateTokenResult.user.email;
-
+    socket.userEmail = email;
     const result = await this.chatService.getChatRoomList(email);
 
     result.forEach((res) => {
@@ -176,15 +176,24 @@ export class ChatGateway {
 
     for await (const socket of sockets) {
       const userSocket: any = this.nsp.sockets.get(socket);
-      const result = await this.chatService.getChatList(
+      const getChatListresult = await this.chatService.getChatList(
         userSocket.userEmail,
         chatRoomId
+      );
+      const getChatRoomListresult = await this.chatService.getChatRoomList(
+        userSocket.userEmail
       );
 
       userSocket.emit('chat-list', {
         statusCode: 200,
         message: '성공',
-        data: { chatList: result },
+        data: { chatList: getChatListresult },
+      });
+
+      userSocket.emit('room-list', {
+        statusCode: 200,
+        message: '성공',
+        data: { chatRoomList: getChatRoomListresult },
       });
     }
 
