@@ -36,6 +36,7 @@ export class ChatService {
       const createChatRoomQuery = new this.chatRoomModel({
         users: [email, usedItemBoardInfo.seller.email],
         boardId: boardId,
+        region: usedItemBoardInfo.address,
       });
       const createChatRoomResult = await createChatRoomQuery.save();
 
