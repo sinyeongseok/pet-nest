@@ -18,6 +18,9 @@ export class ChatRoomSetting {
 
   @Prop({ default: false })
   isPinned: boolean;
+
+  @Prop({ default: false })
+  isLeave: boolean;
 }
 
 export const ChatRoomSettingSchema =
