@@ -319,4 +319,26 @@ export class ChatService {
       );
     }
   }
+
+  async LeaveChatRoom(email: string, chatRoomId: string) {
+    try {
+      await this.chatRoomSettingModel.updateOne(
+        {
+          chatRoomId,
+          userId: email,
+        },
+        {
+          isLeave: true,
+        }
+      );
+
+      return;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
