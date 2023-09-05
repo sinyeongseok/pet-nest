@@ -103,4 +103,17 @@ export class UserController {
     const result = await this.userService.getRandomNickname();
     return { data: { randomNickname: result } };
   }
+
+  @Patch('blocked/:blockedBy')
+  @UseGuards(JwtAccessAuthGuard)
+  async blockedUser(
+    @Req() req,
+    @Res() res,
+    @Param('blockedBy') blockedBy: string
+  ) {
+    const email = req.user.email;
+    const result = await this.userService.blockedUser(email, blockedBy);
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }

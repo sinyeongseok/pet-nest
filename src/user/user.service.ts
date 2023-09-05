@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
@@ -9,7 +9,10 @@ import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
 import { TokenService } from 'src/token/token.service';
 import { UtilService } from 'src/utils/util.service';
-import { isSet } from 'util/types';
+import {
+  BlockedUser,
+  BlockedUserDocument,
+} from 'src/schema/blockedUserSchema.schema';
 
 @Injectable()
 export class UserService {
@@ -19,6 +22,8 @@ export class UserService {
     private UserAddressModel: Model<UserAddressDocument>,
     @InjectModel(CityAddress.name)
     private CityAddressModel: Model<CityAddressDocument>,
+    @InjectModel(BlockedUser.name)
+    private blockedUserModel: Model<BlockedUserDocument>,
     private awsService: AwsService,
     private tokenService: TokenService,
     private utilService: UtilService
@@ -239,5 +244,24 @@ export class UserService {
     }
 
     return nickname;
+  }
+
+  async blockedUser(email: string, blockedBy: string) {
+    try {
+      const blockedUserQuery = new this.blockedUserModel({
+        blockedBy,
+        userId: email,
+      });
+
+      await blockedUserQuery.save();
+
+      return { statusCode: 200, data: { isBlocked: true } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }
