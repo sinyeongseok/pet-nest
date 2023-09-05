@@ -14,6 +14,10 @@ import { Message, MessageSchema } from 'src/schema/message.schema';
 import { UtilService } from 'src/utils/util.service';
 import { TokenService } from 'src/token/token.service';
 import { ChatController } from './chat.controller';
+import {
+  BlockedUser,
+  BlockedUserSchema,
+} from 'src/schema/blockedUserSchema.schema';
 
 @Module({
   imports: [
@@ -24,6 +28,7 @@ import { ChatController } from './chat.controller';
       { name: ChatRoom.name, schema: ChatRoomSchema },
       { name: ChatRoomSetting.name, schema: ChatRoomSettingSchema },
       { name: Message.name, schema: MessageSchema },
+      { name: BlockedUser.name, schema: BlockedUserSchema },
     ]),
   ],
   controllers: [ChatController],

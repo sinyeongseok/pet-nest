@@ -11,6 +11,10 @@ import { Message, MessageDocument } from 'src/schema/message.schema';
 import { User, UserDocument } from 'src/schema/user.schema';
 import { UtilService } from 'src/utils/util.service';
 import * as dayjs from 'dayjs';
+import {
+  BlockedUser,
+  BlockedUserDocument,
+} from 'src/schema/blockedUserSchema.schema';
 
 @Injectable()
 export class ChatService {
@@ -25,6 +29,8 @@ export class ChatService {
     private chatRoomSettingModel: Model<ChatRoomSettingDocument>,
     @InjectModel(Message.name)
     private messageModel: Model<MessageDocument>,
+    @InjectModel(BlockedUser.name)
+    private blockedUserModel: Model<BlockedUserDocument>,
     private utilService: UtilService
   ) {}
 
@@ -114,10 +120,17 @@ export class ChatService {
 
   async getChatRoomList(email: string) {
     try {
+      const findBlockedUsers = await this.blockedUserModel.find({
+        userId: email,
+      });
+      const blockedUsers = findBlockedUsers.map((acc) => acc.blockedBy);
       const chatRoomAndSettings = await this.chatRoomModel.aggregate([
         {
           $match: {
-            users: email,
+            users: {
+              $nin: blockedUsers,
+              $in: [email],
+            },
           },
         },
         {
