@@ -8,6 +8,10 @@ import { CityAddress, CityAddressSchema } from '../schema/cityAddress.schema';
 import { AwsService } from '../utils/s3';
 import { TokenService } from '../token/token.service';
 import { UtilService } from 'src/utils/util.service';
+import {
+  BlockedUser,
+  BlockedUserSchema,
+} from 'src/schema/blockedUserSchema.schema';
 
 @Module({
   imports: [
@@ -15,6 +19,7 @@ import { UtilService } from 'src/utils/util.service';
       { name: User.name, schema: UserSchema },
       { name: UserAddress.name, schema: UserAddressSchema },
       { name: CityAddress.name, schema: CityAddressSchema },
+      { name: BlockedUser.name, schema: BlockedUserSchema },
     ]),
   ],
   controllers: [UserController],
