@@ -276,19 +276,20 @@ export class ChatService {
     }
   }
 
-  async patchChatRoomAllam(email: string, chatRoomId: string) {
+  async patchChatRoomSetting({ email, chatRoomId, patchItem }) {
     try {
       const chatRoomSettingInfo = await this.chatRoomSettingModel.findOne({
         chatRoomId,
         userId: email,
       });
+
       await this.chatRoomSettingModel.updateOne(
         {
           chatRoomId,
           userId: email,
         },
         {
-          isAllam: chatRoomSettingInfo.isAllam ? false : true,
+          [patchItem]: !chatRoomSettingInfo[patchItem],
         }
       );
 
