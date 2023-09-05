@@ -79,4 +79,18 @@ export class ChatController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Patch('leave')
+  @UseGuards(JwtAccessAuthGuard)
+  async leaveChatRoom(
+    @Req() req,
+    @Res() res,
+    @Param('chatRoomId') chatRoomId: string
+  ) {
+    const email = req.user.email;
+    await this.chatService.LeaveChatRoom(email, chatRoomId);
+    const result = await this.chatService.getChatRoomList(email);
+
+    return res.status(200).json({ chatRoomList: result });
+  }
 }

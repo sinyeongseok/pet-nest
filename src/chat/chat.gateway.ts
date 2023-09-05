@@ -199,36 +199,4 @@ export class ChatGateway {
 
     return { success: true };
   }
-
-  @SubscribeMessage('leave-chat-room')
-  async handLeLeaveChatRoom(
-    @ConnectedSocket() socket,
-    @MessageBody() { chatRoomId, token }
-  ) {
-    const validateTokenResult = await this.tokenService.validateToken(token);
-
-    if (validateTokenResult.statusCode !== 200) {
-      socket.emit('error', {
-        ...validateTokenResult,
-        url: 'leave-chat-room',
-        data: { chatRoomId, token },
-      });
-
-      return;
-    }
-    const email = validateTokenResult.user.email;
-
-    await this.chatService.LeaveChatRoom(email, chatRoomId);
-    socket.leave(chatRoomId);
-
-    const chatRoomList = await this.chatService.getChatRoomList(email);
-
-    socket.emit('room-list', {
-      statusCode: 200,
-      message: '성공',
-      data: { chatRoomList },
-    });
-
-    return { success: true };
-  }
 }
