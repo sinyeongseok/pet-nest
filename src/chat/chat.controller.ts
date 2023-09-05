@@ -63,6 +63,24 @@ export class ChatController {
     return res.status(result.statusCode).json(result.data);
   }
 
+  @Patch('header/allam/:chatRoomId')
+  @UseGuards(JwtAccessAuthGuard)
+  async patchChatHeaderAllam(
+    @Req() req,
+    @Res() res,
+    @Param('chatRoomId') chatRoomId: string
+  ) {
+    const email = req.user.email;
+    const result = await this.chatService.patchChatRoomSetting({
+      email,
+      chatRoomId,
+      patchItem: 'isAllam',
+      isChatListVisible: true,
+    });
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Patch('pinned/:chatRoomId')
   @UseGuards(JwtAccessAuthGuard)
   async patchChatPinned(
