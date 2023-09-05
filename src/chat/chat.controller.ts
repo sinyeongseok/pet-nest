@@ -80,7 +80,7 @@ export class ChatController {
     return res.status(result.statusCode).json(result.data);
   }
 
-  @Patch('leave')
+  @Patch('leave/:chatRoomId')
   @UseGuards(JwtAccessAuthGuard)
   async leaveChatRoom(
     @Req() req,
