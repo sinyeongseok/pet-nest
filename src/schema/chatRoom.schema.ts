@@ -22,6 +22,9 @@ export class ChatRoom {
   @Prop({ default: Date.now })
   lastChatAt: Date;
 
+  @Prop()
+  region: string;
+
   @Prop({ required: true, default: false })
   isPetMate: boolean;
 
