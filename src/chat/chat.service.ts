@@ -261,6 +261,7 @@ export class ChatService {
         userId: email,
       });
       const result = {
+        id: userInfo.email,
         nickname: userInfo.nickname,
         region: chatRoomInfo.region,
         isAllam: chatRoomSetting.isAllam,
