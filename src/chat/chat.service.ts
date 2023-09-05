@@ -291,7 +291,12 @@ export class ChatService {
     }
   }
 
-  async patchChatRoomSetting({ email, chatRoomId, patchItem }) {
+  async patchChatRoomSetting({
+    email,
+    chatRoomId,
+    patchItem,
+    isChatListVisible = false,
+  }) {
     try {
       const chatRoomSettingInfo = await this.chatRoomSettingModel.findOne({
         chatRoomId,
@@ -308,9 +313,46 @@ export class ChatService {
         }
       );
 
+      if (isChatListVisible) {
+        return {
+          statusCode: 200,
+          data: { [patchItem]: !chatRoomSettingInfo[patchItem] },
+        };
+      }
+
       const result = await this.getChatRoomList(email);
 
       return { statusCode: 200, data: { chatRoomList: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async patchChatRoomSettingHeader({ email, chatRoomId, patchItem }) {
+    try {
+      const chatRoomSettingInfo = await this.chatRoomSettingModel.findOne({
+        chatRoomId,
+        userId: email,
+      });
+
+      await this.chatRoomSettingModel.updateOne(
+        {
+          chatRoomId,
+          userId: email,
+        },
+        {
+          [patchItem]: !chatRoomSettingInfo[patchItem],
+        }
+      );
+
+      return {
+        statusCode: 200,
+        data: { [patchItem]: !chatRoomSettingInfo[patchItem] },
+      };
     } catch (error) {
       console.log(error);
       throw new HttpException(
