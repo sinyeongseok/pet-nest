@@ -7,6 +7,8 @@ import {
   Req,
   Get,
   Query,
+  Patch,
+  Param,
 } from '@nestjs/common';
 import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
 import { ChatService } from './chat.service';
@@ -40,6 +42,19 @@ export class ChatController {
       email,
       chatRoomId
     );
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Patch('allam/:chatRoomId')
+  @UseGuards(JwtAccessAuthGuard)
+  async patchChatAllam(
+    @Req() req,
+    @Res() res,
+    @Param('chatRoomId') chatRoomId: string
+  ) {
+    const email = req.user.email;
+    const result = await this.chatService.patchChatRoomAllam(email, chatRoomId);
 
     return res.status(result.statusCode).json(result.data);
   }

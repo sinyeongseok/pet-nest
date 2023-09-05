@@ -270,4 +270,32 @@ export class ChatService {
       );
     }
   }
+
+  async patchChatRoomAllam(email: string, chatRoomId: string) {
+    try {
+      const chatRoomSettingInfo = await this.chatRoomSettingModel.findOne({
+        chatRoomId,
+        userId: email,
+      });
+      await this.chatRoomSettingModel.updateOne(
+        {
+          chatRoomId,
+          userId: email,
+        },
+        {
+          isAllam: chatRoomSettingInfo.isAllam ? false : true,
+        }
+      );
+
+      const result = await this.getChatRoomList(email);
+
+      return { statusCode: 200, data: { chatRoomList: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
