@@ -54,7 +54,28 @@ export class ChatController {
     @Param('chatRoomId') chatRoomId: string
   ) {
     const email = req.user.email;
-    const result = await this.chatService.patchChatRoomAllam(email, chatRoomId);
+    const result = await this.chatService.patchChatRoomSetting({
+      email,
+      chatRoomId,
+      patchItem: 'isAllam',
+    });
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Patch('pinned/:chatRoomId')
+  @UseGuards(JwtAccessAuthGuard)
+  async patchChatPinned(
+    @Req() req,
+    @Res() res,
+    @Param('chatRoomId') chatRoomId: string
+  ) {
+    const email = req.user.email;
+    const result = await this.chatService.patchChatRoomSetting({
+      email,
+      chatRoomId,
+      patchItem: 'isPinned',
+    });
 
     return res.status(result.statusCode).json(result.data);
   }
