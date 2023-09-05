@@ -248,4 +248,26 @@ export class ChatService {
       );
     }
   }
+
+  async getChatRoomHeaderInfo(email: string, chatRoomId: string) {
+    try {
+      const chatRoomInfo = await this.chatRoomModel.findOne({
+        _id: chatRoomId,
+      });
+      const otherUser = chatRoomInfo.users.filter((user) => user !== email);
+      const userInfo = await this.userModel.findOne({ email: otherUser });
+      const result = {
+        nickname: userInfo.nickname,
+        region: chatRoomInfo.region,
+      };
+
+      return { statusCode: 200, data: { chatRoomHeaderInfo: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
