@@ -147,6 +147,7 @@ export class ChatService {
         {
           $match: {
             'chatRoomSettings.userId': email,
+            'chatRoomSettings.isLeave': false,
           },
         },
         {
