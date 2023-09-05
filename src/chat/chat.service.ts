@@ -256,9 +256,14 @@ export class ChatService {
       });
       const otherUser = chatRoomInfo.users.filter((user) => user !== email);
       const userInfo = await this.userModel.findOne({ email: otherUser });
+      const chatRoomSetting = await this.chatRoomSettingModel.findOne({
+        chatRoomId,
+        userId: email,
+      });
       const result = {
         nickname: userInfo.nickname,
         region: chatRoomInfo.region,
+        isAllam: chatRoomSetting.isAllam,
       };
 
       return { statusCode: 200, data: { chatRoomHeaderInfo: result } };
