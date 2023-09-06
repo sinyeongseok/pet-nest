@@ -232,4 +232,46 @@ export class ChatGateway {
 
     return { success: true };
   }
+
+  @SubscribeMessage('alarm')
+  async handleChatRoomSettingAlarm(
+    @ConnectedSocket() socket,
+    @MessageBody() { chatRoomId, token }
+  ) {
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      socket.emit('error', {
+        ...validateTokenResult,
+        url: 'alarm',
+        data: { chatRoomId, token },
+      });
+
+      return;
+    }
+
+    const email = validateTokenResult.user.email;
+
+    const chatRoomSettingResult =
+      await this.chatService.patchChatRoomSettingHeader({
+        email,
+        chatRoomId,
+        patchItem: 'isAlarm',
+      });
+
+    const chatRoomList = await this.chatService.getChatRoomList(email);
+
+    socket.emit('alarm', {
+      statusCode: 200,
+      message: '성공',
+      data: chatRoomSettingResult.data,
+    });
+    socket.emit('room-list', {
+      statusCode: 200,
+      message: '성공',
+      data: { chatRoomList },
+    });
+
+    return { success: true };
+  }
 }
