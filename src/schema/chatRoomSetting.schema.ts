@@ -14,7 +14,7 @@ export class ChatRoomSetting {
   userId: string;
 
   @Prop({ default: true })
-  isAllam: boolean;
+  isAlarm: boolean;
 
   @Prop({ default: false })
   isPinned: boolean;

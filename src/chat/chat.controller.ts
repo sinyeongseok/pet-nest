@@ -46,9 +46,9 @@ export class ChatController {
     return res.status(result.statusCode).json(result.data);
   }
 
-  @Patch('allam/:chatRoomId')
+  @Patch('alarm/:chatRoomId')
   @UseGuards(JwtAccessAuthGuard)
-  async patchChatAllam(
+  async patchChatAlarm(
     @Req() req,
     @Res() res,
     @Param('chatRoomId') chatRoomId: string
@@ -57,15 +57,14 @@ export class ChatController {
     const result = await this.chatService.patchChatRoomSetting({
       email,
       chatRoomId,
-      patchItem: 'isAllam',
+      patchItem: 'isAlarm',
     });
 
     return res.status(result.statusCode).json(result.data);
   }
-
-  @Patch('header/allam/:chatRoomId')
+  @Patch('header/alarm/:chatRoomId')
   @UseGuards(JwtAccessAuthGuard)
-  async patchChatHeaderAllam(
+  async patchChatHeaderAlarm(
     @Req() req,
     @Res() res,
     @Param('chatRoomId') chatRoomId: string
@@ -74,7 +73,7 @@ export class ChatController {
     const result = await this.chatService.patchChatRoomSetting({
       email,
       chatRoomId,
-      patchItem: 'isAllam',
+      patchItem: 'isAlarm',
       isChatListVisible: true,
     });
 

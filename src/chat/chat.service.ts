@@ -100,7 +100,7 @@ export class ChatService {
       title: userInfo.nickname,
       lastChat: chatRoom.lastChat,
       lastChatAt: this.utilService.computeTimeDifference(chatRoom.lastChatAt),
-      isAllam: chatRoom.isAllam,
+      isAlarm: chatRoom.isAlarm,
       isPinned: chatRoom.isPinned,
       ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
     };
@@ -158,7 +158,7 @@ export class ChatService {
             isPetMate: 1,
             lastChat: 1,
             lastChatAt: 1,
-            isAllam: '$chatRoomSettings.isAllam',
+            isAlarm: '$chatRoomSettings.isAlarm',
             isPinned: '$chatRoomSettings.isPinned',
           },
         },
@@ -278,7 +278,7 @@ export class ChatService {
         id: userInfo.email,
         nickname: userInfo.nickname,
         region: chatRoomInfo.region,
-        isAllam: chatRoomSetting.isAllam,
+        isAlarm: chatRoomSetting.isAlarm,
       };
 
       return { statusCode: 200, data: { chatRoomHeaderInfo: result } };
