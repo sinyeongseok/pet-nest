@@ -17,10 +17,14 @@ import { UserService } from './user.service';
 import { Express, Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
+import { ChatService } from 'src/chat/chat.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private chatService: ChatService
+  ) {}
 
   @Post('profile')
   @UseInterceptors(FileInterceptor('profileImage'))
@@ -112,8 +116,9 @@ export class UserController {
     @Param('blockedBy') blockedBy: string
   ) {
     const email = req.user.email;
-    const result = await this.userService.blockedUser(email, blockedBy);
+    await this.userService.blockedUser(email, blockedBy);
+    const result = await this.chatService.getChatRoomList(email);
 
-    return res.status(result.statusCode).json(result.data);
+    return res.status(200).json({ chatRoomList: result });
   }
 }
