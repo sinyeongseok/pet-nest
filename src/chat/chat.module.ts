@@ -18,6 +18,7 @@ import {
   BlockedUser,
   BlockedUserSchema,
 } from 'src/schema/blockedUserSchema.schema';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [
@@ -32,6 +33,6 @@ import {
     ]),
   ],
   controllers: [ChatController],
-  providers: [ChatGateway, ChatService, UtilService, TokenService],
+  providers: [ChatGateway, ChatService, UtilService, TokenService, UserService],
 })
 export class ChatModule {}

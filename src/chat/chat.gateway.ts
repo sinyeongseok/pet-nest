@@ -8,6 +8,7 @@ import {
 import { Socket, Namespace } from 'socket.io';
 import { ChatService } from './chat.service';
 import { TokenService } from 'src/token/token.service';
+import { UserService } from 'src/user/user.service';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -18,7 +19,8 @@ import { TokenService } from 'src/token/token.service';
 export class ChatGateway {
   constructor(
     private readonly chatService: ChatService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private userService: UserService
   ) {}
   @WebSocketServer() nsp: Namespace;
 
@@ -266,6 +268,36 @@ export class ChatGateway {
       message: '성공',
       data: chatRoomSettingResult.data,
     });
+    socket.emit('room-list', {
+      statusCode: 200,
+      message: '성공',
+      data: { chatRoomList },
+    });
+
+    return { success: true };
+  }
+
+  @SubscribeMessage('blocked')
+  async handleBlockedUser(
+    @ConnectedSocket() socket,
+    @MessageBody() { blockedBy, token }
+  ) {
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      socket.emit('error', {
+        ...validateTokenResult,
+        url: 'blocked',
+        data: { blockedBy, token },
+      });
+
+      return;
+    }
+
+    const email = validateTokenResult.user.email;
+    await this.userService.blockedUser(email, blockedBy);
+    const chatRoomList = await this.chatService.getChatRoomList(email);
+
     socket.emit('room-list', {
       statusCode: 200,
       message: '성공',
