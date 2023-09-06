@@ -134,6 +134,8 @@ export class ChatGateway {
       return;
     }
 
+    socket.join(chatRoomId);
+
     const result = await this.chatService.getChatList(
       validateTokenResult.user.email,
       chatRoomId
