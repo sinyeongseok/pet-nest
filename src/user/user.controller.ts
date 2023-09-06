@@ -17,14 +17,10 @@ import { UserService } from './user.service';
 import { Express, Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
-import { ChatService } from 'src/chat/chat.service';
 
 @Controller('user')
 export class UserController {
-  constructor(
-    private userService: UserService,
-    private chatService: ChatService
-  ) {}
+  constructor(private userService: UserService) {}
 
   @Post('profile')
   @UseInterceptors(FileInterceptor('profileImage'))

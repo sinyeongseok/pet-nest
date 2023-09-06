@@ -12,7 +12,6 @@ import {
   BlockedUser,
   BlockedUserSchema,
 } from 'src/schema/blockedUserSchema.schema';
-import { ChatService } from 'src/chat/chat.service';
 
 @Module({
   imports: [
@@ -20,10 +19,9 @@ import { ChatService } from 'src/chat/chat.service';
       { name: User.name, schema: UserSchema },
       { name: UserAddress.name, schema: UserAddressSchema },
       { name: CityAddress.name, schema: CityAddressSchema },
-      { name: BlockedUser.name, schema: BlockedUserSchema },
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService, AwsService, TokenService, UtilService, ChatService],
+  providers: [UserService, AwsService, TokenService, UtilService],
 })
 export class UserModule {}

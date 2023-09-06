@@ -8,7 +8,6 @@ import {
 import { Socket, Namespace } from 'socket.io';
 import { ChatService } from './chat.service';
 import { TokenService } from 'src/token/token.service';
-import { UserService } from 'src/user/user.service';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -19,8 +18,7 @@ import { UserService } from 'src/user/user.service';
 export class ChatGateway {
   constructor(
     private readonly chatService: ChatService,
-    private tokenService: TokenService,
-    private userService: UserService
+    private tokenService: TokenService
   ) {}
   @WebSocketServer() nsp: Namespace;
 
@@ -295,7 +293,7 @@ export class ChatGateway {
     }
 
     const email = validateTokenResult.user.email;
-    await this.userService.blockedUser(email, blockedBy);
+    await this.chatService.blockedUser(email, blockedBy);
     const chatRoomList = await this.chatService.getChatRoomList(email);
 
     socket.emit('room-list', {
