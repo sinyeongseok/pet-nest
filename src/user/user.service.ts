@@ -255,7 +255,7 @@ export class UserService {
 
       await blockedUserQuery.save();
 
-      return { statusCode: 200, data: { isBlocked: true } };
+      return;
     } catch (error) {
       console.log(error);
       throw new HttpException(
