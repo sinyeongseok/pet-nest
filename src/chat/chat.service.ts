@@ -108,7 +108,7 @@ export class ChatService {
 
   private async formatChatRoomList(chatRoomList, email) {
     const sortChatRoomList = chatRoomList.sort(
-      (a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0)
+      (a, b) => b.isPinned - a.isPinned
     );
 
     return Promise.all(
