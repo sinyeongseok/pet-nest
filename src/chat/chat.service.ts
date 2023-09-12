@@ -15,6 +15,10 @@ import {
   BlockedUser,
   BlockedUserDocument,
 } from 'src/schema/blockedUserSchema.schema';
+import {
+  UsedItemSchedule,
+  UsedItemScheduleDocument,
+} from 'src/schema/usedItemSchedule.schema';
 
 @Injectable()
 export class ChatService {
@@ -31,6 +35,8 @@ export class ChatService {
     private messageModel: Model<MessageDocument>,
     @InjectModel(BlockedUser.name)
     private blockedUserModel: Model<BlockedUserDocument>,
+    @InjectModel(UsedItemSchedule.name)
+    private usedItemScheduleModel: Model<UsedItemScheduleDocument>,
     private utilService: UtilService
   ) {}
 
@@ -392,6 +398,44 @@ export class ChatService {
       });
 
       await blockedUserQuery.save();
+
+      return;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async createUsedItemSchedule({ chatRoomId, promiseAt, alarmTime = '' }) {
+    try {
+      const date = dayjs(promiseAt, 'YYYY-MM-DD HH:mm');
+      const timestamp = dayjs(
+        new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
+      );
+      const alarmAt = date.subtract(parseInt(alarmTime), 'minute').toDate();
+      const createUsedItemScheduleQuery = new this.usedItemScheduleModel({
+        chatRoomId,
+        timestamp,
+        promiseAt: date.toDate(),
+        ...(!!alarmTime && { alarmAt, isAlarm: true }),
+      });
+      const updateChatRoomQuery = this.chatRoomModel.updateOne(
+        {
+          _id: chatRoomId,
+        },
+        {
+          lastChat: '직거래 약속이 잡혔어요',
+          lastChatAt: timestamp,
+        }
+      );
+
+      await Promise.all([
+        updateChatRoomQuery,
+        createUsedItemScheduleQuery.save(),
+      ]);
 
       return;
     } catch (error) {

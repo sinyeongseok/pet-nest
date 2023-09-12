@@ -306,4 +306,56 @@ export class ChatGateway {
 
     return { success: true };
   }
+
+  @SubscribeMessage('')
+  async handle(
+    @ConnectedSocket() socket,
+    @MessageBody() { chatRoomId, promiseAt, alarmTime, token }
+  ) {
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      socket.emit('error', {
+        ...validateTokenResult,
+        url: 'blocked',
+        data: { chatRoomId, promiseAt, alarmTime, token },
+      });
+
+      return;
+    }
+
+    await this.chatService.createUsedItemSchedule({
+      chatRoomId,
+      promiseAt,
+      alarmTime,
+    });
+
+    const room = this.nsp.adapter.rooms.get(chatRoomId);
+    const sockets = Array.from(room);
+
+    for await (const socket of sockets) {
+      const userSocket: any = this.nsp.sockets.get(socket);
+      const getChatListresult = await this.chatService.getChatList(
+        userSocket.userEmail,
+        chatRoomId
+      );
+      const getChatRoomListresult = await this.chatService.getChatRoomList(
+        userSocket.userEmail
+      );
+
+      userSocket.emit('chat-list', {
+        statusCode: 200,
+        message: '성공',
+        data: { chatList: getChatListresult },
+      });
+
+      userSocket.emit('room-list', {
+        statusCode: 200,
+        message: '성공',
+        data: { chatRoomList: getChatRoomListresult },
+      });
+    }
+
+    return { success: true };
+  }
 }
