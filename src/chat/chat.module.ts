@@ -18,6 +18,10 @@ import {
   BlockedUser,
   BlockedUserSchema,
 } from 'src/schema/blockedUserSchema.schema';
+import {
+  UsedItemSchedule,
+  UsedItemScheduleSchema,
+} from 'src/schema/usedItemSchedule.schema';
 
 @Module({
   imports: [
@@ -29,6 +33,7 @@ import {
       { name: ChatRoomSetting.name, schema: ChatRoomSettingSchema },
       { name: Message.name, schema: MessageSchema },
       { name: BlockedUser.name, schema: BlockedUserSchema },
+      { name: UsedItemSchedule.name, schema: UsedItemScheduleSchema },
     ]),
   ],
   controllers: [ChatController],
