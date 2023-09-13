@@ -20,6 +20,8 @@ import {
   UsedItemScheduleDocument,
 } from 'src/schema/usedItemSchedule.schema';
 
+dayjs.locale('ko');
+
 @Injectable()
 export class ChatService {
   constructor(
@@ -219,34 +221,66 @@ export class ChatService {
     }
   }
 
-  formatChatList(email, chatList) {
-    return chatList.reduce((res, acc) => {
-      if (!res[dayjs(acc.timestamp).format('YYYY년 M월 D일')]) {
-        res[dayjs(acc.timestamp).format('YYYY년 M월 D일')] = [];
+  formatPromiseAt(promiseAt) {
+    const daysMap = {
+      Sunday: '일',
+      Monday: '월',
+      Tuesday: '화',
+      Wednesday: '수',
+      Thursday: '목',
+      Friday: '금',
+      Saturday: '토',
+    };
+    const timeOfDayMap = {
+      am: '오전',
+      pm: '오후',
+    };
+    const date = dayjs(promiseAt);
+    const promiseDate = date.format('M.D');
+    const promiseDay = date.format('dddd');
+    const promiseTimeOfDay = date.format('a');
+    const promiseTime = date.format('h:mm');
+
+    return `${promiseDate} (${daysMap[promiseDay]}) ${timeOfDayMap[promiseTimeOfDay]} ${promiseTime}`;
+  }
+
+  formatChatList(email, chatList, scheduleList) {
+    const newChatList = [...chatList, ...scheduleList].sort(
+      (a, b) => a.timestamp - b.timestamp
+    );
+    return newChatList.reduce((res, acc) => {
+      const date = dayjs(acc.timestamp).format('YYYY년 M월 D일');
+      if (!res[date]) {
+        res[date] = [];
       }
 
-      if (res[dayjs(acc.timestamp).format('YYYY년 M월 D일')].length > 0) {
-        const length =
-          res[dayjs(acc.timestamp).format('YYYY년 M월 D일')].length;
+      if (res[date].length > 0) {
+        const length = res[date].length;
 
         if (
-          res[dayjs(acc.timestamp).format('YYYY년 M월 D일')][length - 1]
-            .timestamp == dayjs(acc.timestamp).format('H:mm')
+          res[date][length - 1].timestamp == dayjs(acc.timestamp).format('H:mm')
         ) {
-          delete res[dayjs(acc.timestamp).format('YYYY년 M월 D일')][length - 1]
-            .timestamp;
-          delete res[dayjs(acc.timestamp).format('YYYY년 M월 D일')][length - 1]
-            .timeOfDay;
+          delete res[date][length - 1].timestamp;
+          delete res[date][length - 1].timeOfDay;
         }
       }
 
-      res[dayjs(acc.timestamp).format('YYYY년 M월 D일')].push({
-        id: acc._id,
-        content: acc.content,
-        timestamp: dayjs(acc.timestamp).format('H:mm'),
-        timeOfDay: dayjs(acc.timestamp).hour() < 12 ? '오전' : '오후',
-        ...(acc.sender === email && { isMe: true }),
-      });
+      if (!!acc.promiseAt) {
+        res[date].push({
+          id: acc._id,
+          promiseAt: this.formatPromiseAt(acc.promiseAt),
+          content: acc.content,
+          isPromise: true,
+        });
+      } else {
+        res[date].push({
+          id: acc._id,
+          content: acc.content,
+          timestamp: dayjs(acc.timestamp).format('H:mm'),
+          timeOfDay: dayjs(acc.timestamp).hour() < 12 ? '오전' : '오후',
+          ...(acc.sender === email && { isMe: true }),
+        });
+      }
 
       return res;
     }, {});
@@ -254,10 +288,19 @@ export class ChatService {
 
   async getChatList(email, chatRoomId: string) {
     try {
-      const chatList = await this.messageModel
+      const getChatList = this.messageModel
         .find({ chatRoomId })
-        .sort({ timestamp: 1 });
-      const result = this.formatChatList(email, chatList);
+        .sort({ timestamp: 1 })
+        .exec();
+      const getScheduleList = this.usedItemScheduleModel
+        .find({ chatRoomId })
+        .sort({ timestamp: 1 })
+        .exec();
+      const [chatList, scheduleList] = await Promise.all([
+        getChatList,
+        getScheduleList,
+      ]);
+      const result = this.formatChatList(email, chatList, scheduleList);
 
       return result;
     } catch (error) {
@@ -420,6 +463,7 @@ export class ChatService {
         chatRoomId,
         timestamp,
         promiseAt: date.toDate(),
+        content: '직거래 약속이 잡혔어요',
         ...(!!alarmTime && { alarmAt, isAlarm: true }),
       });
       const updateChatRoomQuery = this.chatRoomModel.updateOne(
