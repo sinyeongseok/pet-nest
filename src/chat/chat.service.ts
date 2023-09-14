@@ -85,6 +85,7 @@ export class ChatService {
       });
 
       return {
+        id: usedItemBoardInfo._id,
         title: usedItemBoardInfo.title,
         price: `${usedItemBoardInfo.price.toLocaleString()}원`,
         status: usedItemBoardInfo.salesStatus,
