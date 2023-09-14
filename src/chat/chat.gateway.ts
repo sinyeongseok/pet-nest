@@ -307,7 +307,7 @@ export class ChatGateway {
     return { success: true };
   }
 
-  @SubscribeMessage('')
+  @SubscribeMessage('schedule')
   async handle(
     @ConnectedSocket() socket,
     @MessageBody() { chatRoomId, promiseAt, alarmTime, token }
@@ -317,7 +317,7 @@ export class ChatGateway {
     if (validateTokenResult.statusCode !== 200) {
       socket.emit('error', {
         ...validateTokenResult,
-        url: 'blocked',
+        url: 'schedule',
         data: { chatRoomId, promiseAt, alarmTime, token },
       });
 
