@@ -150,6 +150,37 @@ export class ChatGateway {
     return { success: true, data: { chatList: result } };
   }
 
+  private async broadcastChatList(sockets, chatRoomId) {
+    for await (const socket of sockets) {
+      const userSocket: any = this.nsp.sockets.get(socket);
+      const getChatListresult = await this.chatService.getChatList(
+        userSocket.userEmail,
+        chatRoomId
+      );
+
+      userSocket.emit('chat-list', {
+        statusCode: 200,
+        message: '성공',
+        data: { chatList: getChatListresult },
+      });
+    }
+  }
+
+  private async broadcastChatRoomList(sockets) {
+    for await (const socket of sockets) {
+      const userSocket: any = this.nsp.sockets.get(socket);
+      const getChatRoomListresult = await this.chatService.getChatRoomList(
+        userSocket.userEmail
+      );
+
+      userSocket.emit('room-list', {
+        statusCode: 200,
+        message: '성공',
+        data: { chatRoomList: getChatRoomListresult },
+      });
+    }
+  }
+
   @SubscribeMessage('message')
   async handleSendMessage(
     @ConnectedSocket() socket,
@@ -176,28 +207,10 @@ export class ChatGateway {
     const room = this.nsp.adapter.rooms.get(chatRoomId);
     const sockets = Array.from(room);
 
-    for await (const socket of sockets) {
-      const userSocket: any = this.nsp.sockets.get(socket);
-      const getChatListresult = await this.chatService.getChatList(
-        userSocket.userEmail,
-        chatRoomId
-      );
-      const getChatRoomListresult = await this.chatService.getChatRoomList(
-        userSocket.userEmail
-      );
-
-      userSocket.emit('chat-list', {
-        statusCode: 200,
-        message: '성공',
-        data: { chatList: getChatListresult },
-      });
-
-      userSocket.emit('room-list', {
-        statusCode: 200,
-        message: '성공',
-        data: { chatRoomList: getChatRoomListresult },
-      });
-    }
+    await Promise.all([
+      this.broadcastChatList(sockets, chatRoomId),
+      this.broadcastChatRoomList(sockets),
+    ]);
 
     return { success: true };
   }
@@ -333,28 +346,10 @@ export class ChatGateway {
     const room = this.nsp.adapter.rooms.get(chatRoomId);
     const sockets = Array.from(room);
 
-    for await (const socket of sockets) {
-      const userSocket: any = this.nsp.sockets.get(socket);
-      const getChatListresult = await this.chatService.getChatList(
-        userSocket.userEmail,
-        chatRoomId
-      );
-      const getChatRoomListresult = await this.chatService.getChatRoomList(
-        userSocket.userEmail
-      );
-
-      userSocket.emit('chat-list', {
-        statusCode: 200,
-        message: '성공',
-        data: { chatList: getChatListresult },
-      });
-
-      userSocket.emit('room-list', {
-        statusCode: 200,
-        message: '성공',
-        data: { chatRoomList: getChatRoomListresult },
-      });
-    }
+    await Promise.all([
+      this.broadcastChatList(sockets, chatRoomId),
+      this.broadcastChatRoomList(sockets),
+    ]);
 
     return { success: true };
   }
