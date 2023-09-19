@@ -491,4 +491,41 @@ export class ChatService {
       );
     }
   }
+
+  async getAlarmInfo(alarmId: string) {
+    try {
+      const alarmInfo = await this.usedItemScheduleModel.findOne({
+        _id: alarmId,
+      });
+      const alarmTime = (() => {
+        const promiseAt = dayjs(alarmInfo.promiseAt);
+        const alarmAt = dayjs(alarmInfo.alarmAt);
+        const diffMinute = promiseAt.diff(alarmAt, 'minute');
+
+        if (diffMinute === 60) {
+          return `1시간 전`;
+        }
+
+        return `${diffMinute}분 전`;
+      })();
+      const promiseDateAndTime = this.formatPromiseAt(
+        alarmInfo.promiseAt
+      ).split(' ');
+
+      const result = {
+        promiseAt: alarmInfo.promiseAt,
+        promiseDate: `${promiseDateAndTime[0]} ${promiseDateAndTime[1]}`,
+        promiseTime: `${promiseDateAndTime[2]} ${promiseDateAndTime[3]}`,
+        ...(alarmInfo.isAlarm && { alarmTime, isAlarm: alarmInfo.isAlarm }),
+      };
+
+      return { statusCode: 200, data: { alarmInfo: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }

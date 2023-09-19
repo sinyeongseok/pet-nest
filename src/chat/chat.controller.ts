@@ -110,4 +110,12 @@ export class ChatController {
 
     return res.status(200).json({ chatRoomList: result });
   }
+
+  @Get('alarm')
+  @UseGuards(JwtAccessAuthGuard)
+  async getAlarmInfo(@Res() res, @Query('alarmId') alarmId: string) {
+    const result = await this.chatService.getAlarmInfo(alarmId);
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
