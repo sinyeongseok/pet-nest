@@ -321,7 +321,7 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('schedule')
-  async handle(
+  async handleCreateSchedule(
     @ConnectedSocket() socket,
     @MessageBody() { chatRoomId, promiseAt, alarmTime, token }
   ) {
