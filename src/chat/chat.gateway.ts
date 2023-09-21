@@ -348,6 +348,12 @@ export class ChatGateway {
     const room = this.nsp.adapter.rooms.get(chatRoomId);
     const sockets = Array.from(room);
 
+    socket.emit('create-schedule', {
+      statusCode: 200,
+      message: '성공',
+      data: { isCreate: true },
+    });
+
     await Promise.all([
       this.broadcastChatList(sockets, chatRoomId),
       this.broadcastChatRoomList(sockets),
