@@ -418,7 +418,6 @@ export class ChatGateway {
     }
 
     const result = await this.chatService.deleteSchedule(scheduleId);
-    console.log(result);
     const room = this.nsp.adapter.rooms.get(result);
     const sockets = Array.from(room);
 
