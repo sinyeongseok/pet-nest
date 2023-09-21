@@ -8,6 +8,7 @@ import {
 import { Socket, Namespace } from 'socket.io';
 import { ChatService } from './chat.service';
 import { TokenService } from 'src/token/token.service';
+import { BoardService } from 'src/board/board.service';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -18,7 +19,8 @@ import { TokenService } from 'src/token/token.service';
 export class ChatGateway {
   constructor(
     private readonly chatService: ChatService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private boardService: BoardService
   ) {}
   @WebSocketServer() nsp: Namespace;
 
@@ -350,6 +352,44 @@ export class ChatGateway {
       this.broadcastChatList(sockets, chatRoomId),
       this.broadcastChatRoomList(sockets),
     ]);
+
+    return { success: true };
+  }
+
+  @SubscribeMessage('patch-used-item-status')
+  async handlePatchStatusUsedItemBoard(
+    @ConnectedSocket() socket,
+    @MessageBody() { chatRoomId, usedItemBoardId, status, token }
+  ) {
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      socket.emit('error', {
+        ...validateTokenResult,
+        url: 'patch-used-item-status',
+        data: { usedItemBoardId, status, token },
+      });
+
+      return;
+    }
+
+    await this.boardService.changeBoardStatus(usedItemBoardId, status);
+
+    const room = this.nsp.adapter.rooms.get(chatRoomId);
+    const sockets = Array.from(room);
+
+    for await (const socket of sockets) {
+      const userSocket: any = this.nsp.sockets.get(socket);
+      const result = await this.chatService.getProvideUsedTradingInfo(
+        chatRoomId
+      );
+
+      userSocket.emit('get-chat/used-item', {
+        statusCode: 200,
+        message: '성공',
+        data: { usedItemInfo: result },
+      });
+    }
 
     return { success: true };
   }
