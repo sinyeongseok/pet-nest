@@ -528,4 +528,37 @@ export class ChatService {
       );
     }
   }
+
+  async deleteSchedule(scheduleId: string) {
+    try {
+      const scheduleInfo = await this.usedItemScheduleModel.findOne({
+        _id: scheduleId,
+      });
+      const chatRoomId = String(scheduleInfo.chatRoomId);
+      const deleteScheduleQuery = this.usedItemScheduleModel.deleteOne({
+        _id: scheduleId,
+      });
+      const updateChatRoomQuery = this.chatRoomModel.updateOne(
+        {
+          _id: chatRoomId,
+        },
+        {
+          lastChat: '직거래 약속이 취소되었습니다.',
+          lastChatAt: dayjs(
+            new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
+          ),
+        }
+      );
+
+      await Promise.all([deleteScheduleQuery, updateChatRoomQuery]);
+
+      return chatRoomId;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }

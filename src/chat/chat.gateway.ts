@@ -399,4 +399,34 @@ export class ChatGateway {
 
     return { success: true };
   }
+
+  @SubscribeMessage('delete-schedule')
+  async handleDeleteSchedule(
+    @ConnectedSocket() socket,
+    @MessageBody() { scheduleId, token }
+  ) {
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      socket.emit('error', {
+        ...validateTokenResult,
+        url: 'delete-schedule',
+        data: { scheduleId, token },
+      });
+
+      return;
+    }
+
+    const result = await this.chatService.deleteSchedule(scheduleId);
+    console.log(result);
+    const room = this.nsp.adapter.rooms.get(result);
+    const sockets = Array.from(room);
+
+    await Promise.all([
+      this.broadcastChatList(sockets, result),
+      this.broadcastChatRoomList(sockets),
+    ]);
+
+    return { success: true };
+  }
 }
