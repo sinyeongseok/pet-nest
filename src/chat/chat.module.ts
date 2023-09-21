@@ -22,12 +22,17 @@ import {
   UsedItemSchedule,
   UsedItemScheduleSchema,
 } from 'src/schema/usedItemSchedule.schema';
+import { BoardService } from 'src/board/board.service';
+import { AddressService } from 'src/address/address.service';
+import { AwsService } from 'src/utils/s3';
+import { CityAddress, CityAddressSchema } from 'src/schema/cityAddress.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: UsedItemBoard.name, schema: UsedItemBoardSchema },
       { name: UserAddress.name, schema: UserAddressSchema },
+      { name: CityAddress.name, schema: CityAddressSchema },
       { name: User.name, schema: UserSchema },
       { name: ChatRoom.name, schema: ChatRoomSchema },
       { name: ChatRoomSetting.name, schema: ChatRoomSettingSchema },
@@ -37,6 +42,14 @@ import {
     ]),
   ],
   controllers: [ChatController],
-  providers: [ChatGateway, ChatService, UtilService, TokenService],
+  providers: [
+    ChatGateway,
+    ChatService,
+    UtilService,
+    TokenService,
+    BoardService,
+    AwsService,
+    AddressService,
+  ],
 })
 export class ChatModule {}
