@@ -428,4 +428,34 @@ export class ChatGateway {
 
     return { success: true };
   }
+
+  @SubscribeMessage('patch-schedule')
+  async handlePatchSchedule(
+    @ConnectedSocket() socket,
+    @MessageBody() { scheduleId, promiseAt, alarmTime, token }
+  ) {
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      socket.emit('error', {
+        ...validateTokenResult,
+        url: 'patch-schedule',
+        data: { scheduleId, promiseAt, alarmTime, token },
+      });
+
+      return;
+    }
+
+    const result = await this.chatService.updateUsedItemSchedule({
+      scheduleId,
+      promiseAt,
+      alarmTime,
+    });
+    const room = this.nsp.adapter.rooms.get(result);
+    const sockets = Array.from(room);
+
+    await this.broadcastChatList(sockets, result);
+
+    return { success: true };
+  }
 }

@@ -561,4 +561,28 @@ export class ChatService {
       );
     }
   }
+
+  async updateUsedItemSchedule({ scheduleId, promiseAt, alarmTime }) {
+    try {
+      const date = dayjs(promiseAt, 'YYYY-MM-DD HH:mm');
+      const alarmAt = date.subtract(parseInt(alarmTime), 'minute').toDate();
+      const result = await this.usedItemScheduleModel.findOneAndUpdate(
+        {
+          _id: scheduleId,
+        },
+        {
+          promiseAt: date.toDate(),
+          ...(!!alarmTime ? { alarmAt, isAlarm: true } : { isAlarm: false }),
+        }
+      );
+
+      return String(result.chatRoomId);
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
