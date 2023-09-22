@@ -7,7 +7,7 @@ export type ChatRoomDocument = ChatRoom & Document;
   versionKey: false,
 })
 export class ChatRoom {
-  @Prop()
+  @Prop({ type: 'ObjectId', ref: 'UsedItemBoard' })
   boardId: string;
 
   @Prop([String])
