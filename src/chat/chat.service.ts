@@ -100,9 +100,11 @@ export class ChatService {
     }
   }
 
-  private async formatChatRoom(chatRoom, email) {
+  private async formatChatRoom(chatRoom, email, blockedUsers) {
     const otherUser = chatRoom.users.filter((user: string[]) => user !== email);
     const userInfo = await this.userModel.findOne({ email: otherUser });
+    const isBlocked = blockedUsers.includes(otherUser[0]);
+
     return {
       id: chatRoom._id,
       title: userInfo.nickname,
@@ -112,18 +114,19 @@ export class ChatService {
       isPinned: chatRoom.isPinned,
       ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
       ...(!!chatRoom.images && { productImage: chatRoom.images[0] }),
+      ...(isBlocked && { isBlocked: true }),
     };
   }
 
-  private async formatChatRoomList(chatRoomList, email) {
+  private async formatChatRoomList(chatRoomList, email, blockedUsers) {
     const sortChatRoomList = chatRoomList.sort(
       (a, b) => b.isPinned - a.isPinned
     );
 
     return Promise.all(
-      sortChatRoomList.map((chatRoom) => {
-        return this.formatChatRoom(chatRoom, email);
-      })
+      sortChatRoomList.map((chatRoom) =>
+        this.formatChatRoom(chatRoom, email, blockedUsers)
+      )
     );
   }
 
@@ -137,7 +140,6 @@ export class ChatService {
         {
           $match: {
             users: {
-              $nin: blockedUsers,
               $in: [email],
             },
           },
@@ -189,7 +191,11 @@ export class ChatService {
           },
         },
       ]);
-      const result = await this.formatChatRoomList(chatRoomAndSettings, email);
+      const result = await this.formatChatRoomList(
+        chatRoomAndSettings,
+        email,
+        blockedUsers
+      );
 
       return result;
     } catch (error) {
