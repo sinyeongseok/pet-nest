@@ -103,7 +103,6 @@ export class ChatService {
   private async formatChatRoom(chatRoom, email) {
     const otherUser = chatRoom.users.filter((user: string[]) => user !== email);
     const userInfo = await this.userModel.findOne({ email: otherUser });
-
     return {
       id: chatRoom._id,
       title: userInfo.nickname,
@@ -112,6 +111,7 @@ export class ChatService {
       isAlarm: chatRoom.isAlarm,
       isPinned: chatRoom.isPinned,
       ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
+      ...(!!chatRoom.images && { productImage: chatRoom.images[0] }),
     };
   }
 
@@ -160,6 +160,17 @@ export class ChatService {
           },
         },
         {
+          $lookup: {
+            from: 'useditemboards', // UsedItemBoard 모델명을 사용하세요.
+            localField: 'boardId', // ChatRoom 모델과 UsedItemBoard 모델 간의 연결 필드를 사용하세요.
+            foreignField: '_id', // UsedItemBoard 모델의 고유 식별자 필드를 사용하세요.
+            as: 'usedItemBoards',
+          },
+        },
+        {
+          $unwind: '$usedItemBoards',
+        },
+        {
           $project: {
             _id: 1,
             users: 1,
@@ -169,6 +180,7 @@ export class ChatService {
             lastChatAt: 1,
             isAlarm: '$chatRoomSettings.isAlarm',
             isPinned: '$chatRoomSettings.isPinned',
+            images: '$usedItemBoards.images',
           },
         },
         {
