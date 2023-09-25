@@ -100,10 +100,9 @@ export class ChatService {
     }
   }
 
-  private async formatChatRoom(chatRoom, email, blockedUsers) {
+  private async formatChatRoom(chatRoom, email) {
     const otherUser = chatRoom.users.filter((user: string[]) => user !== email);
     const userInfo = await this.userModel.findOne({ email: otherUser });
-    const isBlocked = blockedUsers.includes(otherUser[0]);
 
     return {
       id: chatRoom._id,
@@ -114,28 +113,21 @@ export class ChatService {
       isPinned: chatRoom.isPinned,
       ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
       ...(!!chatRoom.images && { productImage: chatRoom.images[0] }),
-      ...(isBlocked && { isBlocked: true }),
     };
   }
 
-  private async formatChatRoomList(chatRoomList, email, blockedUsers) {
+  private async formatChatRoomList(chatRoomList, email) {
     const sortChatRoomList = chatRoomList.sort(
       (a, b) => b.isPinned - a.isPinned
     );
 
     return Promise.all(
-      sortChatRoomList.map((chatRoom) =>
-        this.formatChatRoom(chatRoom, email, blockedUsers)
-      )
+      sortChatRoomList.map((chatRoom) => this.formatChatRoom(chatRoom, email))
     );
   }
 
   async getChatRoomList(email: string) {
     try {
-      const findBlockedUsers = await this.blockedUserModel.find({
-        userId: email,
-      });
-      const blockedUsers = findBlockedUsers.map((acc) => acc.blockedBy);
       const chatRoomAndSettings = await this.chatRoomModel.aggregate([
         {
           $match: {
@@ -191,11 +183,7 @@ export class ChatService {
           },
         },
       ]);
-      const result = await this.formatChatRoomList(
-        chatRoomAndSettings,
-        email,
-        blockedUsers
-      );
+      const result = await this.formatChatRoomList(chatRoomAndSettings, email);
 
       return result;
     } catch (error) {
@@ -595,6 +583,28 @@ export class ChatService {
       );
 
       return String(result.chatRoomId);
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async checkBlockedUserChats(email: string, chatRoomId: string) {
+    try {
+      const findBlockedUsers = await this.blockedUserModel.find({
+        userId: email,
+      });
+      const blockedUsers = findBlockedUsers.map((acc) => acc.blockedBy);
+      const chatRoom = await this.chatRoomModel.findOne({
+        _id: chatRoomId,
+        users: { $in: blockedUsers },
+      });
+      const isBlockedUser = !!chatRoom;
+
+      return { statusCode: 200, data: { isBlockedUser } };
     } catch (error) {
       console.log(error);
       throw new HttpException(
