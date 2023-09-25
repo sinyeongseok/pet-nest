@@ -465,7 +465,8 @@ export class ChatService {
       const timestamp = dayjs(
         new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
       );
-      const alarmAt = date.subtract(parseInt(alarmTime), 'minute').toDate();
+      const alarm = alarmTime === '1시간 전' ? 60 : parseInt(alarmTime);
+      const alarmAt = date.subtract(alarm, 'minute').toDate();
       const createUsedItemScheduleQuery = new this.usedItemScheduleModel({
         chatRoomId,
         timestamp,
@@ -571,7 +572,8 @@ export class ChatService {
   async updateUsedItemSchedule({ scheduleId, promiseAt, alarmTime }) {
     try {
       const date = dayjs(promiseAt, 'YYYY-MM-DD HH:mm');
-      const alarmAt = date.subtract(parseInt(alarmTime), 'minute').toDate();
+      const alarm = alarmTime === '1시간 전' ? 60 : parseInt(alarmTime);
+      const alarmAt = date.subtract(alarm, 'minute').toDate();
       const result = await this.usedItemScheduleModel.findOneAndUpdate(
         {
           _id: scheduleId,
