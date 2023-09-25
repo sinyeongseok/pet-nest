@@ -118,4 +118,20 @@ export class ChatController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Get('blocked/user/chat')
+  @UseGuards(JwtAccessAuthGuard)
+  async checkBlockedUserChats(
+    @Req() req,
+    @Res() res,
+    @Query('chatRoomId') chatRoomId: string
+  ) {
+    const email = req.user.email;
+    const result = await this.chatService.checkBlockedUserChats(
+      email,
+      chatRoomId
+    );
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
