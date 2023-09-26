@@ -580,7 +580,10 @@ export class ChatService {
         },
         {
           promiseAt: date.toDate(),
-          ...(!!alarmTime ? { alarmAt, isAlarm: true } : { isAlarm: false }),
+          isAlarm: !!alarmTime,
+          ...(!!alarmTime && {
+            alarmAt,
+          }),
         }
       );
 
