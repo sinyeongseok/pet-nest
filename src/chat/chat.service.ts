@@ -19,6 +19,7 @@ import {
   UsedItemSchedule,
   UsedItemScheduleDocument,
 } from 'src/schema/usedItemSchedule.schema';
+import { AlarmTime } from 'src/config/type';
 
 dayjs.locale('ko');
 
@@ -459,14 +460,21 @@ export class ChatService {
     }
   }
 
-  async createUsedItemSchedule({ chatRoomId, promiseAt, alarmTime = '' }) {
+  async createUsedItemSchedule({
+    chatRoomId,
+    promiseAt,
+    alarmTime,
+  }: {
+    chatRoomId: string;
+    promiseAt: string;
+    alarmTime: AlarmTime;
+  }) {
     try {
       const date = dayjs(promiseAt, 'YYYY-MM-DD HH:mm');
       const timestamp = dayjs(
         new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
       );
-      const alarm = alarmTime === '1시간 전' ? 60 : parseInt(alarmTime);
-      const alarmAt = date.subtract(alarm, 'minute').toDate();
+      const alarmAt = this.calculateRelativeAlarmTime(date, alarmTime);
       const createUsedItemScheduleQuery = new this.usedItemScheduleModel({
         chatRoomId,
         timestamp,
@@ -484,10 +492,10 @@ export class ChatService {
         }
       );
 
-      await Promise.all([
-        updateChatRoomQuery,
-        createUsedItemScheduleQuery.save(),
-      ]);
+      // await Promise.all([
+      //   updateChatRoomQuery,
+      //   createUsedItemScheduleQuery.save(),
+      // ]);
 
       return;
     } catch (error) {
@@ -569,11 +577,24 @@ export class ChatService {
     }
   }
 
-  async updateUsedItemSchedule({ scheduleId, promiseAt, alarmTime }) {
+  calculateRelativeAlarmTime(date: dayjs.Dayjs, alarmTime: AlarmTime) {
+    const alarm = alarmTime === '1시간 전' ? 60 : parseInt(alarmTime);
+
+    return date.subtract(alarm, 'minute').toDate();
+  }
+
+  async updateUsedItemSchedule({
+    scheduleId,
+    promiseAt,
+    alarmTime,
+  }: {
+    scheduleId: string;
+    promiseAt: string;
+    alarmTime: AlarmTime;
+  }) {
     try {
       const date = dayjs(promiseAt, 'YYYY-MM-DD HH:mm');
-      const alarm = alarmTime === '1시간 전' ? 60 : parseInt(alarmTime);
-      const alarmAt = date.subtract(alarm, 'minute').toDate();
+      const alarmAt = this.calculateRelativeAlarmTime(date, alarmTime);
       const result = await this.usedItemScheduleModel.findOneAndUpdate(
         {
           _id: scheduleId,
