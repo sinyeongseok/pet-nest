@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { SalesStatus } from 'src/config/type';
 
 export type UsedItemBoardDocument = UsedItemBoard & Document;
 
@@ -51,7 +52,7 @@ export class UsedItemBoard {
   viewedUsers: string[];
 
   @Prop({ default: '판매중' })
-  salesStatus: '판매중' | '예약중' | '판매완료';
+  salesStatus: SalesStatus;
 
   @Prop({ default: false })
   isVisible: boolean;
