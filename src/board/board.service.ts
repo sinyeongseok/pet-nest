@@ -8,6 +8,7 @@ import * as dayjs from 'dayjs';
 import { AddressService } from 'src/address/address.service';
 import { UtilService } from 'src/utils/util.service';
 import { User, UserDocument } from 'src/schema/user.schema';
+import { ChatRoom, ChatRoomDocument } from 'src/schema/chatRoom.schema';
 
 @Injectable()
 export class BoardService {
@@ -16,6 +17,8 @@ export class BoardService {
     private usedItemBoardModel: Model<UsedItemBoardDocument>,
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
+    @InjectModel(ChatRoom.name)
+    private chatRoomModel: Model<ChatRoomDocument>,
     private awsService: AwsService,
     private addressService: AddressService,
     private utilService: UtilService
@@ -207,7 +210,7 @@ export class BoardService {
 
   async getDetailUsedItemBoard(id: string, email: string) {
     try {
-      const usedItemBoardInfo = await (async () => {
+      const getUsedItemBoardInfo = await (async () => {
         const usedItemBoard = await this.usedItemBoardModel.findOne({
           _id: id,
         });
@@ -224,12 +227,22 @@ export class BoardService {
 
         return usedItemBoard;
       })();
-      const result = await this.formatDetailUsedItemBoard(
-        usedItemBoardInfo,
+      const chatInfo = await this.chatRoomModel.findOne({
+        boardId: id,
+        users: {
+          $in: [email],
+        },
+      });
+      const usedItemBoardInfo = await this.formatDetailUsedItemBoard(
+        getUsedItemBoardInfo,
         email
       );
+      const result = {
+        usedItemBoardInfo,
+        ...(!!chatInfo && { chatRoomInfo: { id: chatInfo._id } }),
+      };
 
-      return { statusCode: 200, data: { usedItemBoardInfo: result } };
+      return { statusCode: 200, data: result };
     } catch (error) {
       console.log(error);
       throw new HttpException(
