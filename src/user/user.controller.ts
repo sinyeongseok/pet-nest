@@ -103,4 +103,17 @@ export class UserController {
     const result = await this.userService.getRandomNickname();
     return { data: { randomNickname: result } };
   }
+
+  @Patch('nickname')
+  @UseGuards(JwtAccessAuthGuard)
+  async updateNickname(
+    @Req() req,
+    @Res() res,
+    @Body('nickname') nickname: string
+  ) {
+    const email = req.user.email;
+    const result = await this.userService.updateNickname(email, nickname);
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }

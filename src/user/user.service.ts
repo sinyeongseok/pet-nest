@@ -8,7 +8,7 @@ import { de, fakerKO as faker } from '@faker-js/faker';
 import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
 import { TokenService } from 'src/token/token.service';
-import { UtilService } from 'src/utils/util.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
@@ -20,7 +20,7 @@ export class UserService {
     private CityAddressModel: Model<CityAddressDocument>,
     private awsService: AwsService,
     private tokenService: TokenService,
-    private utilService: UtilService
+    private authService: AuthService
   ) {}
 
   async createProfile(file, { email, nickname, petType, address }) {
@@ -238,5 +238,28 @@ export class UserService {
     }
 
     return nickname;
+  }
+
+  async updateNickname(email: string, nickname: string) {
+    try {
+      await this.authService.validateNickname(nickname);
+
+      await this.UserModel.updateOne({ email }, { nickname });
+
+      return { statusCode: 200, data: { userNickname: nickname } };
+    } catch (error) {
+      console.log(error);
+      if (error instanceof HttpException) {
+        throw new HttpException(
+          '닉네임 확인이 필요합니다.',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }
