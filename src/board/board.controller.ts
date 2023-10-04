@@ -181,11 +181,24 @@ export class BoardController {
     return res.status(result.statusCode).json(result.data);
   }
 
+  @Post('/used-items/completed-deals')
+  @UseGuards(JwtAccessAuthGuard)
+  async hasUsedItemsCompletedDealsOneHourAgo(@Res() res, @Req() req) {
+    const email = req.user.email;
+    const result = await this.boardService.hasUsedItemsCompletedDealsOneHourAgo(
+      email
+    );
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Get('/used-items/completed-deals')
   @UseGuards(JwtAccessAuthGuard)
-  async hasUsedItemsCompletedDeals(@Res() res, @Req() req) {
+  async getUsedItemsCompletedDealsOneHourAgo(@Res() res, @Req() req) {
     const email = req.user.email;
-    const result = await this.boardService.hasUsedItemsCompletedDeals(email);
+    const result = await this.boardService.getUsedItemsCompletedDealsOneHourAgo(
+      email
+    );
 
     return res.status(result.statusCode).json(result.data);
   }

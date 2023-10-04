@@ -544,55 +544,148 @@ export class BoardService {
     }
   }
 
-  async hasUsedItemsCompletedDeals(email: string) {
+  async hasUsedItemsCompletedDealsOneHourAgo(email: string) {
     try {
-      const usedItemsCompletedDeals = await this.chatRoomModel.aggregate([
-        {
-          $match: {
-            isPetMate: false,
-            users: email,
-          },
-        },
-        {
-          $lookup: {
-            from: 'useditemschedules',
-            localField: '_id',
-            foreignField: 'chatRoomId',
-            as: 'usedItemSchedules',
-          },
-        },
-        {
-          $unwind: '$usedItemSchedules',
-        },
-        {
-          $addFields: {
-            oneHourLater: {
-              $add: ['$usedItemSchedules.promiseAt', 60 * 60 * 1000],
+      const usedItemsCompletedDealsOneHourAgo =
+        await this.chatRoomModel.aggregate([
+          {
+            $match: {
+              isPetMate: false,
+              users: email,
             },
           },
-        },
-        {
-          $match: {
-            oneHourLater: {
-              $lt: new Date(),
+          {
+            $lookup: {
+              from: 'useditemschedules',
+              localField: '_id',
+              foreignField: 'chatRoomId',
+              as: 'usedItemSchedules',
             },
           },
-        },
-        {
-          $project: {
-            _id: 0,
-            promiseAt: '$usedItemSchedules.promiseAt',
-            content: '$usedItemSchedules.content',
-            isAlarm: '$usedItemSchedules.isAlarm',
-            alarmAt: '$usedItemSchedules.alarmAt',
-            timestamp: '$usedItemSchedules.timestamp',
+          {
+            $unwind: '$usedItemSchedules',
           },
-        },
-      ]);
+          {
+            $addFields: {
+              oneHourLater: {
+                $add: ['$usedItemSchedules.promiseAt', 60 * 60 * 1000],
+              },
+            },
+          },
+          {
+            $match: {
+              oneHourLater: {
+                $lt: new Date(),
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              promiseAt: '$usedItemSchedules.promiseAt',
+              content: '$usedItemSchedules.content',
+              isAlarm: '$usedItemSchedules.isAlarm',
+              alarmAt: '$usedItemSchedules.alarmAt',
+              timestamp: '$usedItemSchedules.timestamp',
+            },
+          },
+        ]);
 
       return {
         statusCode: 200,
-        data: { hasUsedItemsCompletedDeals: !!usedItemsCompletedDeals.length },
+        data: {
+          hasUsedItemsCompletedDeals:
+            !!usedItemsCompletedDealsOneHourAgo.length,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  formatUsedItemsCompletedDealsOneHourAgo(usedItemsCompletedDealsOneHourAgo) {
+    return usedItemsCompletedDealsOneHourAgo.map((usedItemsCompletedDeal) => {
+      return {
+        id: usedItemsCompletedDeal.id,
+        title: usedItemsCompletedDeal.title,
+        salesStatus: usedItemsCompletedDeal.salesStatus,
+        price: `${usedItemsCompletedDeal.price.toLocaleString()}원`,
+        ...(!!usedItemsCompletedDeal.images.length && {
+          image: usedItemsCompletedDeal.images[0],
+        }),
+      };
+    });
+  }
+
+  async getUsedItemsCompletedDealsOneHourAgo(email: string) {
+    try {
+      const usedItemsCompletedDealsOneHourAgo =
+        await this.chatRoomModel.aggregate([
+          {
+            $match: {
+              isPetMate: false,
+              users: email,
+            },
+          },
+          {
+            $lookup: {
+              from: 'useditemschedules',
+              localField: '_id',
+              foreignField: 'chatRoomId',
+              as: 'usedItemSchedules',
+            },
+          },
+          {
+            $unwind: '$usedItemSchedules',
+          },
+          {
+            $addFields: {
+              oneHourLater: {
+                $add: ['$usedItemSchedules.promiseAt', 60 * 60 * 1000],
+              },
+            },
+          },
+          {
+            $match: {
+              oneHourLater: {
+                $lt: new Date(),
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: 'useditemboards',
+              localField: 'boardId',
+              foreignField: '_id',
+              as: 'usedItemBoards',
+            },
+          },
+          {
+            $unwind: '$usedItemBoards',
+          },
+          {
+            $project: {
+              _id: 0,
+              id: '$usedItemBoards._id',
+              title: '$usedItemBoards.title',
+              images: '$usedItemBoards.images',
+              price: '$usedItemBoards.price',
+              salesStatus: '$usedItemBoards.salesStatus',
+            },
+          },
+        ]);
+
+      const result = this.formatUsedItemsCompletedDealsOneHourAgo(
+        usedItemsCompletedDealsOneHourAgo
+      );
+
+      return {
+        statusCode: 200,
+        data: { usedItemsCompletedDeals: result },
       };
     } catch (error) {
       console.log(error);
