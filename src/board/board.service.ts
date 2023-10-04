@@ -543,4 +543,63 @@ export class BoardService {
       );
     }
   }
+
+  async hasUsedItemsCompletedDeals(email: string) {
+    try {
+      const usedItemsCompletedDeals = await this.chatRoomModel.aggregate([
+        {
+          $match: {
+            isPetMate: false,
+            users: email,
+          },
+        },
+        {
+          $lookup: {
+            from: 'useditemschedules',
+            localField: '_id',
+            foreignField: 'chatRoomId',
+            as: 'usedItemSchedules',
+          },
+        },
+        {
+          $unwind: '$usedItemSchedules',
+        },
+        {
+          $addFields: {
+            oneHourLater: {
+              $add: ['$usedItemSchedules.promiseAt', 60 * 60 * 1000],
+            },
+          },
+        },
+        {
+          $match: {
+            oneHourLater: {
+              $lt: new Date(),
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            promiseAt: '$usedItemSchedules.promiseAt',
+            content: '$usedItemSchedules.content',
+            isAlarm: '$usedItemSchedules.isAlarm',
+            alarmAt: '$usedItemSchedules.alarmAt',
+            timestamp: '$usedItemSchedules.timestamp',
+          },
+        },
+      ]);
+
+      return {
+        statusCode: 200,
+        data: { hasUsedItemsCompletedDeals: !!usedItemsCompletedDeals.length },
+      };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }

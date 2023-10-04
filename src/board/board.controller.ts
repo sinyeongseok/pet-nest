@@ -180,4 +180,13 @@ export class BoardController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Get('/used-items/completed-deals')
+  @UseGuards(JwtAccessAuthGuard)
+  async hasUsedItemsCompletedDeals(@Res() res, @Req() req) {
+    const email = req.user.email;
+    const result = await this.boardService.hasUsedItemsCompletedDeals(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
