@@ -8,10 +8,7 @@ import { CityAddress, CityAddressSchema } from '../schema/cityAddress.schema';
 import { AwsService } from '../utils/s3';
 import { TokenService } from '../token/token.service';
 import { UtilService } from 'src/utils/util.service';
-import {
-  BlockedUser,
-  BlockedUserSchema,
-} from 'src/schema/blockedUserSchema.schema';
+import { AuthService } from 'src/auth/auth.service';
 
 @Module({
   imports: [
@@ -22,6 +19,6 @@ import {
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService, AwsService, TokenService, UtilService],
+  providers: [UserService, AwsService, TokenService, UtilService, AuthService],
 })
 export class UserModule {}
