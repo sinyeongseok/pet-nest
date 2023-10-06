@@ -10,6 +10,7 @@ import { BoardModule } from './board/board.module';
 import { TokenModule } from './token/token.module';
 import { CommonModule } from './common/common.module';
 import { ChatModule } from './chat/chat.module';
+import { MyPageModule } from './my-page/my-page.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ChatModule } from './chat/chat.module';
     TokenModule,
     CommonModule,
     ChatModule,
+    MyPageModule,
   ],
 })
 export class AppModule {}
