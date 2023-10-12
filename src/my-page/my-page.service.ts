@@ -7,6 +7,7 @@ import {
   UserAddress,
   UserAddressDocument,
 } from 'src/schema/userAddress.schema';
+import { petType } from 'src/config/type';
 
 @Injectable()
 export class MyPageService {
@@ -14,7 +15,9 @@ export class MyPageService {
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
     @InjectModel(UserAddress.name)
-    private userAddressModel: Model<UserAddressDocument>
+    private userAddressModel: Model<UserAddressDocument>,
+    @InjectModel(Pet.name)
+    private petModel: Model<PetDocument>
   ) {}
 
   async getMyPageUserInfo(email: string) {
@@ -43,6 +46,32 @@ export class MyPageService {
       };
 
       return { statusCode: 200, data: { userInfo: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  formatPets(pets) {
+    return pets.map((pet) => {
+      return {
+        id: pet._id,
+        name: pet.name,
+        type: petType[pet.type],
+        ...(!!pet.images[0] && { image: pet.images[0] }),
+      };
+    });
+  }
+
+  async getPets(email: string) {
+    try {
+      const pets = await this.petModel.find({ userEmail: email });
+      const result = this.formatPets(pets);
+
+      return { statusCode: 200, data: { pets: result } };
     } catch (error) {
       console.log(error);
       throw new HttpException(

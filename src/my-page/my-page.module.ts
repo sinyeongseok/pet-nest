@@ -11,6 +11,7 @@ import { Pet, PetSchema } from 'src/schema/pet.schema';
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: UserAddress.name, schema: UserAddressSchema },
+      { name: Pet.name, schema: PetSchema },
     ]),
   ],
   controllers: [MyPageController],

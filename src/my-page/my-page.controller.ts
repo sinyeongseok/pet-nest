@@ -22,4 +22,13 @@ export class MyPageController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Get('pets')
+  @UseGuards(JwtAccessAuthGuard)
+  async getPets(@Req() req, @Res() res) {
+    const email = req.user.email;
+    const result = await this.myPageService.getPets(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
