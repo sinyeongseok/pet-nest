@@ -9,7 +9,7 @@ import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
 import { TokenService } from 'src/token/token.service';
 import { AuthService } from 'src/auth/auth.service';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import { Pet, PetDocument } from 'src/schema/pet.schema';
 import { v4 as uuid } from 'uuid';
 
