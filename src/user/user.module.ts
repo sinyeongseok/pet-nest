@@ -9,6 +9,7 @@ import { AwsService } from '../utils/s3';
 import { TokenService } from '../token/token.service';
 import { UtilService } from 'src/utils/util.service';
 import { AuthService } from 'src/auth/auth.service';
+import { Pet, PetSchema } from 'src/schema/pet.schema';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthService } from 'src/auth/auth.service';
       { name: User.name, schema: UserSchema },
       { name: UserAddress.name, schema: UserAddressSchema },
       { name: CityAddress.name, schema: CityAddressSchema },
+      { name: Pet.name, schema: PetSchema },
     ]),
   ],
   controllers: [UserController],

@@ -9,6 +9,9 @@ import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
 import { TokenService } from 'src/token/token.service';
 import { AuthService } from 'src/auth/auth.service';
+import dayjs from 'dayjs';
+import { Pet, PetDocument } from 'src/schema/pet.schema';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -18,6 +21,8 @@ export class UserService {
     private UserAddressModel: Model<UserAddressDocument>,
     @InjectModel(CityAddress.name)
     private CityAddressModel: Model<CityAddressDocument>,
+    @InjectModel(Pet.name)
+    private petModel: Model<PetDocument>,
     private awsService: AwsService,
     private tokenService: TokenService,
     private authService: AuthService
@@ -256,6 +261,55 @@ export class UserService {
         );
       }
 
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async createPet(
+    email,
+    files,
+    {
+      name,
+      species,
+      birthday,
+      gender,
+      neuteredStatus,
+      weight,
+      unusualCondition,
+      helloMessage,
+    }
+  ) {
+    try {
+      const createPetQuery = new this.petModel({
+        name,
+        species,
+        birthday,
+        gender,
+        neuteredStatus,
+        weight,
+        unusualCondition,
+        helloMessage,
+        userEmail: email,
+      });
+      const saveResult = await createPetQuery.save();
+      const imageUploaded = files.map(async (file) => {
+        return await this.awsService.uploadFileToS3(
+          `petImages/${email}/${String(
+            saveResult._id
+          )}/${uuid()}${dayjs().format('YYYYMMDDHHmmss')}`,
+          file
+        );
+      });
+      const imageUploadResults = await Promise.all(imageUploaded);
+      const images = imageUploadResults.map((result) => result.url);
+      await this.petModel.updateOne({ _id: saveResult._id }, { images });
+
+      return { statusCode: 201, data: { isCreated: true } };
+    } catch (error) {
+      console.log(error);
       throw new HttpException(
         '서버요청 실패.',
         HttpStatus.INTERNAL_SERVER_ERROR

@@ -12,10 +12,10 @@ import {
   Delete,
   UseGuards,
   Req,
+  UploadedFiles,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Express, Response } from 'express';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
 
 @Controller('user')
@@ -113,6 +113,21 @@ export class UserController {
   ) {
     const email = req.user.email;
     const result = await this.userService.updateNickname(email, nickname);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Post('pet')
+  @UseGuards(JwtAccessAuthGuard)
+  @UseInterceptors(FilesInterceptor('petImages', 5))
+  async createPet(
+    @Res() res,
+    @Req() req,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Body() petInfo
+  ) {
+    const email = req.user.email;
+    const result = await this.userService.createPet(email, files, petInfo);
 
     return res.status(result.statusCode).json(result.data);
   }
