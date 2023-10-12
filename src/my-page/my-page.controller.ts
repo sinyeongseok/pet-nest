@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Query,
   Req,
@@ -37,6 +39,16 @@ export class MyPageController {
   @UseGuards(JwtAccessAuthGuard)
   async getPet(@Req() req, @Res() res, @Query('id') id: string) {
     const result = await this.myPageService.getPet(id);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Delete('pet/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async deletePet(@Req() req, @Res() res, @Param('id') id: string) {
+    const email = req.user.email;
+    await this.myPageService.deletePet(id);
+    const result = await this.myPageService.getPets(email);
 
     return res.status(result.statusCode).json(result.data);
   }
