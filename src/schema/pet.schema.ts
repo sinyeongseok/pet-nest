@@ -9,6 +9,9 @@ export class Pet {
   userEmail: string;
 
   @Prop({ required: true })
+  type: string;
+
+  @Prop({ required: true })
   name: string;
 
   @Prop()
