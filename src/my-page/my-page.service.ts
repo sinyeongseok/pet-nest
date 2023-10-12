@@ -93,8 +93,8 @@ export class MyPageService {
         unusualCondition: pet.unusualCondition,
         birthday: dayjs(pet.birthday).format('YYYY. MM. DD'),
         neuteredStatus: pet.neuteredStatus,
-        weight: pet.weight,
         helloMessage: pet.helloMessage,
+        ...(!!pet.weight && { weight: `${pet.weight} kg` }),
         ...(!!pet.images.length && { images: pet.images }),
       };
 
