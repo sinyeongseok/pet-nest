@@ -274,6 +274,7 @@ export class UserService {
     {
       type,
       name,
+      speciesInputType,
       species,
       birthday,
       gender,
@@ -287,6 +288,7 @@ export class UserService {
       const createPetQuery = new this.petModel({
         type,
         name,
+        speciesInputType,
         species,
         birthday,
         gender,
