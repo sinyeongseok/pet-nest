@@ -181,6 +181,9 @@ export class BoardService {
 
   async formatDetailUsedItemBoard(usedItemBoardInfo, email) {
     const isLike = await this.isBoardLikedByUser(email, usedItemBoardInfo._id);
+    const chatList = await this.chatRoomModel.find({
+      boardId: usedItemBoardInfo._id,
+    });
     return {
       isLike,
       sellerNickname: usedItemBoardInfo.seller.nickname,
@@ -193,7 +196,7 @@ export class BoardService {
       ),
       description: usedItemBoardInfo.description,
       likeCount: usedItemBoardInfo.likeCount,
-      chatCount: 0,
+      chatCount: chatList.length,
       viewCount: usedItemBoardInfo.viewCount,
       salesStatus: usedItemBoardInfo.salesStatus,
       images: usedItemBoardInfo.images,
