@@ -285,18 +285,23 @@ export class UserService {
     }
   ) {
     try {
+      const [year, month, day] = birthday.split(' ');
+      const birthdayToDate = new Date(
+        `${parseInt(year)} ${parseInt(month)} ${parseInt(day)}`
+      );
+
       const createPetQuery = new this.petModel({
         type,
         name,
         speciesInputType,
         species,
-        birthday,
         gender,
         neuteredStatus,
         weight,
         unusualCondition,
         helloMessage,
         userEmail: email,
+        birthday: birthdayToDate,
       });
       const saveResult = await createPetQuery.save();
       const imageUploaded = files.map(async (file) => {
