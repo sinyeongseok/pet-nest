@@ -17,6 +17,9 @@ export class Pet {
   @Prop()
   images: string[];
 
+  @Prop()
+  speciesInputType: string;
+
   @Prop({ required: true })
   species: string;
 
