@@ -339,10 +339,13 @@ export class ChatGateway {
       return;
     }
 
+    const email = validateTokenResult.user.email;
+
     await this.chatService.createUsedItemSchedule({
       chatRoomId,
       promiseAt,
       alarmTime,
+      writer: email,
     });
 
     const room = this.nsp.adapter.rooms.get(chatRoomId);

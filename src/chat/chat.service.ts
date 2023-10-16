@@ -464,10 +464,12 @@ export class ChatService {
     chatRoomId,
     promiseAt,
     alarmTime,
+    writer,
   }: {
     chatRoomId: string;
     promiseAt: string;
     alarmTime: AlarmTime;
+    writer: string;
   }) {
     try {
       const date = dayjs(promiseAt, 'YYYY-MM-DD HH:mm');
@@ -477,6 +479,7 @@ export class ChatService {
       const alarmAt = this.calculateRelativeAlarmTime(date, alarmTime);
       const createUsedItemScheduleQuery = new this.usedItemScheduleModel({
         chatRoomId,
+        writer,
         timestamp,
         promiseAt: date.toDate(),
         content: '직거래 약속이 잡혔어요',
