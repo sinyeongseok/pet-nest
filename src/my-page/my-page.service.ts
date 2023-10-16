@@ -121,4 +121,29 @@ export class MyPageService {
       );
     }
   }
+
+  async getPetInfo(id: string) {
+    try {
+      const petInfo = await this.petModel.findOne({ _id: id });
+      const result = {
+        name: petInfo.name,
+        gender: PetGender[petInfo.gender],
+        species: petInfo.species,
+        birthday: petInfo.birthday,
+        unusualCondition: petInfo.unusualCondition,
+        neuteredStatus: petInfo.neuteredStatus,
+        helloMessage: petInfo.helloMessage,
+        weight: petInfo.weight,
+        images: petInfo.images[0],
+      };
+
+      return { statusCode: 200, data: { petInfo: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }

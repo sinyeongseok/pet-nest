@@ -52,4 +52,12 @@ export class MyPageController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Get('pet/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async getPetInfo(@Req() req, @Res() res, @Param('id') id: string) {
+    const result = await this.myPageService.getPetInfo(id);
+
+    return res.status(200).json(result.data);
+  }
 }
