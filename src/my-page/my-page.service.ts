@@ -60,7 +60,7 @@ export class MyPageService {
     return pets.map((pet) => {
       return {
         id: pet._id,
-        name: pet.name,
+        name: pet.name.length > 3 ? `${pet.name.substring(0, 2)}...` : pet.name,
         type: PetType[pet.type],
         ...(!!pet.images[0] && { image: pet.images[0] }),
       };
