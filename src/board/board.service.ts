@@ -242,7 +242,8 @@ export class BoardService {
       );
       const result = {
         usedItemBoardInfo,
-        ...(!!chatInfo && { chatRoomInfo: { id: chatInfo._id } }),
+        ...(!usedItemBoardInfo.isMe &&
+          !!chatInfo && { chatRoomInfo: { id: chatInfo._id } }),
       };
 
       return { statusCode: 200, data: result };
@@ -690,6 +691,54 @@ export class BoardService {
         statusCode: 200,
         data: { usedItemsCompletedDeals: result },
       };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async formatChatRoom(email, chatRoom, usedItemBoardInfo) {
+    const otherUser = chatRoom.users.filter((user: string[]) => user !== email);
+    const userInfo = await this.userModel.findOne({ email: otherUser });
+
+    return {
+      id: chatRoom._id,
+      title: userInfo.nickname,
+      lastChat: chatRoom.lastChat,
+      lastChatAt: this.utilService.computeTimeDifference(chatRoom.lastChatAt),
+      ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
+      ...(!!chatRoom.images && { productImage: chatRoom.images[0] }),
+    };
+  }
+
+  async formatChatRooms(email, usedItemBoardInfo, chatRooms) {
+    return Promise.all(
+      chatRooms.map((chatRoom) => {
+        return this.formatChatRoom(email, chatRoom, usedItemBoardInfo);
+      })
+    );
+  }
+
+  async getUsedItemChatRooms(email: string, boardId: string) {
+    try {
+      const [usedItemBoardInfo, chatRoomList] = await Promise.all([
+        this.usedItemBoardModel.findOne({
+          _id: boardId,
+        }),
+        this.chatRoomModel.find({
+          boardId,
+        }),
+      ]);
+      const result = await this.formatChatRooms(
+        email,
+        usedItemBoardInfo,
+        chatRoomList
+      );
+
+      return { statusCode: 200, data: { chatRoomList: result } };
     } catch (error) {
       console.log(error);
       throw new HttpException(

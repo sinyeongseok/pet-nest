@@ -202,4 +202,13 @@ export class BoardController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Get('/used-items/chats')
+  @UseGuards(JwtAccessAuthGuard)
+  async getUsedItemChatRooms(@Res() res, @Req() req, @Query('id') id: string) {
+    const email = req.user.email;
+    const result = await this.boardService.getUsedItemChatRooms(email, id);
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
