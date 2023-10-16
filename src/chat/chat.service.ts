@@ -279,6 +279,7 @@ export class ChatService {
           promiseAt: this.formatPromiseAt(acc.promiseAt),
           content: acc.content,
           isPromise: true,
+          ...(acc.writer === email && { isMe: true }),
         });
       } else {
         res[date].push({
