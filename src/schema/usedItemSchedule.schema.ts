@@ -11,6 +11,9 @@ export class UsedItemSchedule {
   chatRoomId: string;
 
   @Prop({ required: true })
+  writer: string;
+
+  @Prop({ required: true })
   promiseAt: Date;
 
   @Prop()
