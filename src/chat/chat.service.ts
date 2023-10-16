@@ -492,10 +492,10 @@ export class ChatService {
         }
       );
 
-      // await Promise.all([
-      //   updateChatRoomQuery,
-      //   createUsedItemScheduleQuery.save(),
-      // ]);
+      await Promise.all([
+        updateChatRoomQuery,
+        createUsedItemScheduleQuery.save(),
+      ]);
 
       return;
     } catch (error) {
