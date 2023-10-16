@@ -134,7 +134,7 @@ export class MyPageService {
         neuteredStatus: petInfo.neuteredStatus,
         helloMessage: petInfo.helloMessage,
         weight: petInfo.weight,
-        images: petInfo.images[0],
+        ...(!!petInfo.images.length && { images: petInfo.images }),
       };
 
       return { statusCode: 200, data: { petInfo: result } };
