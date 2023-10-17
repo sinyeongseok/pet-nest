@@ -4,14 +4,18 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
 import { MyPageService } from './my-page.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('my-page')
 export class MyPageController {
@@ -66,6 +70,25 @@ export class MyPageController {
   async getUserProfile(@Req() req, @Res() res) {
     const email = req.user.email;
     const result = await this.myPageService.getUserProfile(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Patch('profile')
+  @UseGuards(JwtAccessAuthGuard)
+  @UseInterceptors(FileInterceptor('profileImage'))
+  async patchUserProfile(
+    @Req() req,
+    @Res() res,
+    @UploadedFile() file,
+    @Body('nickname') nickname: string
+  ) {
+    const email = req.user.email;
+    await this.myPageService.patchUserProfile(email, {
+      nickname,
+      profileImage: file,
+    });
+    const result = await this.myPageService.getMyPageUserInfo(email);
 
     return res.status(result.statusCode).json(result.data);
   }
