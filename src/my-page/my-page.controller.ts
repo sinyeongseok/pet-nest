@@ -60,4 +60,13 @@ export class MyPageController {
 
     return res.status(200).json(result.data);
   }
+
+  @Get('profile')
+  @UseGuards(JwtAccessAuthGuard)
+  async getUserProfile(@Req() req, @Res() res) {
+    const email = req.user.email;
+    const result = await this.myPageService.getUserProfile(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }

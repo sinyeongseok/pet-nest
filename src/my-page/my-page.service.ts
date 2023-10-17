@@ -146,4 +146,23 @@ export class MyPageService {
       );
     }
   }
+
+  async getUserProfile(email: string) {
+    try {
+      const userInfo = await this.userModel.findOne({ email });
+      const result = {
+        email,
+        nickname: userInfo.nickname,
+        ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
+      };
+
+      return { statusCode: 200, data: { userProfile: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
