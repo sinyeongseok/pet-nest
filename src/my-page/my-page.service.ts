@@ -9,6 +9,7 @@ import {
 } from 'src/schema/userAddress.schema';
 import { PetType, PetGender } from 'src/config/type';
 import * as dayjs from 'dayjs';
+import { AwsService } from 'src/utils/s3';
 
 @Injectable()
 export class MyPageService {
@@ -18,7 +19,8 @@ export class MyPageService {
     @InjectModel(UserAddress.name)
     private userAddressModel: Model<UserAddressDocument>,
     @InjectModel(Pet.name)
-    private petModel: Model<PetDocument>
+    private petModel: Model<PetDocument>,
+    private awsService: AwsService
   ) {}
 
   async getMyPageUserInfo(email: string) {
@@ -157,6 +159,41 @@ export class MyPageService {
       };
 
       return { statusCode: 200, data: { userProfile: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async patchUserProfile(email: string, { profileImage, nickname }) {
+    try {
+      const profileImageUrl = await (async () => {
+        if (!!profileImage) {
+          const result = await this.awsService.uploadFileToS3(
+            `profileImages/${email}/${email}.jpeg`,
+            profileImage
+          );
+
+          return result.url;
+        }
+
+        return null;
+      })();
+
+      if (!!nickname) {
+        await this.userModel.updateOne(
+          { email },
+          {
+            nickname,
+            ...(!!profileImageUrl && { profileImage: profileImageUrl }),
+          }
+        );
+      }
+
+      return;
     } catch (error) {
       console.log(error);
       throw new HttpException(
