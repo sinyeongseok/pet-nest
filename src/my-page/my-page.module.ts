@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schema/user.schema';
 import { UserAddress, UserAddressSchema } from 'src/schema/userAddress.schema';
 import { Pet, PetSchema } from 'src/schema/pet.schema';
+import { AwsService } from 'src/utils/s3';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { Pet, PetSchema } from 'src/schema/pet.schema';
     ]),
   ],
   controllers: [MyPageController],
-  providers: [MyPageService],
+  providers: [MyPageService, AwsService],
 })
 export class MyPageModule {}
