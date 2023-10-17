@@ -61,6 +61,10 @@ export class AuthService {
   async validateNickname(nickname: string) {
     const regex = /^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/;
 
+    if (!nickname.length) {
+      throw new HttpException('닉네임을 입력해주세요.', HttpStatus.BAD_REQUEST);
+    }
+
     if (nickname.length < 2) {
       throw new HttpException(
         '두글자 이상 작성해주세요.',
