@@ -643,4 +643,49 @@ export class ChatService {
       );
     }
   }
+
+  async isSameTimeSchedule(email: string, promiseAt) {
+    try {
+      const sameTimeSchedule = await this.chatRoomModel.aggregate([
+        {
+          $match: {
+            users: {
+              $in: [email],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'useditemschedules',
+            localField: '_id',
+            foreignField: 'chatRoomId',
+            as: 'usedItemSchedules',
+          },
+        },
+        {
+          $unwind: '$usedItemSchedules',
+        },
+        {
+          $match: {
+            'usedItemSchedules.promiseAt': new Date(promiseAt),
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$usedItemSchedules._id',
+            promiseAt: '$usedItemSchedules.promiseAt',
+          },
+        },
+      ]);
+
+      return !!sameTimeSchedule.length;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
