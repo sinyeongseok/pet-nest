@@ -104,12 +104,14 @@ export class ChatService {
   private async formatChatRoom(chatRoom, email) {
     const otherUser = chatRoom.users.filter((user: string[]) => user !== email);
     const userInfo = await this.userModel.findOne({ email: otherUser });
+    const userAddress = await this.utilService.getUserRecentAddress(email);
 
     return {
       id: chatRoom._id,
       title: userInfo.nickname,
       lastChat: chatRoom.lastChat,
       lastChatAt: this.utilService.computeTimeDifference(chatRoom.lastChatAt),
+      region: userAddress.eupMyeonDong,
       isAlarm: chatRoom.isAlarm,
       isPinned: chatRoom.isPinned,
       ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
