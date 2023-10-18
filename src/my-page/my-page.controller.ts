@@ -76,17 +76,19 @@ export class MyPageController {
 
   @Patch('profile')
   @UseGuards(JwtAccessAuthGuard)
-  @UseInterceptors(FileInterceptor('profileImage'))
+  @UseInterceptors(FileInterceptor('newProfileImage'))
   async patchUserProfile(
     @Req() req,
     @Res() res,
     @UploadedFile() file,
-    @Body('nickname') nickname: string
+    @Body('nickname') nickname: string,
+    @Body('profileImage') profileImage: string
   ) {
     const email = req.user.email;
     await this.myPageService.patchUserProfile(email, {
       nickname,
-      profileImage: file,
+      newProfileImage: file,
+      profileImage,
     });
     const result = await this.myPageService.getMyPageUserInfo(email);
 
