@@ -168,13 +168,16 @@ export class MyPageService {
     }
   }
 
-  async patchUserProfile(email: string, { profileImage, nickname }) {
+  async patchUserProfile(
+    email: string,
+    { newProfileImage, profileImage, nickname }
+  ) {
     try {
-      const profileImageUrl = await (async () => {
-        if (!!profileImage) {
+      const newProfileImageUrl = await (async () => {
+        if (!!newProfileImage) {
           const result = await this.awsService.uploadFileToS3(
             `profileImages/${email}/${email}.jpeg`,
-            profileImage
+            newProfileImage
           );
 
           return result.url;
@@ -188,7 +191,13 @@ export class MyPageService {
           { email },
           {
             nickname,
-            ...(!!profileImageUrl && { profileImage: profileImageUrl }),
+            ...(!!newProfileImage && { profileImage: newProfileImageUrl }),
+            ...(!profileImage &&
+              !newProfileImage && {
+                $unset: {
+                  profileImage: 1,
+                },
+              }),
           }
         );
       }
