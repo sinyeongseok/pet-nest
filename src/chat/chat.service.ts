@@ -444,7 +444,7 @@ export class ChatService {
     }
   }
 
-  async blockedUser(email: string, blockedBy: string) {
+  async blockUser(email: string, blockedBy: string) {
     try {
       const blockedUserQuery = new this.blockedUserModel({
         blockedBy,
@@ -452,6 +452,20 @@ export class ChatService {
       });
 
       await blockedUserQuery.save();
+
+      return;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async unblockUser(email: string, blockedBy: string) {
+    try {
+      await this.blockedUserModel.deleteOne({ blockedBy, userId: email });
 
       return;
     } catch (error) {
