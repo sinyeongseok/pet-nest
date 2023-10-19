@@ -626,17 +626,30 @@ export class ChatService {
 
   async checkBlockedUserChats(email: string, chatRoomId: string) {
     try {
-      const findBlockedUsers = await this.blockedUserModel.find({
-        userId: email,
-      });
-      const blockedUsers = findBlockedUsers.map((acc) => acc.blockedBy);
-      const chatRoom = await this.chatRoomModel.findOne({
+      const chatRoomInfo = await this.chatRoomModel.findOne({
         _id: chatRoomId,
-        users: { $in: blockedUsers },
       });
-      const isBlockedUser = !!chatRoom;
+      const otherUser = chatRoomInfo.users.filter((user) => user !== email);
+      const [myBlockList, otherUserBlockList] = await Promise.all([
+        this.blockedUserModel.findOne({
+          userId: email,
+          blockedBy: otherUser,
+        }),
+        this.blockedUserModel.findOne({
+          userId: otherUser,
+          blockedBy: email,
+        }),
+      ]);
 
-      return { statusCode: 200, data: { isBlockedUser } };
+      if (!!myBlockList) {
+        return { statusCode: 200, data: { blockedStatus: '차단함' } };
+      }
+
+      if (!!otherUserBlockList) {
+        return { statusCode: 200, data: { blockedStatus: '차단당함' } };
+      }
+
+      return { statusCode: 200, data: { blockedStatus: '차단 없음' } };
     } catch (error) {
       console.log(error);
       throw new HttpException(
