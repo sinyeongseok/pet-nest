@@ -119,7 +119,7 @@ export class ChatController {
     return res.status(result.statusCode).json(result.data);
   }
 
-  @Get('blocked/user/chat')
+  @Get('blocked/user')
   @UseGuards(JwtAccessAuthGuard)
   async checkBlockedUserChats(
     @Req() req,
