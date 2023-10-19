@@ -292,32 +292,82 @@ export class ChatGateway {
     return { success: true };
   }
 
-  @SubscribeMessage('blocked')
-  async handleBlockedUser(
+  @SubscribeMessage('block')
+  async handleBlockUser(
     @ConnectedSocket() socket,
-    @MessageBody() { blockedBy, token }
+    @MessageBody() { chatRoomId, blockedBy, token }
   ) {
     const validateTokenResult = await this.tokenService.validateToken(token);
 
     if (validateTokenResult.statusCode !== 200) {
       socket.emit('error', {
         ...validateTokenResult,
-        url: 'blocked',
-        data: { blockedBy, token },
+        url: 'block',
+        data: { chatRoomId, blockedBy, token },
       });
 
       return;
     }
 
     const email = validateTokenResult.user.email;
-    await this.chatService.blockedUser(email, blockedBy);
-    const chatRoomList = await this.chatService.getChatRoomList(email);
+    await this.chatService.blockUser(email, blockedBy);
+    const room = this.nsp.adapter.rooms.get(chatRoomId);
+    const sockets = Array.from(room);
 
-    socket.emit('room-list', {
-      statusCode: 200,
-      message: '성공',
-      data: { chatRoomList },
-    });
+    for await (const socket of sockets) {
+      const userSocket: any = this.nsp.sockets.get(socket);
+      const result = await this.chatService.checkBlockedUserChats(
+        userSocket.userEmail,
+        chatRoomId
+      );
+
+      userSocket.emit('blocked-status', {
+        statusCode: 200,
+        message: '성공',
+        data: { blockedStatus: result.data.blockedStatus },
+      });
+    }
+
+    await this.broadcastChatList(sockets, chatRoomId);
+
+    return { success: true };
+  }
+
+  @SubscribeMessage('unblock')
+  async handleUnBlockUser(
+    @ConnectedSocket() socket,
+    @MessageBody() { chatRoomId, blockedBy, token }
+  ) {
+    const validateTokenResult = await this.tokenService.validateToken(token);
+
+    if (validateTokenResult.statusCode !== 200) {
+      socket.emit('error', {
+        ...validateTokenResult,
+        url: 'unblock',
+        data: { chatRoomId, blockedBy, token },
+      });
+
+      return;
+    }
+
+    const email = validateTokenResult.user.email;
+    await this.chatService.unblockUser(email, blockedBy);
+    const room = this.nsp.adapter.rooms.get(chatRoomId);
+    const sockets = Array.from(room);
+
+    for await (const socket of sockets) {
+      const userSocket: any = this.nsp.sockets.get(socket);
+      const result = await this.chatService.checkBlockedUserChats(
+        userSocket.userEmail,
+        chatRoomId
+      );
+
+      userSocket.emit('blocked-status', {
+        statusCode: 200,
+        message: '성공',
+        data: { blockedStatus: result.data.blockedStatus },
+      });
+    }
 
     return { success: true };
   }
