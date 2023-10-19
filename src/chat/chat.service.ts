@@ -642,14 +642,14 @@ export class ChatService {
       ]);
 
       if (!!myBlockList) {
-        return { statusCode: 200, data: { blockedStatus: '차단함' } };
+        return { statusCode: 200, data: { blockedStatus: 'Me' } };
       }
 
       if (!!otherUserBlockList) {
-        return { statusCode: 200, data: { blockedStatus: '차단당함' } };
+        return { statusCode: 200, data: { blockedStatus: 'Other' } };
       }
 
-      return { statusCode: 200, data: { blockedStatus: '차단 없음' } };
+      return { statusCode: 200, data: { blockedStatus: 'None' } };
     } catch (error) {
       console.log(error);
       throw new HttpException(
