@@ -375,7 +375,7 @@ export class ChatGateway {
   @SubscribeMessage('schedule')
   async handleCreateSchedule(
     @ConnectedSocket() socket,
-    @MessageBody() { chatRoomId, promiseAt, alarmTime, token }
+    @MessageBody() { chatRoomId, promiseAt, alarmTime, option, token }
   ) {
     const validateTokenResult = await this.tokenService.validateToken(token);
 
@@ -390,6 +390,20 @@ export class ChatGateway {
     }
 
     const email = validateTokenResult.user.email;
+    const isSameTimeSchedule = await this.chatService.isSameTimeSchedule(
+      email,
+      promiseAt
+    );
+
+    if (isSameTimeSchedule && option !== 'sameTime') {
+      socket.emit('same-schedule', {
+        statusCode: 202,
+        message: '이 시간에 다른분과 직거래 약속이 있어요.',
+        data: { isSameTimeSchedule },
+      });
+
+      return;
+    }
 
     await this.chatService.createUsedItemSchedule({
       chatRoomId,
