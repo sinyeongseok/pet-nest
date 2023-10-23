@@ -504,7 +504,7 @@ export class ChatGateway {
   @SubscribeMessage('patch-schedule')
   async handlePatchSchedule(
     @ConnectedSocket() socket,
-    @MessageBody() { scheduleId, promiseAt, alarmTime, token }
+    @MessageBody() { scheduleId, promiseAt, alarmTime, option, token }
   ) {
     const validateTokenResult = await this.tokenService.validateToken(token);
 
@@ -513,6 +513,22 @@ export class ChatGateway {
         ...validateTokenResult,
         url: 'patch-schedule',
         data: { scheduleId, promiseAt, alarmTime, token },
+      });
+
+      return;
+    }
+
+    const email = validateTokenResult.user.email;
+    const isSameTimeSchedule = await this.chatService.isSameTimeSchedule(
+      email,
+      promiseAt
+    );
+
+    if (isSameTimeSchedule && option !== 'sameTime') {
+      socket.emit('same-schedule', {
+        statusCode: 202,
+        message: '이 시간에 다른분과 직거래 약속이 있어요.',
+        data: { isSameTimeSchedule },
       });
 
       return;
