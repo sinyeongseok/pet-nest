@@ -137,7 +137,7 @@ export class ChatService {
             users: {
               $in: [email],
             },
-            boardId: new Types.ObjectId(boardId),
+            ...(!!boardId && { boardId: new Types.ObjectId(boardId) }),
           },
         },
         {
