@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { UsedItemBoard, UsedItemBoardDocument } from 'src/schema/board.schema';
 import { ChatRoom, ChatRoomDocument } from 'src/schema/chatRoom.schema';
 import {
@@ -129,7 +129,7 @@ export class ChatService {
     );
   }
 
-  async getChatRoomList(email: string) {
+  async getChatRoomList(email: string, boardId: string = null) {
     try {
       const chatRoomAndSettings = await this.chatRoomModel.aggregate([
         {
@@ -137,6 +137,7 @@ export class ChatService {
             users: {
               $in: [email],
             },
+            boardId: new Types.ObjectId(boardId),
           },
         },
         {
