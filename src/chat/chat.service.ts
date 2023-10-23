@@ -685,7 +685,11 @@ export class ChatService {
     }
   }
 
-  async isSameTimeSchedule(email: string, promiseAt) {
+  async isSameTimeSchedule(
+    email: string,
+    promiseAt,
+    scheduleId: string = null
+  ) {
     try {
       const sameTimeSchedule = await this.chatRoomModel.aggregate([
         {
@@ -693,6 +697,11 @@ export class ChatService {
             users: {
               $in: [email],
             },
+            ...(!!scheduleId && {
+              _id: {
+                $ne: new Types.ObjectId(scheduleId),
+              },
+            }),
           },
         },
         {

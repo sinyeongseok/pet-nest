@@ -521,7 +521,8 @@ export class ChatGateway {
     const email = validateTokenResult.user.email;
     const isSameTimeSchedule = await this.chatService.isSameTimeSchedule(
       email,
-      promiseAt
+      promiseAt,
+      scheduleId
     );
 
     if (isSameTimeSchedule && option !== 'sameTime') {
