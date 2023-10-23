@@ -369,6 +369,8 @@ export class ChatGateway {
       });
     }
 
+    await this.broadcastChatList(sockets, chatRoomId);
+
     return { success: true };
   }
 
