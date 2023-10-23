@@ -451,7 +451,7 @@ export class ChatService {
       });
       const otherUser = chatRoomInfo.users.filter((user) => user !== email);
       const blockedUserQuery = new this.blockedUserModel({
-        blockedBy: otherUser,
+        blockedBy: otherUser[0],
         userId: email,
       });
 
@@ -474,7 +474,7 @@ export class ChatService {
       });
       const otherUser = chatRoomInfo.users.filter((user) => user !== email);
       await this.blockedUserModel.deleteOne({
-        blockedBy: otherUser,
+        blockedBy: otherUser[0],
         userId: email,
       });
 
