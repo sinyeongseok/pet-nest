@@ -444,10 +444,14 @@ export class ChatService {
     }
   }
 
-  async blockUser(email: string, blockedBy: string) {
+  async blockUser(email: string, chatRoomId: string) {
     try {
+      const chatRoomInfo = await this.chatRoomModel.findOne({
+        _id: chatRoomId,
+      });
+      const otherUser = chatRoomInfo.users.filter((user) => user !== email);
       const blockedUserQuery = new this.blockedUserModel({
-        blockedBy,
+        blockedBy: otherUser,
         userId: email,
       });
 
@@ -463,9 +467,16 @@ export class ChatService {
     }
   }
 
-  async unblockUser(email: string, blockedBy: string) {
+  async unblockUser(email: string, chatRoomId: string) {
     try {
-      await this.blockedUserModel.deleteOne({ blockedBy, userId: email });
+      const chatRoomInfo = await this.chatRoomModel.findOne({
+        _id: chatRoomId,
+      });
+      const otherUser = chatRoomInfo.users.filter((user) => user !== email);
+      await this.blockedUserModel.deleteOne({
+        blockedBy: otherUser,
+        userId: email,
+      });
 
       return;
     } catch (error) {
