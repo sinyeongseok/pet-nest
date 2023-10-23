@@ -295,7 +295,7 @@ export class ChatGateway {
   @SubscribeMessage('block')
   async handleBlockUser(
     @ConnectedSocket() socket,
-    @MessageBody() { chatRoomId, blockedBy, token }
+    @MessageBody() { chatRoomId, token }
   ) {
     const validateTokenResult = await this.tokenService.validateToken(token);
 
@@ -303,14 +303,14 @@ export class ChatGateway {
       socket.emit('error', {
         ...validateTokenResult,
         url: 'block',
-        data: { chatRoomId, blockedBy, token },
+        data: { chatRoomId, token },
       });
 
       return;
     }
 
     const email = validateTokenResult.user.email;
-    await this.chatService.blockUser(email, blockedBy);
+    await this.chatService.blockUser(email, chatRoomId);
     const room = this.nsp.adapter.rooms.get(chatRoomId);
     const sockets = Array.from(room);
 
@@ -336,7 +336,7 @@ export class ChatGateway {
   @SubscribeMessage('unblock')
   async handleUnBlockUser(
     @ConnectedSocket() socket,
-    @MessageBody() { chatRoomId, blockedBy, token }
+    @MessageBody() { chatRoomId, token }
   ) {
     const validateTokenResult = await this.tokenService.validateToken(token);
 
@@ -344,14 +344,14 @@ export class ChatGateway {
       socket.emit('error', {
         ...validateTokenResult,
         url: 'unblock',
-        data: { chatRoomId, blockedBy, token },
+        data: { chatRoomId, token },
       });
 
       return;
     }
 
     const email = validateTokenResult.user.email;
-    await this.chatService.unblockUser(email, blockedBy);
+    await this.chatService.unblockUser(email, chatRoomId);
     const room = this.nsp.adapter.rooms.get(chatRoomId);
     const sockets = Array.from(room);
 
