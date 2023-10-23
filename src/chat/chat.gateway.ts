@@ -89,14 +89,17 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('room-list')
-  async handleRoomList(@ConnectedSocket() socket, @MessageBody() { token }) {
+  async handleRoomList(
+    @ConnectedSocket() socket,
+    @MessageBody() { token, boardId }
+  ) {
     const validateTokenResult = await this.tokenService.validateToken(token);
 
     if (validateTokenResult.statusCode !== 200) {
       socket.emit('error', {
         ...validateTokenResult,
         url: 'room-list',
-        data: { token },
+        data: { token, boardId },
       });
 
       return;
@@ -104,7 +107,7 @@ export class ChatGateway {
 
     const email = validateTokenResult.user.email;
     socket.userEmail = email;
-    const result = await this.chatService.getChatRoomList(email);
+    const result = await this.chatService.getChatRoomList(email, boardId);
 
     result.forEach((res) => {
       socket.join(String(res.id));
