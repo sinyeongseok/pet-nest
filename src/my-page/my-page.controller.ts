@@ -5,17 +5,18 @@ import {
   Get,
   Param,
   Patch,
-  Post,
+  Put,
   Query,
   Req,
   Res,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
 import { MyPageService } from './my-page.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('my-page')
 export class MyPageController {
@@ -91,6 +92,27 @@ export class MyPageController {
       profileImage,
     });
     const result = await this.myPageService.getMyPageUserInfo(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Put('pet/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  @UseInterceptors(FilesInterceptor('petImages', 5))
+  async createPet(
+    @Res() res,
+    @Req() req,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Param('id') petId: string,
+    @Body() petInfo
+  ) {
+    const email = req.user.email;
+    const result = await this.myPageService.updatePetInfo(
+      files,
+      email,
+      petId,
+      petInfo
+    );
 
     return res.status(result.statusCode).json(result.data);
   }
