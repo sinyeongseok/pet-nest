@@ -58,6 +58,15 @@ export class MyPageController {
     return res.status(result.statusCode).json(result.data);
   }
 
+  @Get('pet/edit')
+  @UseGuards(JwtAccessAuthGuard)
+  async getPetEditPageInfo(@Res() res, @Req() req, @Query('id') id: string) {
+    console.log(id);
+    const result = await this.myPageService.getPetEditPageInfo(id);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Get('pet/:id')
   @UseGuards(JwtAccessAuthGuard)
   async getPetInfo(@Req() req, @Res() res, @Param('id') id: string) {
