@@ -515,7 +515,8 @@ export class BoardService {
   ) {
     try {
       const boardInfo = await this.usedItemBoardModel.findOne({ _id: boardId });
-      await this.deleteUnusedImage(boardInfo.images, JSON.parse(images));
+      const currentImage = !!images ? JSON.parse(images) : [];
+      await this.deleteUnusedImage(boardInfo.images, currentImage);
       const imageUploaded = files.map(async (file) => {
         return await this.awsService.uploadFileToS3(
           `usedItemImages/${boardId}/${uuid()}${dayjs().format(
@@ -534,7 +535,7 @@ export class BoardService {
           title,
           description,
           price,
-          images: [...JSON.parse(images), ...newImages],
+          images: [...currentImage, ...newImages],
         }
       );
 
