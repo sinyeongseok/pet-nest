@@ -286,4 +286,31 @@ export class MyPageService {
       );
     }
   }
+
+  async getPetEditPageInfo(id: string) {
+    try {
+      console.log(id);
+      const pet = await this.petModel.findOne({ _id: id });
+      const result = {
+        name: pet.name,
+        gender: PetGender[pet.gender],
+        speciesInputType: pet.speciesInputType,
+        species: pet.species,
+        unusualCondition: pet.unusualCondition,
+        birthday: pet.birthday,
+        neuteredStatus: pet.neuteredStatus,
+        helloMessage: pet.helloMessage,
+        weight: pet.weight,
+        ...(!!pet.images.length && { images: pet.images }),
+      };
+
+      return { statusCode: 200, data: { petInfo: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
