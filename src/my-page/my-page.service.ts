@@ -10,6 +10,7 @@ import {
 import { PetType, PetGender } from 'src/config/type';
 import * as dayjs from 'dayjs';
 import { AwsService } from 'src/utils/s3';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class MyPageService {
@@ -203,6 +204,80 @@ export class MyPageService {
       }
 
       return;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async deleteUnusedImage(images, newImages) {
+    const isSameArray =
+      images.length === newImages.length &&
+      images.every((value, idx) => value === newImages[idx]);
+
+    if (isSameArray) {
+      return;
+    }
+
+    for await (const image of images) {
+      if (!newImages.includes(image)) {
+        await this.awsService.deleteS3Object(image);
+      }
+    }
+  }
+
+  async updatePetInfo(
+    files: Array<Express.Multer.File>,
+    email: string,
+    petId: string,
+    {
+      type,
+      name,
+      speciesInputType,
+      species,
+      birthday,
+      gender,
+      neuteredStatus,
+      weight,
+      unusualCondition,
+      helloMessage,
+      images,
+    }
+  ) {
+    try {
+      const petInfo = await this.petModel.findOne({ _id: petId });
+      await this.deleteUnusedImage(petInfo.images, JSON.parse(images));
+      const imageUploaded = files.map(async (file) => {
+        return await this.awsService.uploadFileToS3(
+          `petImages/${email}/${String(petId)}/${uuid()}${dayjs().format(
+            'YYYYMMDDHHmmss'
+          )}`,
+          file
+        );
+      });
+      const imageUploadResults = await Promise.all(imageUploaded);
+      const newImages = imageUploadResults.map((result) => result.url);
+      await this.petModel.updateOne(
+        { _id: petId },
+        {
+          type,
+          name,
+          speciesInputType,
+          species,
+          birthday,
+          gender,
+          neuteredStatus,
+          weight,
+          unusualCondition,
+          helloMessage,
+          images: [...JSON.parse(images), ...newImages],
+        }
+      );
+
+      return { statusCode: 200, data: { isUpdated: true } };
     } catch (error) {
       console.log(error);
       throw new HttpException(
