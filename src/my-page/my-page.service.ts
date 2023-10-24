@@ -248,8 +248,14 @@ export class MyPageService {
     }
   ) {
     try {
+      const [year, month, day] = birthday.split(' ');
+      const birthdayToDate = new Date(
+        `${parseInt(year)} ${parseInt(month)} ${parseInt(day)}`
+      );
+
       const petInfo = await this.petModel.findOne({ _id: petId });
-      await this.deleteUnusedImage(petInfo.images, JSON.parse(images));
+      const currentImage = !!images ? JSON.parse(images) : [];
+      await this.deleteUnusedImage(petInfo.images, currentImage);
       const imageUploaded = files.map(async (file) => {
         return await this.awsService.uploadFileToS3(
           `petImages/${email}/${String(petId)}/${uuid()}${dayjs().format(
@@ -267,13 +273,13 @@ export class MyPageService {
           name,
           speciesInputType,
           species,
-          birthday,
           gender,
           neuteredStatus,
           weight,
           unusualCondition,
           helloMessage,
-          images: [...JSON.parse(images), ...newImages],
+          birthday: birthdayToDate,
+          images: [...currentImage, ...newImages],
         }
       );
 
