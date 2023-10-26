@@ -297,6 +297,7 @@ export class MyPageService {
     try {
       const pet = await this.petModel.findOne({ _id: id });
       const result = {
+        type: pet.type,
         name: pet.name,
         gender: pet.gender,
         speciesInputType: pet.speciesInputType,
