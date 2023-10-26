@@ -295,11 +295,10 @@ export class MyPageService {
 
   async getPetEditPageInfo(id: string) {
     try {
-      console.log(id);
       const pet = await this.petModel.findOne({ _id: id });
       const result = {
         name: pet.name,
-        gender: PetGender[pet.gender],
+        gender: pet.gender,
         speciesInputType: pet.speciesInputType,
         species: pet.species,
         unusualCondition: pet.unusualCondition,
