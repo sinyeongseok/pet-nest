@@ -34,15 +34,9 @@ export class MyPageService {
         getUserInfo,
         getUserAddressInfo,
       ])) as [UserDocument, UserAddressDocument[]];
-      const userAddress = (() => {
-        if (userAddressInfo.length === 1) {
-          return userAddressInfo[0].eupMyeonDong;
-        }
-
-        return userAddressInfo
-          .map((userAddress) => userAddress.eupMyeonDong)
-          .join(' / ');
-      })();
+      const userAddress = userAddressInfo
+        .map((userAddress) => userAddress.eupMyeonDong)
+        .join(' / ');
       const result = {
         nickname: userInfo.nickname,
         address: userAddress,
