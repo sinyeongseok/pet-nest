@@ -42,7 +42,7 @@ export class MyPageController {
 
   @Get('pet')
   @UseGuards(JwtAccessAuthGuard)
-  async getPet(@Req() req, @Res() res, @Query('id') id: string) {
+  async getPet(@Res() res, @Query('id') id: string) {
     const result = await this.myPageService.getPet(id);
 
     return res.status(result.statusCode).json(result.data);
@@ -60,8 +60,7 @@ export class MyPageController {
 
   @Get('pet/edit')
   @UseGuards(JwtAccessAuthGuard)
-  async getPetEditPageInfo(@Res() res, @Req() req, @Query('id') id: string) {
-    console.log(id);
+  async getPetEditPageInfo(@Res() res, @Query('id') id: string) {
     const result = await this.myPageService.getPetEditPageInfo(id);
 
     return res.status(result.statusCode).json(result.data);
@@ -69,7 +68,7 @@ export class MyPageController {
 
   @Get('pet/:id')
   @UseGuards(JwtAccessAuthGuard)
-  async getPetInfo(@Req() req, @Res() res, @Param('id') id: string) {
+  async getPetInfo(@Res() res, @Param('id') id: string) {
     const result = await this.myPageService.getPetInfo(id);
 
     return res.status(200).json(result.data);
@@ -109,8 +108,8 @@ export class MyPageController {
   @UseGuards(JwtAccessAuthGuard)
   @UseInterceptors(FilesInterceptor('petImages', 5))
   async createPet(
-    @Res() res,
     @Req() req,
+    @Res() res,
     @UploadedFiles() files: Array<Express.Multer.File>,
     @Param('id') petId: string,
     @Body() petInfo
