@@ -10,6 +10,10 @@ import { CityAddress, CityAddressSchema } from 'src/schema/cityAddress.schema';
 import { UtilService } from 'src/utils/util.service';
 import { User, UserSchema } from 'src/schema/user.schema';
 import { ChatRoom, ChatRoomSchema } from 'src/schema/chatRoom.schema';
+import {
+  BlockedUser,
+  BlockedUserSchema,
+} from 'src/schema/blockedUserSchema.schema';
 
 @Module({
   imports: [
@@ -19,6 +23,7 @@ import { ChatRoom, ChatRoomSchema } from 'src/schema/chatRoom.schema';
       { name: CityAddress.name, schema: CityAddressSchema },
       { name: User.name, schema: UserSchema },
       { name: ChatRoom.name, schema: ChatRoomSchema },
+      { name: BlockedUser.name, schema: BlockedUserSchema },
     ]),
   ],
   controllers: [BoardController],
