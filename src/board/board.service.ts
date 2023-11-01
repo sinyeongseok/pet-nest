@@ -9,6 +9,10 @@ import { AddressService } from 'src/address/address.service';
 import { UtilService } from 'src/utils/util.service';
 import { User, UserDocument } from 'src/schema/user.schema';
 import { ChatRoom, ChatRoomDocument } from 'src/schema/chatRoom.schema';
+import {
+  BlockedUser,
+  BlockedUserDocument,
+} from 'src/schema/blockedUserSchema.schema';
 
 @Injectable()
 export class BoardService {
@@ -17,6 +21,8 @@ export class BoardService {
     private usedItemBoardModel: Model<UsedItemBoardDocument>,
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
+    @InjectModel(BlockedUser.name)
+    private blockedUserModel: Model<BlockedUserDocument>,
     @InjectModel(ChatRoom.name)
     private chatRoomModel: Model<ChatRoomDocument>,
     private awsService: AwsService,
@@ -141,12 +147,17 @@ export class BoardService {
   ) {
     try {
       const findQuery = await this.getNearbyPostsQueryBasedOnUserAddress(email);
+      const getBlockedlockedUsers = await this.blockedUserModel.find({
+        userId: email,
+      });
+      const blockedUser = getBlockedlockedUsers.map((users) => users.blockedBy);
       const usedItemBoardList = await this.usedItemBoardModel
         .find({
           $and: [
             { topCategory },
             { isVisible: false },
             { $or: findQuery },
+            { 'seller.email': { $not: { $in: blockedUser } } },
             ...(!!subCategory ? [{ subCategory }] : []),
           ],
           $or: [
