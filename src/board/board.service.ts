@@ -138,6 +138,14 @@ export class BoardService {
     );
   }
 
+  async getBlocklist(email: string) {
+    const blocklist = await this.blockedUserModel.find({
+      userId: email,
+    });
+
+    return blocklist.map((users) => users.blockedBy);
+  }
+
   async getUsedItemBoardList(
     limit: number,
     page: number,
@@ -147,17 +155,14 @@ export class BoardService {
   ) {
     try {
       const findQuery = await this.getNearbyPostsQueryBasedOnUserAddress(email);
-      const getBlockedlockedUsers = await this.blockedUserModel.find({
-        userId: email,
-      });
-      const blockedUser = getBlockedlockedUsers.map((users) => users.blockedBy);
+      const blocklist = await this.getBlocklist(email);
       const usedItemBoardList = await this.usedItemBoardModel
         .find({
           $and: [
             { topCategory },
             { isVisible: false },
             { $or: findQuery },
-            { 'seller.email': { $not: { $in: blockedUser } } },
+            { 'seller.email': { $not: { $in: blocklist } } },
             ...(!!subCategory ? [{ subCategory }] : []),
           ],
           $or: [
