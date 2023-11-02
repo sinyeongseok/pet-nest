@@ -333,12 +333,14 @@ export class BoardService {
         _id: id,
       });
       const findQuery = await this.getNearbyPostsQueryBasedOnUserAddress(email);
+      const blocklist = await this.getBlocklist(email);
       const similarUsedItemBoardsQuery = this.usedItemBoardModel
         .find({
           $and: [
             { subCategory: usedItemBoardInfo.subCategory },
             { _id: { $ne: usedItemBoardInfo._id } },
             { 'seller.email': { $ne: email } },
+            { 'seller.email': { $not: { $in: blocklist } } },
             { $or: findQuery },
           ],
         })
@@ -370,10 +372,12 @@ export class BoardService {
         _id: id,
       });
       const findQuery = await this.getNearbyPostsQueryBasedOnUserAddress(email);
+      const blocklist = await this.getBlocklist(email);
       const otherUsedItemBoardsQuery = this.usedItemBoardModel
         .find({
           $and: [
             { 'seller.email': usedItemBoardInfo.seller.email },
+            { 'seller.email': { $not: { $in: blocklist } } },
             { _id: { $ne: usedItemBoardInfo._id } },
             { $or: findQuery },
           ],
