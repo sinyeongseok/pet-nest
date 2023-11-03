@@ -82,7 +82,6 @@ export class MyPageService {
   async getPet(id: string) {
     try {
       const pet = await this.petModel.findOne({ _id: id });
-      console.log(pet);
       const result = {
         name: pet.name,
         gender: PetGender[pet.gender],
