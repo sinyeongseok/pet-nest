@@ -26,10 +26,10 @@ export class BoardController {
   @UseGuards(JwtAccessAuthGuard)
   @UseInterceptors(FilesInterceptor('itemImages', 5))
   async generateUsedItemsBoard(
-    @UploadedFiles() files: Array<Express.Multer.File>,
-    @Body() usedItemBoardInfo,
+    @Req() req,
     @Res() res,
-    @Req() req
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Body() usedItemBoardInfo
   ) {
     const email = req.user.email;
     const result = await this.boardService.generateUsedItemsBoard(
@@ -44,8 +44,8 @@ export class BoardController {
   @Get('used-item')
   @UseGuards(JwtAccessAuthGuard)
   async getUsedItemBoardList(
-    @Res() res,
     @Req() req,
+    @Res() res,
     @Query('topCategory') topCategory: string,
     @Query('subCategory') subCategory: string,
     @Query('limit') limit: number,
@@ -65,8 +65,8 @@ export class BoardController {
   @Get('used-item/:id')
   @UseGuards(JwtAccessAuthGuard)
   async getDetailUsedItemBoard(
-    @Res() res,
     @Req() req,
+    @Res() res,
     @Param('id') id: string
   ) {
     const email = req.user.email;
@@ -87,8 +87,8 @@ export class BoardController {
   @Get('used-item/other-posts/:id')
   @UseGuards(JwtAccessAuthGuard)
   async getOtherUsedItemBoardList(
-    @Res() res,
     @Req() req,
+    @Res() res,
     @Param('id') id: string,
     @Query('limit') limit: string
   ) {
@@ -105,8 +105,8 @@ export class BoardController {
   @Get('used-item/similar-posts/:id')
   @UseGuards(JwtAccessAuthGuard)
   async getSimilarUsedBoardList(
-    @Res() res,
     @Req() req,
+    @Res() res,
     @Param('id') id: string,
     @Query('limit') limit: string
   ) {
@@ -122,7 +122,7 @@ export class BoardController {
 
   @Post('used-item/like/:id')
   @UseGuards(JwtAccessAuthGuard)
-  async likeBoard(@Res() res, @Req() req, @Param('id') id: string) {
+  async likeBoard(@Req() req, @Res() res, @Param('id') id: string) {
     const email = req.user.email;
     const result = await this.boardService.likeBoard(email, id);
 
@@ -131,7 +131,7 @@ export class BoardController {
 
   @Delete('used-item/like/:id')
   @UseGuards(JwtAccessAuthGuard)
-  async dislikeBoard(@Res() res, @Req() req, @Param('id') id: string) {
+  async dislikeBoard(@Req() req, @Res() res, @Param('id') id: string) {
     const email = req.user.email;
     const result = await this.boardService.dislikeBoard(email, id);
 
@@ -140,7 +140,7 @@ export class BoardController {
 
   @Delete('used-item/:id')
   @UseGuards(JwtAccessAuthGuard)
-  async deleteBoard(@Res() res, @Req() req, @Param('id') id: string) {
+  async deleteBoard(@Req() req, @Res() res, @Param('id') id: string) {
     const email = req.user.email;
     const result = await this.boardService.deleteBoard(email, id);
 
@@ -151,7 +151,6 @@ export class BoardController {
   @UseGuards(JwtAccessAuthGuard)
   async changeBoardStatus(
     @Res() res,
-    @Req() req,
     @Param('id') id: string,
     @Body('salesStatus') salesStatus: string
   ) {
@@ -164,8 +163,8 @@ export class BoardController {
   @UseGuards(JwtAccessAuthGuard)
   @UseInterceptors(FilesInterceptor('newItemImages', 5))
   async updateBoard(
-    @Res() res,
     @Req() req,
+    @Res() res,
     @Param('id') id: string,
     @UploadedFiles() files: Array<Express.Multer.File>,
     @Body() usedItemBoardInfo
@@ -183,7 +182,7 @@ export class BoardController {
 
   @Post('/used-items/completed-deals')
   @UseGuards(JwtAccessAuthGuard)
-  async hasUsedItemsCompletedDealsOneHourAgo(@Res() res, @Req() req) {
+  async hasUsedItemsCompletedDealsOneHourAgo(@Req() req, @Res() res) {
     const email = req.user.email;
     const result = await this.boardService.hasUsedItemsCompletedDealsOneHourAgo(
       email
@@ -194,7 +193,7 @@ export class BoardController {
 
   @Get('/used-items/completed-deals')
   @UseGuards(JwtAccessAuthGuard)
-  async getUsedItemsCompletedDealsOneHourAgo(@Res() res, @Req() req) {
+  async getUsedItemsCompletedDealsOneHourAgo(@Req() req, @Res() res) {
     const email = req.user.email;
     const result = await this.boardService.getUsedItemsCompletedDealsOneHourAgo(
       email
@@ -205,7 +204,7 @@ export class BoardController {
 
   @Get('/used-items/chats')
   @UseGuards(JwtAccessAuthGuard)
-  async getUsedItemChatRooms(@Res() res, @Req() req, @Query('id') id: string) {
+  async getUsedItemChatRooms(@Req() req, @Res() res, @Query('id') id: string) {
     const email = req.user.email;
     const result = await this.boardService.getUsedItemChatRooms(email, id);
 

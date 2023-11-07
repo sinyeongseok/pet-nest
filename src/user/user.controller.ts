@@ -6,7 +6,6 @@ import {
   Res,
   UploadedFile,
   UseInterceptors,
-  Query,
   Param,
   Patch,
   Delete,
@@ -44,8 +43,8 @@ export class UserController {
   @Post('addresses')
   @UseGuards(JwtAccessAuthGuard)
   async createUserAddress(
-    @Res() res,
     @Req() req,
+    @Res() res,
     @Body('latitude') latitude: number,
     @Body('longitude') longitude: number
   ) {
@@ -61,8 +60,8 @@ export class UserController {
   @Patch('addresses/:id')
   @UseGuards(JwtAccessAuthGuard)
   async updateAddressLastSelected(
-    @Res() res,
     @Req() req,
+    @Res() res,
     @Param('id') id: string
   ) {
     const email = req.user.email;
@@ -73,7 +72,7 @@ export class UserController {
 
   @Delete('addresses/:id')
   @UseGuards(JwtAccessAuthGuard)
-  async deleteAddress(@Res() res, @Req() req, @Param('id') id: string) {
+  async deleteAddress(@Req() req, @Res() res, @Param('id') id: string) {
     const email = req.user.email;
     const result = await this.userService.deleteAddress(email, id);
 
@@ -82,7 +81,7 @@ export class UserController {
 
   @Get('addresses')
   @UseGuards(JwtAccessAuthGuard)
-  async getUserAddresses(@Res() res, @Req() req) {
+  async getUserAddresses(@Req() req, @Res() res) {
     const email = req.user.email;
     const result = await this.userService.getUserAddresses(email, null);
 
@@ -91,7 +90,7 @@ export class UserController {
 
   @Get('addresses/settings')
   @UseGuards(JwtAccessAuthGuard)
-  async getUserAddressesSettings(@Res() res, @Req() req) {
+  async getUserAddressesSettings(@Req() req, @Res() res) {
     const email = req.user.email;
     const result = await this.userService.getUserAddresses(email, 'settings');
 
@@ -121,8 +120,8 @@ export class UserController {
   @UseGuards(JwtAccessAuthGuard)
   @UseInterceptors(FilesInterceptor('petImages', 5))
   async createPet(
-    @Res() res,
     @Req() req,
+    @Res() res,
     @UploadedFiles() files: Array<Express.Multer.File>,
     @Body() petInfo
   ) {

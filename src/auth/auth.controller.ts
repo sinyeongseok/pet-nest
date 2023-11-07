@@ -37,7 +37,7 @@ export class AuthController {
 
   @Get('local-area')
   @UseGuards(JwtAccessAuthGuard)
-  async checkLocalArea(@Res() res, @Req() req) {
+  async checkLocalArea(@Req() req, @Res() res) {
     const email = req.user.email;
     const result = await this.authService.checkLocalArea(email);
 
@@ -47,8 +47,8 @@ export class AuthController {
   @Post('local-area')
   @UseGuards(JwtAccessAuthGuard)
   async verifyLocalArea(
-    @Res() res,
     @Req() req,
+    @Res() res,
     @Body('latitude') latitude: number,
     @Body('longitude') longitude: number
   ) {

@@ -8,7 +8,7 @@ export class TokenController {
 
   @Post('refresh-token')
   @UseGuards(JwtRefreshAuthGuard)
-  async refreshToken(@Res() res, @Req() req) {
+  async refreshToken(@Req() req, @Res() res) {
     const result = await this.tokenService.refreshToken(req.user.email);
     return res.status(result.statusCode).json({ data: result.data });
   }
