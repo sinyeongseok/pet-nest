@@ -97,12 +97,6 @@ export class UserController {
     return res.status(result.statusCode).json(result.data);
   }
 
-  @Get('random-nickname')
-  async getRandomNickname() {
-    const result = await this.userService.getRandomNickname();
-    return { data: { randomNickname: result } };
-  }
-
   @Patch('nickname')
   @UseGuards(JwtAccessAuthGuard)
   async updateNickname(

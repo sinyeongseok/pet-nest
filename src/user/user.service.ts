@@ -4,8 +4,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schema/user.schema';
 import { UserAddress, UserAddressDocument } from '../schema/userAddress.schema';
 import { CityAddress, CityAddressDocument } from '../schema/cityAddress.schema';
-import { de, fakerKO as faker } from '@faker-js/faker';
-import { adjective } from './adjective';
 import { AwsService } from '../utils/s3';
 import { TokenService } from 'src/token/token.service';
 import { AuthService } from 'src/auth/auth.service';
@@ -230,19 +228,6 @@ export class UserService {
       console.log(error);
       return { statusCode: 500, data: { message: '서버요청 실패.' } };
     }
-  }
-
-  async getRandomNickname() {
-    const nickname = `${
-      adjective[Math.floor(Math.random() * adjective.length)]
-    }${faker.person.lastName()}${faker.person.firstName()}`;
-    const existingNickname = await this.UserModel.findOne({ nickname });
-
-    if (!!existingNickname) {
-      return this.getRandomNickname();
-    }
-
-    return nickname;
   }
 
   async updateNickname(email: string, nickname: string) {
