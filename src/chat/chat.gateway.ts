@@ -5,7 +5,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket, Namespace } from 'socket.io';
+import { Namespace } from 'socket.io';
 import { ChatService } from './chat.service';
 import { TokenService } from 'src/token/token.service';
 import { BoardService } from 'src/board/board.service';

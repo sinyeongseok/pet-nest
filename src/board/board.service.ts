@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Model, Query, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UsedItemBoard, UsedItemBoardDocument } from '../schema/board.schema';
 import { AwsService } from '../utils/s3';

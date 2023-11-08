@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Res,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
