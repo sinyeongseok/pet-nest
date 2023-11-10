@@ -118,9 +118,26 @@ export class MyPageService {
     }
   }
 
-  async getPetInfo(id: string) {
+  formatOtherPets(otherPets) {
+    return otherPets.map((pet) => {
+      return {
+        id: pet._id,
+        name: pet.name.length > 3 ? `${pet.name.substring(0, 2)}...` : pet.name,
+        ...(!!pet.images.length && { image: pet.images[0] }),
+      };
+    });
+  }
+
+  async getPetInfo(email: string, id: string) {
     try {
-      const petInfo = await this.petModel.findOne({ _id: id });
+      const [petInfo, getOtherPets] = await Promise.all([
+        this.petModel.findOne({ _id: id }),
+        this.petModel.find({
+          _id: { $not: { $eq: id } },
+          userEmail: email,
+        }),
+      ]);
+      const otherPets = this.formatOtherPets(getOtherPets);
       const result = {
         name: petInfo.name,
         gender: PetGender[petInfo.gender],
@@ -131,6 +148,7 @@ export class MyPageService {
         helloMessage: petInfo.helloMessage,
         weight: petInfo.weight,
         ...(!!petInfo.images.length && { images: petInfo.images }),
+        ...(!!otherPets.length && { otherPets }),
       };
 
       return { statusCode: 200, data: { petInfo: result } };

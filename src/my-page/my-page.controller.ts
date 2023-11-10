@@ -68,8 +68,9 @@ export class MyPageController {
 
   @Get('pet/:id')
   @UseGuards(JwtAccessAuthGuard)
-  async getPetInfo(@Res() res, @Param('id') id: string) {
-    const result = await this.myPageService.getPetInfo(id);
+  async getPetInfo(@Req() req, @Res() res, @Param('id') id: string) {
+    const email = req.user.email;
+    const result = await this.myPageService.getPetInfo(email, id);
 
     return res.status(200).json(result.data);
   }
