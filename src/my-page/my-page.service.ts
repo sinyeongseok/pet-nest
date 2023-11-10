@@ -79,31 +79,6 @@ export class MyPageService {
     }
   }
 
-  async getPet(id: string) {
-    try {
-      const pet = await this.petModel.findOne({ _id: id });
-      const result = {
-        name: pet.name,
-        gender: PetGender[pet.gender],
-        species: pet.species,
-        unusualCondition: pet.unusualCondition,
-        birthday: dayjs(pet.birthday).format('YYYY. MM. DD'),
-        neuteredStatus: pet.neuteredStatus,
-        helloMessage: pet.helloMessage,
-        ...(!!pet.weight && { weight: `${pet.weight} kg` }),
-        ...(!!pet.images.length && { images: pet.images }),
-      };
-
-      return { statusCode: 200, data: { petInfo: result } };
-    } catch (error) {
-      console.log(error);
-      throw new HttpException(
-        '서버요청 실패.',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
   async deletePet(id: string) {
     try {
       await this.petModel.deleteOne({ _id: id });
