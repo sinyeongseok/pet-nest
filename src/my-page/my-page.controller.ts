@@ -40,14 +40,6 @@ export class MyPageController {
     return res.status(result.statusCode).json(result.data);
   }
 
-  @Get('pet')
-  @UseGuards(JwtAccessAuthGuard)
-  async getPet(@Res() res, @Query('id') id: string) {
-    const result = await this.myPageService.getPet(id);
-
-    return res.status(result.statusCode).json(result.data);
-  }
-
   @Delete('pet/:id')
   @UseGuards(JwtAccessAuthGuard)
   async deletePet(@Req() req, @Res() res, @Param('id') id: string) {
