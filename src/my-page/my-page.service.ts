@@ -98,7 +98,7 @@ export class MyPageService {
       return {
         id: pet._id,
         name: pet.name.length > 3 ? `${pet.name.substring(0, 2)}...` : pet.name,
-        type: pet.type,
+        type: PetType[pet.type],
         ...(!!pet.images.length && { image: pet.images[0] }),
       };
     });
