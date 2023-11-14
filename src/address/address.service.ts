@@ -10,7 +10,7 @@ export class AddressService {
     private CityAddressModel: Model<CityAddressDocument>
   ) {}
 
-  convertAddressList(addressList) {
+  private convertAddressList(addressList) {
     return addressList.map(({ location, detail }) => {
       const [longitude, latitude] = location.coordinates;
       return {
