@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { ChatGateway } from './chat.gateway';
 import { ChatService } from './chat.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UsedItemBoard, UsedItemBoardSchema } from 'src/schema/board.schema';
+import {
+  UsedItemBoard,
+  UsedItemBoardSchema,
+} from 'src/schema/usedItemBoard.schema';
 import { User, UserSchema } from 'src/schema/user.schema';
 import { UserAddress, UserAddressSchema } from 'src/schema/userAddress.schema';
 import { ChatRoom, ChatRoomSchema } from 'src/schema/chatRoom.schema';

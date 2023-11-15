@@ -1,7 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { UsedItemBoard, UsedItemBoardDocument } from 'src/schema/board.schema';
+import {
+  UsedItemBoard,
+  UsedItemBoardDocument,
+} from 'src/schema/usedItemBoard.schema';
 import { ChatRoom, ChatRoomDocument } from 'src/schema/chatRoom.schema';
 import {
   ChatRoomSetting,

@@ -1,7 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { UsedItemBoard, UsedItemBoardDocument } from '../schema/board.schema';
+import {
+  UsedItemBoard,
+  UsedItemBoardDocument,
+} from '../schema/usedItemBoard.schema';
 import { AwsService } from '../utils/s3';
 import { v4 as uuid } from 'uuid';
 import * as dayjs from 'dayjs';
