@@ -17,6 +17,7 @@ import {
   BlockedUser,
   BlockedUserSchema,
 } from 'src/schema/blockedUserSchema.schema';
+import { PetMateBoard } from 'src/schema/petMateBoardSchema.schema';
 
 @Module({
   imports: [
@@ -30,6 +31,12 @@ import {
     ]),
   ],
   controllers: [BoardController],
-  providers: [UsedItemBoardService, AwsService, AddressService, UtilService],
+  providers: [
+    UsedItemBoardService,
+    AwsService,
+    AddressService,
+    UtilService,
+    PetMateBoard,
+  ],
 })
 export class BoardModule {}
