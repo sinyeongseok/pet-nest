@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BoardController } from './board.controller';
-import { BoardService } from './board.service';
+import { UsedItemBoardService } from './usedItemBoard.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
   UsedItemBoard,
@@ -30,6 +30,6 @@ import {
     ]),
   ],
   controllers: [BoardController],
-  providers: [BoardService, AwsService, AddressService, UtilService],
+  providers: [UsedItemBoardService, AwsService, AddressService, UtilService],
 })
 export class BoardModule {}

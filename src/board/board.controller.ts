@@ -14,13 +14,13 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { BoardService } from './board.service';
+import { UsedItemBoardService } from './usedItemBoard.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
 
 @Controller('board')
 export class BoardController {
-  constructor(private boardService: BoardService) {}
+  constructor(private usedItemBoardService: UsedItemBoardService) {}
 
   @Post('used-item')
   @UseGuards(JwtAccessAuthGuard)
@@ -32,7 +32,7 @@ export class BoardController {
     @Body() usedItemBoardInfo
   ) {
     const email = req.user.email;
-    const result = await this.boardService.generateUsedItemsBoard(
+    const result = await this.usedItemBoardService.generateUsedItemsBoard(
       files,
       email,
       usedItemBoardInfo
@@ -52,7 +52,7 @@ export class BoardController {
     @Query('page') page: number
   ) {
     const email = req.user.email;
-    const result = await this.boardService.getUsedItemBoardList(
+    const result = await this.usedItemBoardService.getUsedItemBoardList(
       limit,
       page,
       topCategory,
@@ -70,7 +70,10 @@ export class BoardController {
     @Param('id') id: string
   ) {
     const email = req.user.email;
-    const result = await this.boardService.getDetailUsedItemBoard(id, email);
+    const result = await this.usedItemBoardService.getDetailUsedItemBoard(
+      id,
+      email
+    );
 
     return res.status(result.statusCode).json(result.data);
   }
@@ -79,7 +82,10 @@ export class BoardController {
   @UseGuards(JwtAccessAuthGuard)
   async getEditUsedItemBoard(@Res() res, @Req() req, @Param('id') id: string) {
     const email = req.user.email;
-    const result = await this.boardService.getEditUsedItemBoard(id, email);
+    const result = await this.usedItemBoardService.getEditUsedItemBoard(
+      id,
+      email
+    );
 
     return res.status(result.statusCode).json(result.data);
   }
@@ -93,7 +99,7 @@ export class BoardController {
     @Query('limit') limit: string
   ) {
     const email = req.user.email;
-    const result = await this.boardService.getOtherUsedItemBoardList(
+    const result = await this.usedItemBoardService.getOtherUsedItemBoardList(
       email,
       id,
       limit
@@ -111,7 +117,7 @@ export class BoardController {
     @Query('limit') limit: string
   ) {
     const email = req.user.email;
-    const result = await this.boardService.getSimilarUsedItemBoardList(
+    const result = await this.usedItemBoardService.getSimilarUsedItemBoardList(
       email,
       id,
       limit
@@ -124,7 +130,7 @@ export class BoardController {
   @UseGuards(JwtAccessAuthGuard)
   async likeBoard(@Req() req, @Res() res, @Param('id') id: string) {
     const email = req.user.email;
-    const result = await this.boardService.likeBoard(email, id);
+    const result = await this.usedItemBoardService.likeBoard(email, id);
 
     return res.status(result.statusCode).json(result.data);
   }
@@ -133,7 +139,7 @@ export class BoardController {
   @UseGuards(JwtAccessAuthGuard)
   async dislikeBoard(@Req() req, @Res() res, @Param('id') id: string) {
     const email = req.user.email;
-    const result = await this.boardService.dislikeBoard(email, id);
+    const result = await this.usedItemBoardService.dislikeBoard(email, id);
 
     return res.status(result.statusCode).json(result.data);
   }
@@ -142,7 +148,7 @@ export class BoardController {
   @UseGuards(JwtAccessAuthGuard)
   async deleteBoard(@Req() req, @Res() res, @Param('id') id: string) {
     const email = req.user.email;
-    const result = await this.boardService.deleteBoard(email, id);
+    const result = await this.usedItemBoardService.deleteBoard(email, id);
 
     return res.status(result.statusCode).json(result.data);
   }
@@ -154,7 +160,10 @@ export class BoardController {
     @Param('id') id: string,
     @Body('salesStatus') salesStatus: string
   ) {
-    const result = await this.boardService.changeBoardStatus(id, salesStatus);
+    const result = await this.usedItemBoardService.changeBoardStatus(
+      id,
+      salesStatus
+    );
 
     return res.status(result.statusCode).json(result.data);
   }
@@ -170,7 +179,7 @@ export class BoardController {
     @Body() usedItemBoardInfo
   ) {
     const email = req.user.email;
-    const result = await this.boardService.updateBoardInfo(
+    const result = await this.usedItemBoardService.updateBoardInfo(
       files,
       email,
       id,
@@ -184,9 +193,10 @@ export class BoardController {
   @UseGuards(JwtAccessAuthGuard)
   async hasUsedItemsCompletedDealsOneHourAgo(@Req() req, @Res() res) {
     const email = req.user.email;
-    const result = await this.boardService.hasUsedItemsCompletedDealsOneHourAgo(
-      email
-    );
+    const result =
+      await this.usedItemBoardService.hasUsedItemsCompletedDealsOneHourAgo(
+        email
+      );
 
     return res.status(result.statusCode).json(result.data);
   }
@@ -195,9 +205,10 @@ export class BoardController {
   @UseGuards(JwtAccessAuthGuard)
   async getUsedItemsCompletedDealsOneHourAgo(@Req() req, @Res() res) {
     const email = req.user.email;
-    const result = await this.boardService.getUsedItemsCompletedDealsOneHourAgo(
-      email
-    );
+    const result =
+      await this.usedItemBoardService.getUsedItemsCompletedDealsOneHourAgo(
+        email
+      );
 
     return res.status(result.statusCode).json(result.data);
   }
@@ -206,7 +217,10 @@ export class BoardController {
   @UseGuards(JwtAccessAuthGuard)
   async getUsedItemChatRooms(@Req() req, @Res() res, @Query('id') id: string) {
     const email = req.user.email;
-    const result = await this.boardService.getUsedItemChatRooms(email, id);
+    const result = await this.usedItemBoardService.getUsedItemChatRooms(
+      email,
+      id
+    );
 
     return res.status(result.statusCode).json(result.data);
   }

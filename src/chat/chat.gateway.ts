@@ -8,7 +8,7 @@ import {
 import { Namespace } from 'socket.io';
 import { ChatService } from './chat.service';
 import { TokenService } from 'src/token/token.service';
-import { BoardService } from 'src/board/board.service';
+import { UsedItemBoardService } from 'src/board/usedItemBoard.service';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -20,7 +20,7 @@ export class ChatGateway {
   constructor(
     private readonly chatService: ChatService,
     private tokenService: TokenService,
-    private boardService: BoardService
+    private usedItemBoardService: UsedItemBoardService
   ) {}
   @WebSocketServer() nsp: Namespace;
 
@@ -451,7 +451,7 @@ export class ChatGateway {
       return;
     }
 
-    await this.boardService.changeBoardStatus(usedItemBoardId, status);
+    await this.usedItemBoardService.changeBoardStatus(usedItemBoardId, status);
 
     const room = this.nsp.adapter.rooms.get(chatRoomId);
     const sockets = Array.from(room);

@@ -18,7 +18,7 @@ import {
 } from 'src/schema/blockedUserSchema.schema';
 
 @Injectable()
-export class BoardService {
+export class UsedItemBoardService {
   constructor(
     @InjectModel(UsedItemBoard.name)
     private usedItemBoardModel: Model<UsedItemBoardDocument>,

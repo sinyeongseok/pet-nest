@@ -25,7 +25,7 @@ import {
   UsedItemSchedule,
   UsedItemScheduleSchema,
 } from 'src/schema/usedItemSchedule.schema';
-import { BoardService } from 'src/board/board.service';
+import { UsedItemBoardService } from 'src/board/usedItemBoard.service';
 import { AddressService } from 'src/address/address.service';
 import { AwsService } from 'src/utils/s3';
 import { CityAddress, CityAddressSchema } from 'src/schema/cityAddress.schema';
@@ -50,7 +50,7 @@ import { CityAddress, CityAddressSchema } from 'src/schema/cityAddress.schema';
     ChatService,
     UtilService,
     TokenService,
-    BoardService,
+    UsedItemBoardService,
     AwsService,
     AddressService,
   ],
