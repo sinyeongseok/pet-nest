@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import * as dayjs from 'dayjs';
 import { Model } from 'mongoose';
 import {
   participatingPets,
@@ -35,7 +36,7 @@ export class PetMateBoardService {
         content,
         place,
         maxPet,
-        data: walkDate,
+        date: walkDate,
       });
       const createPetMateBoardResult = await createPetMateBoard.save();
       const createParticipatingPets = petIds.map((petId) => {
