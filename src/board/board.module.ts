@@ -17,7 +17,15 @@ import {
   BlockedUser,
   BlockedUserSchema,
 } from 'src/schema/blockedUserSchema.schema';
-import { PetMateBoard } from 'src/schema/petMateBoardSchema.schema';
+import {
+  PetMateBoard,
+  PetMateBoardSchema,
+} from 'src/schema/petMateBoardSchema.schema';
+import {
+  participatingPets,
+  participatingPetsSchema,
+} from 'src/schema/participatingPetsSchema.schema';
+import { PetMateBoardService } from './petMateBoard.service';
 
 @Module({
   imports: [
@@ -28,6 +36,8 @@ import { PetMateBoard } from 'src/schema/petMateBoardSchema.schema';
       { name: User.name, schema: UserSchema },
       { name: ChatRoom.name, schema: ChatRoomSchema },
       { name: BlockedUser.name, schema: BlockedUserSchema },
+      { name: PetMateBoard.name, schema: PetMateBoardSchema },
+      { name: participatingPets.name, schema: participatingPetsSchema },
     ]),
   ],
   controllers: [BoardController],
@@ -36,7 +46,7 @@ import { PetMateBoard } from 'src/schema/petMateBoardSchema.schema';
     AwsService,
     AddressService,
     UtilService,
-    PetMateBoard,
+    PetMateBoardService,
   ],
 })
 export class BoardModule {}
