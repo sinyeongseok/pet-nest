@@ -9,6 +9,9 @@ export class PetMateBoard {
   title: string;
 
   @Prop()
+  host: string;
+
+  @Prop()
   content: string;
 
   @Prop()
