@@ -235,29 +235,6 @@ export class ChatService {
     }
   }
 
-  formatPromiseAt(promiseAt) {
-    const daysMap = {
-      Sunday: '일',
-      Monday: '월',
-      Tuesday: '화',
-      Wednesday: '수',
-      Thursday: '목',
-      Friday: '금',
-      Saturday: '토',
-    };
-    const timeOfDayMap = {
-      am: '오전',
-      pm: '오후',
-    };
-    const date = dayjs(promiseAt);
-    const promiseDate = date.format('M.D');
-    const promiseDay = date.format('dddd');
-    const promiseTimeOfDay = date.format('a');
-    const promiseTime = date.format('h:mm');
-
-    return `${promiseDate} (${daysMap[promiseDay]}) ${timeOfDayMap[promiseTimeOfDay]} ${promiseTime}`;
-  }
-
   formatChatList(email, chatList, scheduleList) {
     const newChatList = [...chatList, ...scheduleList].sort(
       (a, b) => a.timestamp - b.timestamp
@@ -282,7 +259,7 @@ export class ChatService {
       if (!!acc.promiseAt) {
         res[date].push({
           id: acc._id,
-          promiseAt: this.formatPromiseAt(acc.promiseAt),
+          promiseAt: this.utilService.formatDate(acc.promiseAt),
           content: acc.content,
           isPromise: true,
           ...(acc.writer === email && { isMe: true }),
@@ -558,9 +535,9 @@ export class ChatService {
 
         return `${diffMinute}분 전`;
       })();
-      const promiseDateAndTime = this.formatPromiseAt(
-        alarmInfo.promiseAt
-      ).split(' ');
+      const promiseDateAndTime = this.utilService
+        .formatDate(alarmInfo.promiseAt)
+        .split(' ');
 
       const result = {
         promiseAt: alarmInfo.promiseAt,

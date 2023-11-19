@@ -55,4 +55,27 @@ export class UtilService {
 
     return `${diffYear}년 전`;
   }
+
+  formatDate(dateToConvert) {
+    const daysMap = {
+      Sunday: '일',
+      Monday: '월',
+      Tuesday: '화',
+      Wednesday: '수',
+      Thursday: '목',
+      Friday: '금',
+      Saturday: '토',
+    };
+    const timeOfDayMap = {
+      am: '오전',
+      pm: '오후',
+    };
+    const date = dayjs(dateToConvert);
+    const convertedDate = date.format('M.D');
+    const convertedDay = date.format('dddd');
+    const convertedTimeOfDay = date.format('a');
+    const convertedTime = date.format('h:mm');
+
+    return `${convertedDate} (${daysMap[convertedDay]}) ${timeOfDayMap[convertedTimeOfDay]} ${convertedTime}`;
+  }
 }
