@@ -17,10 +17,14 @@ import {
 import { UsedItemBoardService } from './usedItemBoard.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAccessAuthGuard } from 'src/common/guards/jwtAccessAuthGuard.guard';
+import { PetMateBoardService } from './petMateBoard.service';
 
 @Controller('board')
 export class BoardController {
-  constructor(private usedItemBoardService: UsedItemBoardService) {}
+  constructor(
+    private usedItemBoardService: UsedItemBoardService,
+    private petMateBoardService: PetMateBoardService
+  ) {}
 
   @Post('used-item')
   @UseGuards(JwtAccessAuthGuard)
@@ -221,6 +225,18 @@ export class BoardController {
       email,
       id
     );
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Post('/pet-mate')
+  @UseGuards(JwtAccessAuthGuard)
+  async createPetMateBoard(@Req() req, @Res() res, @Body() petMateBoardInfo) {
+    const email = req.user.email;
+    const result = await this.petMateBoardService.createPetMateBoard({
+      host: email,
+      ...petMateBoardInfo,
+    });
 
     return res.status(result.statusCode).json(result.data);
   }
