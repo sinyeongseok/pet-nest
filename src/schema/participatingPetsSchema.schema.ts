@@ -10,6 +10,9 @@ export class participatingPets {
 
   @Prop({ type: 'ObjectId', ref: 'Pet' })
   petId: string;
+
+  @Prop()
+  isHostPet: boolean;
 }
 
 export const participatingPetsSchema =
