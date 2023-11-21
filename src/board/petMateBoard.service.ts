@@ -60,4 +60,115 @@ export class PetMateBoardService {
       );
     }
   }
+
+  async getPetMateBoardList(limit: number = 20, page: number = 0) {
+    try {
+      const skip = page * limit;
+      const currentDate = new Date();
+      const petMateBoardList = await this.petMateBoardModel.aggregate([
+        {
+          $match: {
+            date: { $gte: currentDate },
+          },
+        },
+        {
+          $lookup: {
+            from: 'participatingpets',
+            localField: '_id',
+            foreignField: 'boardId',
+            as: 'participatingPets',
+          },
+        },
+        {
+          $addFields: {
+            hostPetsCount: {
+              $size: {
+                $filter: {
+                  input: '$participatingPets',
+                  as: 'pet',
+                  cond: { $eq: ['$$pet.isHostPet', true] },
+                },
+              },
+            },
+            participatingPetsCount: {
+              $size: {
+                $filter: {
+                  input: '$participatingPets',
+                  as: 'pet',
+                  cond: {
+                    $or: [
+                      { $eq: ['$$pet.isHostPet', true] },
+                      { $not: { $ifNull: ['$$pet.isHostPet', false] } },
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            totalPets: {
+              $add: ['$maxPet', '$participatingPetsCount'],
+            },
+          },
+        },
+        {
+          $project: {
+            title: 1,
+            date: 1,
+            place: 1,
+            hostPetsCount: 1,
+            participatingPetsCount: 1,
+            maxPet: 1,
+            totalPets: 1,
+            status: {
+              $cond: {
+                if: {
+                  $eq: [
+                    { $subtract: ['$totalPets', '$participatingPetsCount'] },
+                    0,
+                  ],
+                },
+                then: '모집마감',
+                else: '모집중',
+              },
+            },
+            remainingPetsCount: {
+              $subtract: ['$totalPets', '$participatingPetsCount'],
+            },
+          },
+        },
+        {
+          $sort: { date: 1, remainingPetsCount: 1 },
+        },
+        {
+          $skip: skip,
+        },
+        {
+          $limit: limit,
+        },
+      ]);
+
+      const result = petMateBoardList.map((petMateBoard) => {
+        return {
+          id: petMateBoard._id,
+          title: petMateBoard.title,
+          region: '신림동',
+          date: this.utilService.formatDate(petMateBoard.date),
+          totalPets: petMateBoard.totalPets,
+          participatingPetsCount: petMateBoard.participatingPetsCount,
+          status: petMateBoard.status,
+        };
+      });
+
+      return { statusCode: 200, data: { petMateBoardList: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
