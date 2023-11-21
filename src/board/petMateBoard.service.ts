@@ -10,6 +10,7 @@ import {
   PetMateBoard,
   PetMateBoardDocument,
 } from 'src/schema/petMateBoardSchema.schema';
+import { UtilService } from 'src/utils/util.service';
 
 @Injectable()
 export class PetMateBoardService {
@@ -17,7 +18,8 @@ export class PetMateBoardService {
     @InjectModel(PetMateBoard.name)
     private petMateBoardModel: Model<PetMateBoardDocument>,
     @InjectModel(participatingPets.name)
-    private participatingPetsModel: Model<participatingPetsDocument>
+    private participatingPetsModel: Model<participatingPetsDocument>,
+    private utilService: UtilService
   ) {}
 
   async createPetMateBoard({
@@ -43,6 +45,7 @@ export class PetMateBoardService {
         return new this.participatingPetsModel({
           boardId: createPetMateBoardResult._id,
           petId: petId,
+          isHostPet: true,
         }).save();
       });
 
