@@ -240,4 +240,20 @@ export class BoardController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Get('/pet-mate')
+  @UseGuards(JwtAccessAuthGuard)
+  async test(
+    @Req() req,
+    @Res() res,
+    @Query('limit') limit,
+    @Query('page') page
+  ) {
+    const result = await this.petMateBoardService.getPetMateBoardList(
+      limit,
+      page
+    );
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
