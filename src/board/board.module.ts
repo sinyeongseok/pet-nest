@@ -26,6 +26,7 @@ import {
   participatingPetsSchema,
 } from 'src/schema/participatingPetsSchema.schema';
 import { PetMateBoardService } from './petMateBoard.service';
+import { Pet, PetSchema } from 'src/schema/pet.schema';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { PetMateBoardService } from './petMateBoard.service';
       { name: BlockedUser.name, schema: BlockedUserSchema },
       { name: PetMateBoard.name, schema: PetMateBoardSchema },
       { name: participatingPets.name, schema: participatingPetsSchema },
+      { name: Pet.name, schema: PetSchema },
     ]),
   ],
   controllers: [BoardController],
