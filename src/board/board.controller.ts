@@ -243,7 +243,7 @@ export class BoardController {
 
   @Get('/pet-mate')
   @UseGuards(JwtAccessAuthGuard)
-  async test(
+  async getPetMateBoardList(
     @Req() req,
     @Res() res,
     @Query('limit') limit,
@@ -253,6 +253,14 @@ export class BoardController {
       limit,
       page
     );
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Get('/pet-mate/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async getPetMateBoardInfo(@Req() req, @Res() res, @Param('id') id) {
+    const result = await this.petMateBoardService.getPetMateBoardInfo(id);
 
     return res.status(result.statusCode).json(result.data);
   }
