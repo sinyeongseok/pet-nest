@@ -152,7 +152,7 @@ export class PetMateBoardService {
           $skip: skip,
         },
         {
-          $limit: limit,
+          $limit: Number(limit),
         },
       ]);
 
