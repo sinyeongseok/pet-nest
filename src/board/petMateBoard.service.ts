@@ -67,7 +67,11 @@ export class PetMateBoardService {
     }
   }
 
-  async getPetMateBoardList(limit: number = 20, page: number = 0) {
+  async getPetMateBoardList(
+    limit: number = 20,
+    page: number = 0,
+    isRecruiting
+  ) {
     try {
       const skip = page * limit;
       const currentDate = new Date();
@@ -119,6 +123,20 @@ export class PetMateBoardService {
             },
           },
         },
+        ...(isRecruiting === 'true'
+          ? [
+              {
+                $match: {
+                  $expr: {
+                    $ne: [
+                      { $subtract: ['$totalPets', '$participatingPetsCount'] },
+                      0,
+                    ],
+                  },
+                },
+              },
+            ]
+          : []),
         {
           $project: {
             title: 1,

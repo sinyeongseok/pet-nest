@@ -247,11 +247,13 @@ export class BoardController {
     @Req() req,
     @Res() res,
     @Query('limit') limit,
-    @Query('page') page
+    @Query('page') page,
+    @Query('isRecruiting') isRecruiting
   ) {
     const result = await this.petMateBoardService.getPetMateBoardList(
       limit,
-      page
+      page,
+      isRecruiting
     );
 
     return res.status(result.statusCode).json(result.data);
