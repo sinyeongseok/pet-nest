@@ -41,4 +41,8 @@ export class PetMateBoard {
   };
 }
 
-export const PetMateBoardSchema = SchemaFactory.createForClass(PetMateBoard);
+export const PetMateBoardSchema = SchemaFactory.createForClass(
+  PetMateBoard
+).index({
+  location: '2dsphere',
+});
