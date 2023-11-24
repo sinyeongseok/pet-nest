@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 export type PetMateBoardDocument = PetMateBoard & Document;
@@ -22,6 +22,23 @@ export class PetMateBoard {
 
   @Prop()
   maxPet: number;
+
+  @Prop()
+  address: string;
+
+  @Prop()
+  addressDetail: string;
+
+  @Prop(
+    raw({
+      type: { type: String },
+      coordinates: { type: [Number] },
+    })
+  )
+  location: {
+    type: string;
+    coordinates: number[];
+  };
 }
 
 export const PetMateBoardSchema = SchemaFactory.createForClass(PetMateBoard);
