@@ -38,6 +38,7 @@ export class PetMateBoardService {
     maxPet,
   }) {
     try {
+      const userAddressInfo = await this.utilService.getUserRecentAddress(host);
       const createPetMateBoard = new this.petMateBoardModel({
         host,
         title,
@@ -45,6 +46,15 @@ export class PetMateBoardService {
         place,
         maxPet,
         date: walkDate,
+        address: userAddressInfo.eupMyeonDong,
+        addressDetail: userAddressInfo.detail,
+        location: {
+          type: 'Point',
+          coordinates: [
+            Number(userAddressInfo.longitude),
+            Number(userAddressInfo.latitude),
+          ],
+        },
       });
       const createPetMateBoardResult = await createPetMateBoard.save();
       const createParticipatingPets = petIds.map((petId) => {
