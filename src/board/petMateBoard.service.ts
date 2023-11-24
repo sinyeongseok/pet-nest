@@ -77,15 +77,28 @@ export class PetMateBoardService {
     }
   }
 
-  async getPetMateBoardList(
-    limit: number = 20,
-    page: number = 0,
-    isRecruiting
-  ) {
+  async getPetMateBoardList({ email, limit = 20, page = 0, isRecruiting }) {
     try {
+      const userAddressInfo = await this.utilService.getUserRecentAddress(
+        email
+      );
       const skip = page * limit;
       const currentDate = new Date();
       const petMateBoardList = await this.petMateBoardModel.aggregate([
+        {
+          $geoNear: {
+            maxDistance: 2000,
+            near: {
+              type: 'Point',
+              coordinates: [
+                Number(userAddressInfo.longitude),
+                Number(userAddressInfo.latitude),
+              ],
+            },
+            distanceField: 'distance',
+            key: 'location',
+          },
+        },
         {
           $match: {
             date: { $gte: currentDate },
@@ -139,7 +152,9 @@ export class PetMateBoardService {
                 $match: {
                   $expr: {
                     $ne: [
-                      { $subtract: ['$totalPets', '$participatingPetsCount'] },
+                      {
+                        $subtract: ['$totalPets', '$participatingPetsCount'],
+                      },
                       0,
                     ],
                   },
