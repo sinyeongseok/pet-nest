@@ -105,43 +105,50 @@ export class PetMateBoardService {
         },
         {
           $lookup: {
-            from: 'participatingpets',
-            localField: '_id',
-            foreignField: 'boardId',
-            as: 'participatingPets',
+            from: 'participatinglists',
+            let: { boardId: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ['$boardId', '$$boardId'] },
+                },
+              },
+              {
+                $project: {
+                  petCount: { $size: '$petIds' },
+                  isHostPet: 1,
+                },
+              },
+            ],
+            as: 'participatingLists',
           },
         },
         {
           $addFields: {
             hostPetsCount: {
-              $size: {
-                $filter: {
-                  input: '$participatingPets',
+              $sum: {
+                $map: {
+                  input: '$participatingLists',
                   as: 'pet',
-                  cond: { $eq: ['$$pet.isHostPet', true] },
+                  in: {
+                    $cond: {
+                      if: '$$pet.isHostPet',
+                      then: '$$pet.petCount',
+                      else: 0,
+                    },
+                  },
                 },
               },
             },
             participatingPetsCount: {
-              $size: {
-                $filter: {
-                  input: '$participatingPets',
-                  as: 'pet',
-                  cond: {
-                    $or: [
-                      { $eq: ['$$pet.isHostPet', true] },
-                      { $not: { $ifNull: ['$$pet.isHostPet', false] } },
-                    ],
-                  },
-                },
-              },
+              $sum: '$participatingLists.petCount',
             },
           },
         },
         {
           $addFields: {
             totalPets: {
-              $add: ['$maxPet', '$participatingPetsCount'],
+              $add: ['$maxPet', '$hostPetsCount'],
             },
           },
         },
@@ -220,26 +227,19 @@ export class PetMateBoardService {
     }
   }
 
-  private async getParticipatingList(participatingPets) {
-    const result = {};
-    for await (const pet of participatingPets) {
-      const petInfo = await this.petModel.findOne({ _id: pet.petId });
+  private formatParticipatingList(participatingList) {
+    return participatingList.map(async (participatingInfo) => {
       const ownerInfo = await this.userModel.findOne({
-        email: petInfo.userEmail,
+        email: participatingInfo.userEmail,
       });
 
-      if (!result[ownerInfo.nickname]) {
-        result[ownerInfo.nickname] = {
-          petCount: 0,
-          ...(!!pet.isHostPet && { isHost: true }),
-        };
-      }
-
-      result[ownerInfo.nickname].profileImage = ownerInfo.profileImage;
-      result[ownerInfo.nickname].petCount++;
-    }
-
-    return result;
+      return {
+        nickname: ownerInfo.nickname,
+        petCount: participatingInfo.petIds.length,
+        profileImage: ownerInfo.profileImage,
+        ...(!!participatingInfo.isHostPet && { isHost: true }),
+      };
+    });
   }
 
   async getPetMateBoardInfo(id: string) {
@@ -252,43 +252,50 @@ export class PetMateBoardService {
         },
         {
           $lookup: {
-            from: 'participatingpets',
-            localField: '_id',
-            foreignField: 'boardId',
-            as: 'participatingPets',
+            from: 'participatinglists',
+            let: { boardId: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ['$boardId', '$$boardId'] },
+                },
+              },
+              {
+                $project: {
+                  petCount: { $size: '$petIds' },
+                  isHostPet: 1,
+                },
+              },
+            ],
+            as: 'participatingLists',
           },
         },
         {
           $addFields: {
             hostPetsCount: {
-              $size: {
-                $filter: {
-                  input: '$participatingPets',
+              $sum: {
+                $map: {
+                  input: '$participatingLists',
                   as: 'pet',
-                  cond: { $eq: ['$$pet.isHostPet', true] },
+                  in: {
+                    $cond: {
+                      if: '$$pet.isHostPet',
+                      then: '$$pet.petCount',
+                      else: 0,
+                    },
+                  },
                 },
               },
             },
             participatingPetsCount: {
-              $size: {
-                $filter: {
-                  input: '$participatingPets',
-                  as: 'pet',
-                  cond: {
-                    $or: [
-                      { $eq: ['$$pet.isHostPet', true] },
-                      { $not: { $ifNull: ['$$pet.isHostPet', false] } },
-                    ],
-                  },
-                },
-              },
+              $sum: '$participatingLists.petCount',
             },
           },
         },
         {
           $addFields: {
             totalPets: {
-              $add: ['$maxPet', '$participatingPetsCount'],
+              $add: ['$maxPet', '$hostPetsCount'],
             },
           },
         },
@@ -319,14 +326,14 @@ export class PetMateBoardService {
           },
         },
       ]);
-      const [petMateBoardInfo, participatingPets] = await Promise.all([
+      const [petMateBoardInfo, participatingList] = await Promise.all([
         petMateBoardInfoQuery,
         this.participatingListModel.find({
           boardId: id,
         }),
       ]);
-      const participatingList = await this.getParticipatingList(
-        participatingPets
+      const fomatParticipatingList = await Promise.all(
+        this.formatParticipatingList(participatingList)
       );
       const result = {
         petMateBoardInfo: {
@@ -338,7 +345,7 @@ export class PetMateBoardService {
           participatingPetsCount: petMateBoardInfo[0].participatingPetsCount,
           status: petMateBoardInfo[0].status,
         },
-        participatingList,
+        participatingList: fomatParticipatingList,
       };
 
       return { statusCode: 200, data: result };
