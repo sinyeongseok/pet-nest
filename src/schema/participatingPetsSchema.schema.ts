@@ -8,8 +8,11 @@ export class participatingPets {
   @Prop({ type: 'ObjectId', ref: 'PetMate' })
   boardId: string;
 
-  @Prop({ type: 'ObjectId', ref: 'Pet' })
-  petId: string;
+  @Prop()
+  userEmail: string;
+
+  @Prop([{ type: 'ObjectId', ref: 'Pet' }])
+  petIds: string[];
 
   @Prop()
   isHostPet: boolean;
