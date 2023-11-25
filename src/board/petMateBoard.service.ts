@@ -3,9 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { Model, Types } from 'mongoose';
 import {
-  participatingPets,
-  participatingPetsDocument,
-} from 'src/schema/participatingPetsSchema.schema';
+  ParticipatingList,
+  ParticipatingListDocument,
+} from 'src/schema/ParticipatingList.schema';
 import { Pet, PetDocument } from 'src/schema/pet.schema';
 import {
   PetMateBoard,
@@ -19,8 +19,8 @@ export class PetMateBoardService {
   constructor(
     @InjectModel(PetMateBoard.name)
     private petMateBoardModel: Model<PetMateBoardDocument>,
-    @InjectModel(participatingPets.name)
-    private participatingPetsModel: Model<participatingPetsDocument>,
+    @InjectModel(ParticipatingList.name)
+    private participatingListModel: Model<ParticipatingListDocument>,
     @InjectModel(Pet.name)
     private petModel: Model<PetDocument>,
     @InjectModel(User.name)
@@ -57,7 +57,7 @@ export class PetMateBoardService {
         },
       });
       const createPetMateBoardResult = await createPetMateBoard.save();
-      const createParticipatingPets = new this.participatingPetsModel({
+      const createParticipatingPets = new this.participatingListModel({
         petIds,
         boardId: createPetMateBoardResult._id,
         userEmail: host,
@@ -321,7 +321,7 @@ export class PetMateBoardService {
       ]);
       const [petMateBoardInfo, participatingPets] = await Promise.all([
         petMateBoardInfoQuery,
-        this.participatingPetsModel.find({
+        this.participatingListModel.find({
           boardId: id,
         }),
       ]);

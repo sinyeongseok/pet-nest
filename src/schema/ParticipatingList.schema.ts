@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type participatingPetsDocument = participatingPets & Document;
+export type ParticipatingListDocument = ParticipatingList & Document;
 
 @Schema({ versionKey: false })
-export class participatingPets {
+export class ParticipatingList {
   @Prop({ type: 'ObjectId', ref: 'PetMate' })
   boardId: string;
 
@@ -18,5 +18,5 @@ export class participatingPets {
   isHostPet: boolean;
 }
 
-export const participatingPetsSchema =
-  SchemaFactory.createForClass(participatingPets);
+export const ParticipatingListSchema =
+  SchemaFactory.createForClass(ParticipatingList);

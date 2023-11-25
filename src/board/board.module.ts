@@ -22,9 +22,9 @@ import {
   PetMateBoardSchema,
 } from 'src/schema/petMateBoardSchema.schema';
 import {
-  participatingPets,
-  participatingPetsSchema,
-} from 'src/schema/participatingPetsSchema.schema';
+  ParticipatingList,
+  ParticipatingListSchema,
+} from 'src/schema/ParticipatingList.schema';
 import { PetMateBoardService } from './petMateBoard.service';
 import { Pet, PetSchema } from 'src/schema/pet.schema';
 
@@ -38,7 +38,7 @@ import { Pet, PetSchema } from 'src/schema/pet.schema';
       { name: ChatRoom.name, schema: ChatRoomSchema },
       { name: BlockedUser.name, schema: BlockedUserSchema },
       { name: PetMateBoard.name, schema: PetMateBoardSchema },
-      { name: participatingPets.name, schema: participatingPetsSchema },
+      { name: ParticipatingList.name, schema: ParticipatingListSchema },
       { name: Pet.name, schema: PetSchema },
     ]),
   ],
