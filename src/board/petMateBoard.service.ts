@@ -57,15 +57,14 @@ export class PetMateBoardService {
         },
       });
       const createPetMateBoardResult = await createPetMateBoard.save();
-      const createParticipatingPets = petIds.map((petId) => {
-        return new this.participatingPetsModel({
-          boardId: createPetMateBoardResult._id,
-          petId: petId,
-          isHostPet: true,
-        }).save();
+      const createParticipatingPets = new this.participatingPetsModel({
+        petIds,
+        boardId: createPetMateBoardResult._id,
+        userEmail: host,
+        isHostPet: true,
       });
 
-      await Promise.all(createParticipatingPets);
+      await createParticipatingPets.save();
 
       return { statusCode: 201, data: { isCreated: true } };
     } catch (error) {
