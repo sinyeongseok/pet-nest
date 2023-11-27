@@ -16,6 +16,9 @@ export class ParticipatingList {
 
   @Prop()
   isHostPet: boolean;
+
+  @Prop()
+  message: string;
 }
 
 export const ParticipatingListSchema =
