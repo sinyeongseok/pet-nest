@@ -268,4 +268,22 @@ export class BoardController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Post('/pet-mate/attend/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async applyForParticipation(
+    @Req() req,
+    @Res() res,
+    @Param('id') id,
+    @Body() applyForParticipationInfo
+  ) {
+    const email = req.user.email;
+    const result = await this.petMateBoardService.applyForParticipation({
+      email,
+      id,
+      ...applyForParticipationInfo,
+    });
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
