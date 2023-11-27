@@ -357,4 +357,105 @@ export class PetMateBoardService {
       );
     }
   }
+
+  async applyForParticipation({ email, id, petIds, message }) {
+    try {
+      const petMateBoardInfoQuery = this.petMateBoardModel.aggregate([
+        {
+          $match: {
+            _id: new Types.ObjectId(id),
+          },
+        },
+        {
+          $lookup: {
+            from: 'participatinglists',
+            let: { boardId: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ['$boardId', '$$boardId'] },
+                },
+              },
+              {
+                $project: {
+                  petCount: { $size: '$petIds' },
+                  isHostPet: 1,
+                },
+              },
+            ],
+            as: 'participatingLists',
+          },
+        },
+        {
+          $addFields: {
+            hostPetsCount: {
+              $sum: {
+                $map: {
+                  input: '$participatingLists',
+                  as: 'pet',
+                  in: {
+                    $cond: {
+                      if: '$$pet.isHostPet',
+                      then: '$$pet.petCount',
+                      else: 0,
+                    },
+                  },
+                },
+              },
+            },
+            participatingPetsCount: {
+              $sum: '$participatingLists.petCount',
+            },
+          },
+        },
+        {
+          $addFields: {
+            totalPets: {
+              $add: ['$maxPet', '$hostPetsCount'],
+            },
+          },
+        },
+        {
+          $project: {
+            hostPetsCount: 1,
+            participatingPetsCount: 1,
+            maxPet: 1,
+            totalPets: 1,
+          },
+        },
+      ]);
+      const petMateBoardInfo = await petMateBoardInfoQuery;
+      const isExceededSelectedLimit =
+        petIds.length + petMateBoardInfo[0].participatingPetsCount >
+        petMateBoardInfo[0].totalPets;
+
+      if (isExceededSelectedLimit) {
+        throw new HttpException(
+          '선택 가능 견수를 초과했습니다.',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      const createParticipatingPets = new this.participatingListModel({
+        petIds,
+        message,
+        boardId: id,
+        userEmail: email,
+      });
+
+      await createParticipatingPets.save();
+
+      return { statusCode: 201, data: { isApplyForParticipation: true } };
+    } catch (error) {
+      console.log(error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
