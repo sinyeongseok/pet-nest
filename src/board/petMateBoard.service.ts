@@ -174,6 +174,7 @@ export class PetMateBoardService {
             date: 1,
             place: 1,
             hostPetsCount: 1,
+            address: 1,
             participatingPetsCount: 1,
             maxPet: 1,
             totalPets: 1,
@@ -209,7 +210,7 @@ export class PetMateBoardService {
         return {
           id: petMateBoard._id,
           title: petMateBoard.title,
-          region: '신림동',
+          region: petMateBoard.address,
           date: this.utilService.formatDate(petMateBoard.date),
           totalPets: petMateBoard.totalPets,
           participatingPetsCount: petMateBoard.participatingPetsCount,
