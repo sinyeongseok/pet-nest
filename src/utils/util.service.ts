@@ -76,6 +76,6 @@ export class UtilService {
     const convertedTimeOfDay = date.format('a');
     const convertedTime = date.format('h:mm');
 
-    return `${convertedDate} (${daysMap[convertedDay]}) ${timeOfDayMap[convertedTimeOfDay]} ${convertedTime}`;
+    return `${convertedDate} (${daysMap[convertedDay]}), ${timeOfDayMap[convertedTimeOfDay]} ${convertedTime}`;
   }
 }
