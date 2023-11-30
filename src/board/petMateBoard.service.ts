@@ -211,7 +211,7 @@ export class PetMateBoardService {
           id: petMateBoard._id,
           title: petMateBoard.title,
           region: petMateBoard.address,
-          date: this.utilService.formatDate(petMateBoard.date),
+          date: dayjs.convertToKoreanDate(petMateBoard.date),
           totalPets: petMateBoard.totalPets,
           participatingPetsCount: petMateBoard.participatingPetsCount,
           status: petMateBoard.status,
@@ -340,7 +340,7 @@ export class PetMateBoardService {
         petMateBoardInfo: {
           title: petMateBoardInfo[0].title,
           content: petMateBoardInfo[0].content,
-          date: this.utilService.formatDate(petMateBoardInfo[0].date),
+          date: dayjs.convertToKoreanDate(petMateBoardInfo[0].date),
           place: petMateBoardInfo[0].place,
           totalPets: petMateBoardInfo[0].totalPets,
           participatingPetsCount: petMateBoardInfo[0].participatingPetsCount,

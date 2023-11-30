@@ -113,7 +113,7 @@ export class ChatService {
       id: chatRoom._id,
       title: userInfo.nickname,
       lastChat: chatRoom.lastChat,
-      lastChatAt: this.utilService.computeTimeDifference(chatRoom.lastChatAt),
+      lastChatAt: dayjs.computeTimeDifference(chatRoom.lastChatAt),
       region: userAddress.eupMyeonDong,
       isAlarm: chatRoom.isAlarm,
       isPinned: chatRoom.isPinned,
@@ -162,9 +162,9 @@ export class ChatService {
         },
         {
           $lookup: {
-            from: 'useditemboards', // UsedItemBoard 모델명을 사용하세요.
-            localField: 'boardId', // ChatRoom 모델과 UsedItemBoard 모델 간의 연결 필드를 사용하세요.
-            foreignField: '_id', // UsedItemBoard 모델의 고유 식별자 필드를 사용하세요.
+            from: 'useditemboards',
+            localField: 'boardId',
+            foreignField: '_id',
             as: 'usedItemBoards',
           },
         },
@@ -259,7 +259,7 @@ export class ChatService {
       if (!!acc.promiseAt) {
         res[date].push({
           id: acc._id,
-          promiseAt: this.utilService.formatDate(acc.promiseAt),
+          promiseAt: dayjs.convertToKoreanDate(acc.promiseAt),
           content: acc.content,
           isPromise: true,
           ...(acc.writer === email && { isMe: true }),
@@ -535,13 +535,15 @@ export class ChatService {
 
         return `${diffMinute}분 전`;
       })();
-      const promiseDateAndTime = this.utilService
-        .formatDate(alarmInfo.promiseAt)
+      const promiseDateAndTime = dayjs
+        .convertToKoreanDate(alarmInfo.promiseAt)
         .split(' ');
-
       const result = {
         promiseAt: alarmInfo.promiseAt,
-        promiseDate: `${promiseDateAndTime[0]} ${promiseDateAndTime[1]}`,
+        promiseDate: `${promiseDateAndTime[0]} ${promiseDateAndTime[1].replace(
+          /,/g,
+          ''
+        )}`,
         promiseTime: `${promiseDateAndTime[2]} ${promiseDateAndTime[3]}`,
         ...(alarmInfo.isAlarm && { alarmTime, isAlarm: alarmInfo.isAlarm }),
       };

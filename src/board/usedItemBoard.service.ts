@@ -120,9 +120,7 @@ export class UsedItemBoardService {
     return {
       id: usedItemBoardInfo._id,
       title: usedItemBoardInfo.title,
-      timeDelta: this.utilService.computeTimeDifference(
-        usedItemBoardInfo.createdAt
-      ),
+      timeDelta: dayjs.computeTimeDifference(usedItemBoardInfo.createdAt),
       image: usedItemBoardInfo.images[0],
       address: usedItemBoardInfo.address,
       salesStatus: usedItemBoardInfo.salesStatus,
@@ -210,9 +208,7 @@ export class UsedItemBoardService {
       title: usedItemBoardInfo.title,
       address: usedItemBoardInfo.address,
       subCategory: usedItemBoardInfo.subCategory,
-      timeDelta: this.utilService.computeTimeDifference(
-        usedItemBoardInfo.createdAt
-      ),
+      timeDelta: dayjs.computeTimeDifference(usedItemBoardInfo.createdAt),
       description: usedItemBoardInfo.description,
       likeCount: usedItemBoardInfo.likeCount,
       chatCount: chatList.length,
@@ -732,7 +728,7 @@ export class UsedItemBoardService {
       id: chatRoom._id,
       title: userInfo.nickname,
       lastChat: chatRoom.lastChat,
-      lastChatAt: this.utilService.computeTimeDifference(chatRoom.lastChatAt),
+      lastChatAt: dayjs.computeTimeDifference(chatRoom.lastChatAt),
       ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
       ...(!!chatRoom.images && { productImage: chatRoom.images[0] }),
     };
