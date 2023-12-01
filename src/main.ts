@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dayjs from 'dayjs';
-import dayjsDateFormatPlugin from './utils/plugin/dayjsDateFormatPlugin';
+import dayjsPlugin from './utils/plugin/dayjsPlugin';
 
-dayjs.extend(dayjsDateFormatPlugin);
+dayjs.extend(dayjsPlugin);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
