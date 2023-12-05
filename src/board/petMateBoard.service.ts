@@ -101,6 +101,7 @@ export class PetMateBoardService {
         {
           $match: {
             date: { $gte: currentDate },
+            ...(isRecruiting == 'true' && { status: '모집중' }),
           },
         },
         {
@@ -152,22 +153,6 @@ export class PetMateBoardService {
             },
           },
         },
-        ...(isRecruiting === 'true'
-          ? [
-              {
-                $match: {
-                  $expr: {
-                    $ne: [
-                      {
-                        $subtract: ['$totalPets', '$participatingPetsCount'],
-                      },
-                      0,
-                    ],
-                  },
-                },
-              },
-            ]
-          : []),
         {
           $project: {
             title: 1,
@@ -178,18 +163,7 @@ export class PetMateBoardService {
             participatingPetsCount: 1,
             maxPet: 1,
             totalPets: 1,
-            status: {
-              $cond: {
-                if: {
-                  $eq: [
-                    { $subtract: ['$totalPets', '$participatingPetsCount'] },
-                    0,
-                  ],
-                },
-                then: '모집마감',
-                else: '모집중',
-              },
-            },
+            status: 1,
             remainingPetsCount: {
               $subtract: ['$totalPets', '$participatingPetsCount'],
             },
@@ -310,20 +284,7 @@ export class PetMateBoardService {
             participatingPetsCount: 1,
             maxPet: 1,
             totalPets: 1,
-            status: {
-              $cond: {
-                if: {
-                  $eq: [
-                    {
-                      $subtract: ['$totalPets', '$participatingPetsCount'],
-                    },
-                    0,
-                  ],
-                },
-                then: '모집마감',
-                else: '모집중',
-              },
-            },
+            status: 1,
           },
         },
       ]);
