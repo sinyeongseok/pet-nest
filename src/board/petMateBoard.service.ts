@@ -217,7 +217,7 @@ export class PetMateBoardService {
     });
   }
 
-  async getPetMateBoardInfo(id: string) {
+  async getPetMateBoardInfo(email: string, id: string) {
     try {
       const petMateBoardInfoQuery = this.petMateBoardModel.aggregate([
         {
@@ -278,6 +278,7 @@ export class PetMateBoardService {
           $project: {
             title: 1,
             content: 1,
+            host: 1,
             date: 1,
             place: 1,
             hostPetsCount: 1,
@@ -306,6 +307,9 @@ export class PetMateBoardService {
           totalPets: petMateBoardInfo[0].totalPets,
           participatingPetsCount: petMateBoardInfo[0].participatingPetsCount,
           status: petMateBoardInfo[0].status,
+          ...(petMateBoardInfo[0].host === email && {
+            isHost: petMateBoardInfo[0].host === email,
+          }),
         },
         participatingList: fomatParticipatingList,
       };
