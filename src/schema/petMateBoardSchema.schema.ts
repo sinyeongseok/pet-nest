@@ -29,6 +29,9 @@ export class PetMateBoard {
   @Prop()
   addressDetail: string;
 
+  @Prop({ required: true, default: '모집중' })
+  status: '모집중' | '모집마감';
+
   @Prop(
     raw({
       type: { type: String },
