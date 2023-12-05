@@ -202,15 +202,31 @@ export class PetMateBoardService {
     }
   }
 
+  private getParticipatingPets(petIds) {
+    return petIds.map(async (petId) => {
+      const petInfo = await this.petModel.findOne({ _id: petId });
+
+      return {
+        id: petId,
+        image: petInfo.images[0],
+        name: petInfo.name,
+        type: petInfo.type,
+      };
+    });
+  }
+
   private formatParticipatingList(participatingList) {
     return participatingList.map(async (participatingInfo) => {
       const ownerInfo = await this.userModel.findOne({
         email: participatingInfo.userEmail,
       });
+      const pets = await Promise.all(
+        this.getParticipatingPets(participatingInfo.petIds)
+      );
 
       return {
+        pets,
         nickname: ownerInfo.nickname,
-        petCount: participatingInfo.petIds.length,
         profileImage: ownerInfo.profileImage,
         ...(!!participatingInfo.isHostPet && { isHost: true }),
       };
