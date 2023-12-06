@@ -250,6 +250,7 @@ export class PetMateBoardService {
               {
                 $match: {
                   $expr: { $eq: ['$boardId', '$$boardId'] },
+                  isApproved: true,
                 },
               },
               {
@@ -310,6 +311,7 @@ export class PetMateBoardService {
         petMateBoardInfoQuery,
         this.participatingListModel.find({
           boardId: id,
+          isApproved: true,
         }),
       ]);
       const fomatParticipatingList = await Promise.all(
