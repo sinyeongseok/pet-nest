@@ -19,6 +19,9 @@ export class ParticipatingList {
 
   @Prop()
   message: string;
+
+  @Prop({ required: true, default: false })
+  isApproved: boolean;
 }
 
 export const ParticipatingListSchema =
