@@ -62,6 +62,7 @@ export class PetMateBoardService {
         boardId: createPetMateBoardResult._id,
         userEmail: host,
         isHostPet: true,
+        isApproved: true,
       });
 
       await createParticipatingPets.save();
