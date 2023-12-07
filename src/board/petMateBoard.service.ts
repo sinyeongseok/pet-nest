@@ -461,4 +461,19 @@ export class PetMateBoardService {
       );
     }
   }
+
+  async setRecruitmentStatus(id: string, status: '모집중' | '모집마감') {
+    try {
+      await this.petMateBoardModel.updateOne({ _id: id }, { status });
+
+      return { statusCode: 200, data: { status } };
+    } catch (error) {
+      console.log(error);
+
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
