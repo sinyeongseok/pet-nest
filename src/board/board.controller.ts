@@ -290,4 +290,12 @@ export class BoardController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Delete('pet-mate/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async deletePetMateBoard(@Res() res, @Param('id') id: string) {
+    const result = await this.petMateBoardService.deletePetMateBoard(id);
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
