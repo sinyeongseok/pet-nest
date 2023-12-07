@@ -313,4 +313,12 @@ export class BoardController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Get('pet-mate/participants/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async getPetMateBoardApplicationList(@Res() res, @Param('id') id: string) {
+    const result = await this.petMateBoardService.getApplicationList(id);
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
