@@ -443,4 +443,22 @@ export class PetMateBoardService {
       );
     }
   }
+
+  async deletePetMateBoard(id: string) {
+    try {
+      await Promise.all([
+        this.petMateBoardModel.deleteOne({ _id: id }),
+        this.participatingListModel.deleteOne({ boardId: id }),
+      ]);
+
+      return { statusCode: 204, data: { isDeleted: true } };
+    } catch (error) {
+      console.log(error);
+
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
