@@ -476,4 +476,43 @@ export class PetMateBoardService {
       );
     }
   }
+
+  formatApplicationList(applicationList) {
+    return applicationList.map(async (applicationInfo) => {
+      const ownerInfo = await this.userModel.findOne({
+        email: applicationInfo.userEmail,
+      });
+      const pets = await Promise.all(
+        this.getParticipatingPets(applicationInfo.petIds)
+      );
+
+      return {
+        pets,
+        nickname: ownerInfo.nickname,
+        profileImage: ownerInfo.profileImage,
+        message: applicationInfo.message,
+      };
+    });
+  }
+
+  async getApplicationList(id: string) {
+    try {
+      const applicationList = await this.participatingListModel.find({
+        boardId: id,
+        isApproved: false,
+      });
+      const result = await Promise.all(
+        this.formatApplicationList(applicationList)
+      );
+
+      return { statusCode: 200, data: { applicationList: result } };
+    } catch (error) {
+      console.log(error);
+
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
