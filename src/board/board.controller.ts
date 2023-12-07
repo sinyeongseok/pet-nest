@@ -298,4 +298,19 @@ export class BoardController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Patch('pet-mate/status/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async setPetMateBoardRecruitmentStatus(
+    @Res() res,
+    @Param('id') id: string,
+    @Body('status') status: '모집중' | '모집마감'
+  ) {
+    const result = await this.petMateBoardService.setRecruitmentStatus(
+      id,
+      status
+    );
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
