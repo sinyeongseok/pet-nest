@@ -487,6 +487,7 @@ export class PetMateBoardService {
       );
 
       return {
+        id: applicationInfo._id,
         pets,
         nickname: ownerInfo.nickname,
         profileImage: ownerInfo.profileImage,
@@ -506,6 +507,28 @@ export class PetMateBoardService {
       );
 
       return { statusCode: 200, data: { applicationList: result } };
+    } catch (error) {
+      console.log(error);
+
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async approveParticipantApplication(
+    boardId: string,
+    participatingId: string
+  ) {
+    try {
+      await this.participatingListModel.updateOne(
+        { _id: participatingId },
+        { isApproved: true }
+      );
+      const result = await this.getApplicationList(boardId);
+
+      return result;
     } catch (error) {
       console.log(error);
 
