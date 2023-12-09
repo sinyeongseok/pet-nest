@@ -321,4 +321,19 @@ export class BoardController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Post('pet-mate/participants/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async approveParticipantApplication(
+    @Res() res,
+    @Param('id') id: string,
+    @Body('boardId') boardId: string
+  ) {
+    const result = await this.petMateBoardService.approveParticipantApplication(
+      boardId,
+      id
+    );
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
