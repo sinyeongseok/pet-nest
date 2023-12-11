@@ -255,10 +255,10 @@ export class ChatService {
           delete res[date][length - 1].timeOfDay;
         }
       }
-
-      if (!!acc.promiseAt) {
+      if (!acc.type) {
         res[date].push({
           id: acc._id,
+          type: 'schedule',
           promiseAt: dayjs.convertToKoreanDate(acc.promiseAt),
           content: acc.content,
           isPromise: true,
@@ -267,6 +267,7 @@ export class ChatService {
       } else {
         res[date].push({
           id: acc._id,
+          type: acc.type,
           content: acc.content,
           timestamp: dayjs(acc.timestamp).format('H:mm'),
           timeOfDay: dayjs(acc.timestamp).hour() < 12 ? '오전' : '오후',
