@@ -16,6 +16,9 @@ export class Message {
   @Prop({ required: true })
   content: string;
 
+  @Prop()
+  type: 'user' | 'schedule_cancel';
+
   @Prop({ required: true, default: Date.now })
   timestamp: Date;
 }
