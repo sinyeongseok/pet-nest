@@ -558,28 +558,44 @@ export class ChatService {
     }
   }
 
-  async deleteSchedule(scheduleId: string) {
+  async deleteSchedule(email: string, scheduleId: string) {
     try {
-      const scheduleInfo = await this.usedItemScheduleModel.findOne({
-        _id: scheduleId,
-      });
+      const [scheduleInfo, userInfo] = await Promise.all([
+        this.usedItemScheduleModel.findOne({
+          _id: scheduleId,
+        }),
+        this.userModel.findOne({ email }),
+      ]);
       const chatRoomId = String(scheduleInfo.chatRoomId);
       const deleteScheduleQuery = this.usedItemScheduleModel.deleteOne({
         _id: scheduleId,
       });
+      const timestamp = dayjs(
+        new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
+      );
+      const message = `${userInfo.nickname}님이 약속을 삭제했어요.`;
       const updateChatRoomQuery = this.chatRoomModel.updateOne(
         {
           _id: chatRoomId,
         },
         {
-          lastChat: '직거래 약속이 취소되었습니다.',
-          lastChatAt: dayjs(
-            new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
-          ),
+          lastChat: message,
+          lastChatAt: timestamp,
         }
       );
+      const createMessageQuery = new this.messageModel({
+        chatRoomId,
+        timestamp,
+        sender: email,
+        content: message,
+        type: 'schedule_cancel',
+      });
 
-      await Promise.all([deleteScheduleQuery, updateChatRoomQuery]);
+      await Promise.all([
+        deleteScheduleQuery,
+        updateChatRoomQuery,
+        createMessageQuery.save(),
+      ]);
 
       return chatRoomId;
     } catch (error) {

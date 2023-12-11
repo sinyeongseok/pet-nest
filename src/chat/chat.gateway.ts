@@ -489,7 +489,8 @@ export class ChatGateway {
       return;
     }
 
-    const result = await this.chatService.deleteSchedule(scheduleId);
+    const email = validateTokenResult.user.email;
+    const result = await this.chatService.deleteSchedule(email, scheduleId);
     const room = this.nsp.adapter.rooms.get(result);
     const sockets = Array.from(room);
 
