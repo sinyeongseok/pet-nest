@@ -210,10 +210,7 @@ export class PetMateBoardService {
       return {
         id: petId,
         image: petInfo.images[0],
-        name:
-          petInfo.name.length > 3
-            ? `${petInfo.name.substring(0, 2)}...`
-            : petInfo.name,
+        name: this.utilService.formatPetName(petInfo.name),
         type: petInfo.type,
       };
     });

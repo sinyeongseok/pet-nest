@@ -11,6 +11,7 @@ import { PetType, PetGender } from 'src/config/type';
 import * as dayjs from 'dayjs';
 import { AwsService } from 'src/utils/s3';
 import { v4 as uuid } from 'uuid';
+import { UtilService } from 'src/utils/util.service';
 
 @Injectable()
 export class MyPageService {
@@ -21,7 +22,8 @@ export class MyPageService {
     private userAddressModel: Model<UserAddressDocument>,
     @InjectModel(Pet.name)
     private petModel: Model<PetDocument>,
-    private awsService: AwsService
+    private awsService: AwsService,
+    private utilService: UtilService
   ) {}
 
   async getMyPageUserInfo(email: string) {
@@ -57,7 +59,7 @@ export class MyPageService {
     return pets.map((pet) => {
       return {
         id: pet._id,
-        name: pet.name.length > 3 ? `${pet.name.substring(0, 2)}...` : pet.name,
+        name: this.utilService.formatPetName(pet.name),
         type: PetType[pet.type],
         ...(!!pet.images[0] && { image: pet.images[0] }),
       };
@@ -97,7 +99,7 @@ export class MyPageService {
     return otherPets.map((pet) => {
       return {
         id: pet._id,
-        name: pet.name.length > 3 ? `${pet.name.substring(0, 2)}...` : pet.name,
+        name: this.utilService.formatPetName(pet.name),
         type: PetType[pet.type],
         ...(!!pet.images.length && { image: pet.images[0] }),
       };
