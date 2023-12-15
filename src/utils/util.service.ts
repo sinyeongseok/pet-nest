@@ -21,4 +21,8 @@ export class UtilService {
 
     return userAddressInfo;
   }
+
+  formatPetName(name: string): string {
+    return name.length > 3 ? `${name.substring(0, 2)}...` : name;
+  }
 }
