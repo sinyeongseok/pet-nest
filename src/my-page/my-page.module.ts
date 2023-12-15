@@ -6,6 +6,7 @@ import { User, UserSchema } from 'src/schema/user.schema';
 import { UserAddress, UserAddressSchema } from 'src/schema/userAddress.schema';
 import { Pet, PetSchema } from 'src/schema/pet.schema';
 import { AwsService } from 'src/utils/s3';
+import { UtilService } from 'src/utils/util.service';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { AwsService } from 'src/utils/s3';
     ]),
   ],
   controllers: [MyPageController],
-  providers: [MyPageService, AwsService],
+  providers: [MyPageService, AwsService, UtilService],
 })
 export class MyPageModule {}
