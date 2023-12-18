@@ -2,10 +2,12 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { Model, Types } from 'mongoose';
+import { ChatService } from 'src/chat/chat.service';
 import {
   ParticipatingList,
   ParticipatingListDocument,
 } from 'src/schema/ParticipatingList.schema';
+import { ChatRoom, ChatRoomDocument } from 'src/schema/chatRoom.schema';
 import { Pet, PetDocument } from 'src/schema/pet.schema';
 import {
   PetMateBoard,
@@ -25,7 +27,10 @@ export class PetMateBoardService {
     private petModel: Model<PetDocument>,
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
-    private utilService: UtilService
+    @InjectModel(ChatRoom.name)
+    private chatRoomModel: Model<ChatRoomDocument>,
+    private utilService: UtilService,
+    private chatService: ChatService
   ) {}
 
   async createPetMateBoard({
@@ -522,10 +527,22 @@ export class PetMateBoardService {
     participatingId: string
   ) {
     try {
-      await this.participatingListModel.updateOne(
-        { _id: participatingId },
-        { isApproved: true }
-      );
+      const approveParticipantApplicationQuery =
+        this.participatingListModel.updateOne(
+          { _id: participatingId },
+          { isApproved: true }
+        );
+      const [chatRoomInfo, _] = await Promise.all([
+        this.chatRoomModel.findOne({ boardId }),
+        approveParticipantApplicationQuery,
+      ]);
+
+      if (!chatRoomInfo) {
+        await this.chatService.createPetMateChatRoom(boardId);
+      } else {
+        await this.chatService.joinPetMateChatRoom(participatingId, boardId);
+      }
+
       const result = await this.getApplicationList(boardId);
 
       return result;
