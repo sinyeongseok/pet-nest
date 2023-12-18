@@ -27,6 +27,16 @@ import {
 } from 'src/schema/ParticipatingList.schema';
 import { PetMateBoardService } from './petMateBoard.service';
 import { Pet, PetSchema } from 'src/schema/pet.schema';
+import { ChatService } from 'src/chat/chat.service';
+import {
+  ChatRoomSetting,
+  ChatRoomSettingSchema,
+} from 'src/schema/chatRoomSetting.schema';
+import { Message, MessageSchema } from 'src/schema/message.schema';
+import {
+  UsedItemSchedule,
+  UsedItemScheduleSchema,
+} from 'src/schema/usedItemSchedule.schema';
 
 @Module({
   imports: [
@@ -40,6 +50,11 @@ import { Pet, PetSchema } from 'src/schema/pet.schema';
       { name: PetMateBoard.name, schema: PetMateBoardSchema },
       { name: ParticipatingList.name, schema: ParticipatingListSchema },
       { name: Pet.name, schema: PetSchema },
+      { name: PetMateBoard.name, schema: PetMateBoardSchema },
+      { name: ChatRoomSetting.name, schema: ChatRoomSettingSchema },
+      { name: Message.name, schema: MessageSchema },
+      { name: UsedItemBoard.name, schema: UsedItemBoardSchema },
+      { name: UsedItemSchedule.name, schema: UsedItemScheduleSchema },
     ]),
   ],
   controllers: [BoardController],
@@ -49,6 +64,7 @@ import { Pet, PetSchema } from 'src/schema/pet.schema';
     AddressService,
     UtilService,
     PetMateBoardService,
+    ChatService,
   ],
 })
 export class BoardModule {}

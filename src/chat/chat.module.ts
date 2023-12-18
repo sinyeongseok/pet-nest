@@ -29,6 +29,14 @@ import { UsedItemBoardService } from 'src/board/usedItemBoard.service';
 import { AddressService } from 'src/address/address.service';
 import { AwsService } from 'src/utils/s3';
 import { CityAddress, CityAddressSchema } from 'src/schema/cityAddress.schema';
+import {
+  PetMateBoard,
+  PetMateBoardSchema,
+} from 'src/schema/petMateBoardSchema.schema';
+import {
+  ParticipatingList,
+  ParticipatingListSchema,
+} from 'src/schema/ParticipatingList.schema';
 
 @Module({
   imports: [
@@ -42,6 +50,8 @@ import { CityAddress, CityAddressSchema } from 'src/schema/cityAddress.schema';
       { name: Message.name, schema: MessageSchema },
       { name: BlockedUser.name, schema: BlockedUserSchema },
       { name: UsedItemSchedule.name, schema: UsedItemScheduleSchema },
+      { name: PetMateBoard.name, schema: PetMateBoardSchema },
+      { name: ParticipatingList.name, schema: ParticipatingListSchema },
     ]),
   ],
   controllers: [ChatController],
