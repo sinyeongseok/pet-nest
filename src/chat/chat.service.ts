@@ -23,6 +23,14 @@ import {
   UsedItemScheduleDocument,
 } from 'src/schema/usedItemSchedule.schema';
 import { AlarmTime } from 'src/config/type';
+import {
+  PetMateBoard,
+  PetMateBoardDocument,
+} from 'src/schema/petMateBoardSchema.schema';
+import {
+  ParticipatingList,
+  ParticipatingListDocument,
+} from 'src/schema/ParticipatingList.schema';
 
 dayjs.locale('ko');
 
@@ -43,6 +51,10 @@ export class ChatService {
     private blockedUserModel: Model<BlockedUserDocument>,
     @InjectModel(UsedItemSchedule.name)
     private usedItemScheduleModel: Model<UsedItemScheduleDocument>,
+    @InjectModel(PetMateBoard.name)
+    private petMateBoardModel: Model<PetMateBoardDocument>,
+    @InjectModel(ParticipatingList.name)
+    private participatingListModel: Model<ParticipatingListDocument>,
     private utilService: UtilService
   ) {}
 
@@ -729,6 +741,70 @@ export class ChatService {
       ]);
 
       return !!sameTimeSchedule.length;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async createPetMateChatRoom(boardId) {
+    try {
+      const [petMateBoardInfo, participatingList] = await Promise.all([
+        this.petMateBoardModel.findOne({
+          _id: boardId,
+        }),
+        this.participatingListModel.find({
+          boardId,
+          isApproved: true,
+        }),
+      ]);
+      const users = participatingList.map((data) => data.userEmail);
+      const createChatRoomQuery = new this.chatRoomModel({
+        users,
+        boardId: boardId,
+        region: petMateBoardInfo.address,
+        isPetMate: true,
+      });
+      const createChatRoomResult = await createChatRoomQuery.save();
+
+      for await (const user of users) {
+        const createChatRoomSettingQuery = new this.chatRoomSettingModel({
+          chatRoomId: createChatRoomResult._id,
+          userId: user,
+        });
+        await createChatRoomSettingQuery.save();
+      }
+
+      return;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async joinPetMateChatRoom(email, boardId) {
+    try {
+      const chatRoomInfo = await this.chatRoomModel.findOne({ boardId });
+      const createChatRoomSettingQuery = new this.chatRoomSettingModel({
+        chatRoomId: chatRoomInfo._id,
+        userId: email,
+      });
+
+      await Promise.all([
+        createChatRoomSettingQuery.save(),
+        this.chatRoomModel.updateOne(
+          { _id: chatRoomInfo._id },
+          { $push: { users: email } }
+        ),
+      ]);
+
+      return;
     } catch (error) {
       console.log(error);
       throw new HttpException(
