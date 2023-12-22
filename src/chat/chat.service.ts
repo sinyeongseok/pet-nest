@@ -273,7 +273,6 @@ export class ChatService {
           type: 'schedule',
           promiseAt: dayjs.convertToKoreanDate(acc.promiseAt),
           content: acc.content,
-          isPromise: true,
           ...(acc.writer === email && { isMe: true }),
         });
       } else {
