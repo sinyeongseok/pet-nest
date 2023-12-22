@@ -129,6 +129,7 @@ export class ChatService {
       region: userAddress.eupMyeonDong,
       isAlarm: chatRoom.isAlarm,
       isPinned: chatRoom.isPinned,
+      isPetMate: chatRoom.isPetMate,
       ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
       ...(!!chatRoom.images && { productImage: chatRoom.images[0] }),
     };
