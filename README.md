@@ -1,67 +1,101 @@
-[![example-nestjs](https://github.com/koyeb/example-nestjs/actions/workflows/deploy.yaml/badge.svg)](https://github.com/koyeb/example-nestjs/actions)
+## 📃 프로젝트 목적
 
-<div align="center">
-  <a href="https://koyeb.com">
-    <img src="https://www.koyeb.com/static/images/icons/koyeb.svg" alt="Logo" width="80" height="80">
-  </a>
-  <h3 align="center">Koyeb Serverless Platform</h3>
-  <p align="center">
-    Deploy a NestJS application on Koyeb
-    <br />
-    <a href="https://koyeb.com">Learn more about Koyeb</a>
-    ·
-    <a href="https://koyeb.com/docs">Explore the documentation</a>
-    ·
-    <a href="https://koyeb.com/tutorials">Discover our tutorials</a>
-  </p>
-</div>
+- 사이드 프로젝트 (4명)
+- 반려인을 위한 당근마켓과 산책메이트 구하기
 
+## 💻 사용한 기술, 모듈, 외부 리소스
 
-## About Koyeb and the NestJS example application
+#### 주 기술
 
-Koyeb is a developer-friendly serverless platform to deploy apps globally. No-ops, servers, or infrastructure management.
-This repository contains a NestJS application you can deploy on the Koyeb serverless platform for testing.
+<img src="https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
+<img src="https://img.shields.io/badge/nestjs-E0234E?style=for-the-badge&logo=nestjs&logoColor=white">
+<img src="https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=mongodb&logoColor=white">
+<img src="https://img.shields.io/badge/amazons3-569A31?style=for-the-badge&logo=amazons3&logoColor=white">
 
-This example application is designed to show how a NestJS application can be deployed on Koyeb.
+#### 모듈, 외부 리소스
 
-## Getting Started
+- typescript
+- mongoose
+- @nestjs/websockets, socket.io
+- aws-sdk
+- passport, passport-jwt
+- dayjs
+- multer, multer-s3
+- uuid
 
-Follow the steps below to deploy and run the NestJS application on your Koyeb account.
+## 📂 프로젝트 폴더 구조
 
-### Requirements
-
-You need a Koyeb account to successfully deploy and run this application. If you don't already have an account, you can sign-up for free [here](https://app.koyeb.com/auth/signup).
-
-### Deploy using the Koyeb button
-
-The fastest way to deploy the NestJS application is to click the **Deploy to Koyeb** button below.
-
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/koyeb/example-nestjs&branch=main&run_command=yarn%20run%20start:prod&name=nestjs-on-koyeb)
-
-Clicking on this button brings you to the Koyeb App creation page with everything pre-set to launch this application.
-
-_To modify this application example, you will need to fork this repository. Checkout the [fork and deploy](#fork-and-deploy-to-koyeb) instructions._
-
-# ## Fork and deploy to Koyeb
-
-If you want to customize and enhance this application, you need to fork this repository.
-
-If you used the **Deploy to Koyeb** button, you can simply link your service to your forked repository to be able to push changes.
-Alternatively, you can manually create the application as described below.
-
-On the [Koyeb Control Panel](//app.koyeb.com/apps), click the **Create App** button to go to the App creation page.
-
-1. Select `GitHub` as the deployment method to use
-2. In the repositories list, select the repository you just forked
-3. Specify the branch to deploy, in this case `main`
-4. Then, give your App a name, i.e `nestjs-on-koyeb`, and click **Create App.**
-
-You land on the deployment page where you can follow the build of your NestJS application. Once the build is completed, your application is being deployed and you will be able to access it via `<YOUR_APP_NAME>-<YOUR_ORG_NAME>.koyeb.app`.
-
-## Contributing
-
-If you have any questions, ideas or suggestions regarding this application sample, feel free to open an [issue](//github.com/koyeb/example-nestjs/issues) or fork this repository and open a [pull request](//github.com/koyeb/example-nestjs/pulls).
-
-## Contact
-
-[Koyeb](https://www.koyeb.com) - [@gokoyeb](https://twitter.com/gokoyeb) - [Slack](http://slack.koyeb.com/)
+```
+📦src
+ ┣ 📂address
+ ┃ ┣ 📜address.controller.ts
+ ┃ ┣ 📜address.model.ts
+ ┃ ┣ 📜address.module.ts
+ ┃ ┗ 📜address.service.ts
+ ┣ 📂auth
+ ┃ ┣ 📜auth.controller.ts
+ ┃ ┣ 📜auth.module.ts
+ ┃ ┗ 📜auth.service.ts
+ ┣ 📂board
+ ┃ ┣ 📜board.controller.ts
+ ┃ ┣ 📜board.module.ts
+ ┃ ┣ 📜petMateBoard.service.ts
+ ┃ ┗ 📜usedItemBoard.service.ts
+ ┣ 📂chat
+ ┃ ┣ 📜chat.controller.ts
+ ┃ ┣ 📜chat.gateway.ts
+ ┃ ┣ 📜chat.module.ts
+ ┃ ┗ 📜chat.service.ts
+ ┣ 📂common
+ ┃ ┣ 📂guards
+ ┃ ┃ ┣ 📜jwtAccessAuthGuard.guard.ts
+ ┃ ┃ ┗ 📜jwtRefreshAuthGuard.guard.ts
+ ┃ ┣ 📂strategy
+ ┃ ┃ ┣ 📜jwtAccess.strategy.ts
+ ┃ ┃ ┗ 📜jwtRefresh.strategy.ts
+ ┃ ┗ 📜common.module.ts
+ ┣ 📂config
+ ┃ ┣ 📂constants
+ ┃ ┃ ┣ 📂dist
+ ┃ ┃ ┃ ┗ 📜index.js
+ ┃ ┃ ┗ 📜index.ts
+ ┃ ┗ 📂type
+ ┃ ┃ ┣ 📂dist
+ ┃ ┃ ┃ ┗ 📜index.js
+ ┃ ┃ ┗ 📜index.ts
+ ┣ 📂my-page
+ ┃ ┣ 📜my-page.controller.ts
+ ┃ ┣ 📜my-page.module.ts
+ ┃ ┗ 📜my-page.service.ts
+ ┣ 📂schema
+ ┃ ┣ 📜ParticipatingList.schema.ts
+ ┃ ┣ 📜blockedUserSchema.schema.ts
+ ┃ ┣ 📜chatRoom.schema.ts
+ ┃ ┣ 📜chatRoomSetting.schema.ts
+ ┃ ┣ 📜cityAddress.schema.ts
+ ┃ ┣ 📜message.schema.ts
+ ┃ ┣ 📜pet.schema.ts
+ ┃ ┣ 📜petMateBoardSchema.schema.ts
+ ┃ ┣ 📜usedItemBoard.schema.ts
+ ┃ ┣ 📜usedItemSchedule.schema.ts
+ ┃ ┣ 📜user.schema.ts
+ ┃ ┗ 📜userAddress.schema.ts
+ ┣ 📂token
+ ┃ ┣ 📜token.controller.ts
+ ┃ ┣ 📜token.module.ts
+ ┃ ┗ 📜token.service.ts
+ ┣ 📂user
+ ┃ ┣ 📜user.controller.ts
+ ┃ ┣ 📜user.module.ts
+ ┃ ┗ 📜user.service.ts
+ ┣ 📂utils
+ ┃ ┣ 📂plugin
+ ┃ ┃ ┗ 📜dayjsPlugin.ts
+ ┃ ┣ 📜s3.ts
+ ┃ ┗ 📜util.service.ts
+ ┣ 📂web
+ ┃ ┣ 📜web.controller.ts
+ ┃ ┗ 📜web.module.ts
+ ┣ 📜app.module.ts
+ ┗ 📜main.ts
+```
