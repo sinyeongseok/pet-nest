@@ -102,7 +102,7 @@
 
 ## 📸 프로젝트 사진
 
-![온보딩](https://github.com/sinyeongseok/pet-nest/assets/80402309/4bed8099-c8dc-4b1b-83bf-5247ef9eaff8)
+![온보딩](https://github.com/sinyeongseok/pet-nest/assets/80402309/7fbdfcda-4fdb-45ef-8919-fe643b6a2ec3)
 
 --
 
@@ -111,8 +111,8 @@
 
 --
 
-![중고거래](https://github.com/sinyeongseok/pet-nest/assets/80402309/1515d91b-4d0b-4dc2-a281-80de2928b4e0)
+![중고거래](https://github.com/sinyeongseok/pet-nest/assets/80402309/1464171d-267e-45ea-ae80-369ceb1a7770)
 
 --
 
-![마이페이지](https://github.com/sinyeongseok/pet-nest/assets/80402309/708f2c03-847c-4878-92a9-4f5a2ddabc7b)
+![마이페이지](https://github.com/sinyeongseok/pet-nest/assets/80402309/6301b6d2-8469-41de-ab35-23de31cd497e)
