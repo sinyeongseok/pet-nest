@@ -99,3 +99,20 @@
  ┣ 📜app.module.ts
  ┗ 📜main.ts
 ```
+
+## 📸 프로젝트 사진
+
+![온보딩](https://github.com/sinyeongseok/pet-nest/assets/80402309/4bed8099-c8dc-4b1b-83bf-5247ef9eaff8)
+
+--
+
+![동네선택1](https://github.com/sinyeongseok/pet-nest/assets/80402309/8bf9fe80-0ba0-4d85-8478-06becec51c14)
+![동네선택2](https://github.com/sinyeongseok/pet-nest/assets/80402309/a0390dda-d76d-4fd8-a7f9-470b272bd642)
+
+--
+
+![중고거래](https://github.com/sinyeongseok/pet-nest/assets/80402309/1515d91b-4d0b-4dc2-a281-80de2928b4e0)
+
+--
+
+![마이페이지](https://github.com/sinyeongseok/pet-nest/assets/80402309/708f2c03-847c-4878-92a9-4f5a2ddabc7b)
