@@ -64,6 +64,7 @@ export class ChatService {
         _id: boardId,
       });
       const createChatRoomQuery = new this.chatRoomModel({
+        type: 'usedTrade',
         users: [email, usedItemBoardInfo.seller.email],
         boardId: boardId,
         region: usedItemBoardInfo.address,
@@ -764,6 +765,7 @@ export class ChatService {
       const users = participatingList.map((data) => data.userEmail);
       const createChatRoomQuery = new this.chatRoomModel({
         users,
+        type: 'petMate',
         boardId: boardId,
         region: petMateBoardInfo.address,
         isPetMate: true,
