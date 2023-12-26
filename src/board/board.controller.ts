@@ -261,6 +261,22 @@ export class BoardController {
     return res.status(result.statusCode).json(result.data);
   }
 
+  @Get('pet-mate/walking-schedules')
+  @UseGuards(JwtAccessAuthGuard)
+  async getScheduledWalkInfo(
+    @Req() req,
+    @Res() res,
+    @Query('limit') limit: string
+  ) {
+    const email = req.user.email;
+    const result = await this.petMateBoardService.getScheduledWalkInfo(
+      email,
+      limit
+    );
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Get('/pet-mate/:id')
   @UseGuards(JwtAccessAuthGuard)
   async getPetMateBoardInfo(@Req() req, @Res() res, @Param('id') id) {
