@@ -14,6 +14,9 @@ export class ChatRoom {
   users: string[];
 
   @Prop()
+  type: 'usedTrade' | 'petMate';
+
+  @Prop()
   title: string;
 
   @Prop({ default: '' })
