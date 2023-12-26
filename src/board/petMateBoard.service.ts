@@ -555,4 +555,71 @@ export class PetMateBoardService {
       );
     }
   }
+
+  private formatScheduledWalkInfo(scheduledWalkInfo) {
+    return scheduledWalkInfo.map((info) => {
+      return {
+        id: info.id,
+        address: info.address,
+        date: dayjs.convertToKoreanDate(info.date),
+        title: info.title,
+      };
+    });
+  }
+
+  async getScheduledWalkInfo(email: string, limit: string) {
+    try {
+      const todayStart = dayjs().toDate();
+      const tomorrowEnd = dayjs().add(1, 'day').endOf('day').toDate();
+      const scheduledWalkInfo = await this.participatingListModel.aggregate([
+        {
+          $match: {
+            userEmail: email,
+          },
+        },
+        {
+          $lookup: {
+            from: 'petmateboards',
+            localField: 'boardId',
+            foreignField: '_id',
+            as: 'petMateBoard',
+          },
+        },
+        {
+          $unwind: '$petMateBoard',
+        },
+        {
+          $match: {
+            'petMateBoard.date': { $gte: todayStart, $lte: tomorrowEnd },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$petMateBoard._id',
+            date: '$petMateBoard.date',
+            address: '$petMateBoard.address',
+            title: '$petMateBoard.title',
+          },
+        },
+        ...(!!limit
+          ? [
+              {
+                $limit: Number(limit),
+              },
+            ]
+          : []),
+      ]);
+      const result = this.formatScheduledWalkInfo(scheduledWalkInfo);
+
+      return { statusCode: 200, data: { scheduledWalkInfo: result } };
+    } catch (error) {
+      console.log(error);
+
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
