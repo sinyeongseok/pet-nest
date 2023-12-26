@@ -124,13 +124,13 @@ export class ChatService {
 
     return {
       id: chatRoom._id,
+      type: chatRoom.type,
       title: userInfo.nickname,
       lastChat: chatRoom.lastChat,
       lastChatAt: dayjs.computeTimeDifference(chatRoom.lastChatAt),
       region: userAddress.eupMyeonDong,
       isAlarm: chatRoom.isAlarm,
       isPinned: chatRoom.isPinned,
-      isPetMate: chatRoom.isPetMate,
       ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
       ...(!!chatRoom.images && { productImage: chatRoom.images[0] }),
     };
@@ -188,9 +188,9 @@ export class ChatService {
         {
           $project: {
             _id: 1,
+            type: 1,
             users: 1,
             title: 1,
-            isPetMate: 1,
             lastChat: 1,
             lastChatAt: 1,
             isAlarm: '$chatRoomSettings.isAlarm',
@@ -768,7 +768,6 @@ export class ChatService {
         type: 'petMate',
         boardId: boardId,
         region: petMateBoardInfo.address,
-        isPetMate: true,
       });
       const createChatRoomResult = await createChatRoomQuery.save();
 
