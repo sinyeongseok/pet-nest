@@ -31,6 +31,7 @@ import {
   ParticipatingList,
   ParticipatingListDocument,
 } from 'src/schema/ParticipatingList.schema';
+import e from 'express';
 
 dayjs.locale('ko');
 
@@ -221,11 +222,18 @@ export class ChatService {
       const timestamp = dayjs(
         new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
       );
+      const chatRoomInfo = await this.chatRoomModel.findOne({
+        _id: chatRoomId,
+      });
       const createMessageQuery = new this.messageModel({
         chatRoomId,
-        sender,
-        timestamp,
-        content: message,
+        type: 'message',
+        details: {
+          sender,
+          timestamp,
+          content: message,
+          type: chatRoomInfo.type,
+        },
       });
       const updateChatRoomQuery = this.chatRoomModel.updateOne(
         {
@@ -249,11 +257,18 @@ export class ChatService {
     }
   }
 
-  formatChatList(email, chatList, scheduleList) {
-    const newChatList = [...chatList, ...scheduleList].sort(
-      (a, b) => a.timestamp - b.timestamp
-    );
-    return newChatList.reduce((res, acc) => {
+  formatChatTimestamp(type, timestamp) {
+    if (type === 'schedule') {
+      return dayjs.convertToKoreanDate(timestamp);
+    }
+
+    return `${dayjs(timestamp).hour() < 12 ? '오전' : '오후'} ${dayjs(
+      timestamp
+    ).format('H:mm')}`;
+  }
+
+  formatChatList(email, chatList) {
+    return chatList.reduce((res, acc) => {
       const date = dayjs(acc.timestamp).format('YYYY년 M월 D일');
       if (!res[date]) {
         res[date] = [];
@@ -263,52 +278,109 @@ export class ChatService {
         const length = res[date].length;
 
         if (
-          res[date][length - 1].timestamp == dayjs(acc.timestamp).format('H:mm')
+          res[date][length - 1].timestamp ==
+            dayjs(acc.timestamp).format('H:mm') &&
+          res[date][length - 1].details.type !== 'schedule'
         ) {
           delete res[date][length - 1].timestamp;
-          delete res[date][length - 1].timeOfDay;
         }
       }
-      if (!acc.type) {
-        res[date].push({
-          id: acc._id,
-          type: 'schedule',
-          promiseAt: dayjs.convertToKoreanDate(acc.promiseAt),
-          content: acc.content,
-          ...(acc.writer === email && { isMe: true }),
-        });
-      } else {
-        res[date].push({
-          id: acc._id,
-          type: acc.type,
-          content: acc.content,
-          timestamp: dayjs(acc.timestamp).format('H:mm'),
-          timeOfDay: dayjs(acc.timestamp).hour() < 12 ? '오전' : '오후',
+
+      res[date].push({
+        id: acc._id,
+        type: acc.type,
+        details: {
+          type: acc.details.type,
+          content: acc.details.content,
+          timestamp: this.formatChatTimestamp(
+            acc.details.type,
+            acc.details.timestamp
+          ),
           ...(acc.sender === email && { isMe: true }),
-        });
-      }
+          ...(acc.details.type === 'petMate' && { user: acc.details.user }),
+        },
+      });
 
       return res;
     }, {});
   }
 
+  async getUsedTradeChatList(email, chatRoomId) {
+    const getChatList = this.messageModel
+      .find({ chatRoomId })
+      .sort({ timestamp: 1 })
+      .exec();
+    const getScheduleList = this.usedItemScheduleModel
+      .find({ chatRoomId })
+      .sort({ timestamp: 1 })
+      .exec();
+    const [chatList, scheduleList] = await Promise.all([
+      getChatList,
+      getScheduleList,
+    ]);
+    const newScheduleList = scheduleList.map((schedule) => {
+      return {
+        _id: schedule._id,
+        type: 'message',
+        details: {
+          sender: schedule.writer,
+          content: schedule.content,
+          timestamp: schedule.timestamp,
+        },
+      };
+    });
+    const newChatList = [...chatList, ...newScheduleList].sort(
+      (a, b) =>
+        new Date(a.details.timestamp).getTime() -
+        new Date(b.details.timestamp).getTime()
+    );
+
+    return this.formatChatList(email, newChatList);
+  }
+
+  async getPetMateChatList(email, chatRoomId) {
+    const chatList = await this.messageModel
+      .find({ chatRoomId })
+      .sort({ timestamp: 1 })
+      .exec();
+    const newChatList = await Promise.all(
+      chatList.map(async (chat) => {
+        if (chat.details.type === 'petMate') {
+          const userInfo = await this.userModel.findOne({
+            email: chat.details.sender,
+          });
+
+          return {
+            _id: chat._id,
+            type: chat.type,
+            details: {
+              ...chat.details,
+              user: {
+                nickname: userInfo.nickname,
+                profileImage: userInfo.profileImage,
+              },
+            },
+          };
+        }
+
+        return chat;
+      })
+    );
+
+    return this.formatChatList(email, newChatList);
+  }
+
   async getChatList(email, chatRoomId: string) {
     try {
-      const getChatList = this.messageModel
-        .find({ chatRoomId })
-        .sort({ timestamp: 1 })
-        .exec();
-      const getScheduleList = this.usedItemScheduleModel
-        .find({ chatRoomId })
-        .sort({ timestamp: 1 })
-        .exec();
-      const [chatList, scheduleList] = await Promise.all([
-        getChatList,
-        getScheduleList,
-      ]);
-      const result = this.formatChatList(email, chatList, scheduleList);
+      const chatRoomInfo = await this.chatRoomModel.findOne({
+        _id: chatRoomId,
+      });
 
-      return result;
+      if (chatRoomInfo.type === 'usedTrade') {
+        return await this.getUsedTradeChatList(email, chatRoomId);
+      } else if (chatRoomInfo.type === 'petMate') {
+        return await this.getPetMateChatList(email, chatRoomId);
+      }
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -599,10 +671,13 @@ export class ChatService {
       );
       const createMessageQuery = new this.messageModel({
         chatRoomId,
-        timestamp,
-        sender: email,
-        content: message,
-        type: 'schedule_cancel',
+        type: 'action',
+        details: {
+          timestamp,
+          type: 'schedule_cancel',
+          sender: email,
+          content: message,
+        },
       });
 
       await Promise.all([
