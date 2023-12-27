@@ -866,14 +866,30 @@ export class ChatService {
 
   async joinPetMateChatRoom(email, boardId) {
     try {
-      const chatRoomInfo = await this.chatRoomModel.findOne({ boardId });
+      const [chatRoomInfo, userInfo] = await Promise.all([
+        this.chatRoomModel.findOne({ boardId }),
+        this.userModel.findOne({ email }),
+      ]);
       const createChatRoomSettingQuery = new this.chatRoomSettingModel({
         chatRoomId: chatRoomInfo._id,
         userId: email,
       });
+      const createMessage = new this.messageModel({
+        chatRoomId: chatRoomInfo._id,
+        type: 'action',
+        details: {
+          timestamp: dayjs(
+            new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
+          ),
+          type: 'join',
+          sender: email,
+          content: `${userInfo.nickname}님이 들어왔습니다.`,
+        },
+      });
 
       await Promise.all([
         createChatRoomSettingQuery.save(),
+        createMessage.save(),
         this.chatRoomModel.updateOne(
           { _id: chatRoomInfo._id },
           { $push: { users: email } }
