@@ -230,7 +230,7 @@ export class ChatService {
         type: 'message',
         details: {
           sender,
-          timestamp,
+          timestamp: timestamp.toDate(),
           content: message,
           type: chatRoomInfo.type,
         },
@@ -241,7 +241,7 @@ export class ChatService {
         },
         {
           lastChat: message,
-          lastChatAt: timestamp,
+          lastChatAt: timestamp.toDate(),
         }
       );
 
@@ -667,14 +667,14 @@ export class ChatService {
         },
         {
           lastChat: message,
-          lastChatAt: timestamp,
+          lastChatAt: timestamp.toDate(),
         }
       );
       const createMessageQuery = new this.messageModel({
         chatRoomId,
         type: 'action',
         details: {
-          timestamp,
+          timestamp: timestamp.toDate(),
           type: 'schedule_cancel',
           sender: email,
           content: message,
@@ -881,7 +881,7 @@ export class ChatService {
         details: {
           timestamp: dayjs(
             new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
-          ),
+          ).toDate(),
           type: 'join',
           sender: email,
           content: `${userInfo.nickname}님이 들어왔습니다.`,
