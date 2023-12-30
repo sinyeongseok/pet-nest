@@ -269,20 +269,23 @@ export class ChatService {
 
   formatChatList(email, chatList) {
     return chatList.reduce((res, acc) => {
-      const date = dayjs(acc.timestamp).format('YYYY년 M월 D일');
+      const date = dayjs(acc.details.timestamp).format('YYYY년 M월 D일');
       if (!res[date]) {
         res[date] = [];
       }
 
       if (res[date].length > 0) {
         const length = res[date].length;
-
+        console.log(
+          res[date][length - 1].details.timestamp,
+          dayjs(acc.timestamp).format('H:mm')
+        );
         if (
-          res[date][length - 1].timestamp ==
-            dayjs(acc.timestamp).format('H:mm') &&
+          res[date][length - 1].details.timestamp ==
+            this.formatChatTimestamp(acc.details.type, acc.details.timestamp) &&
           res[date][length - 1].details.type !== 'schedule'
         ) {
-          delete res[date][length - 1].timestamp;
+          delete res[date][length - 1].details.timestamp;
         }
       }
 
@@ -308,7 +311,7 @@ export class ChatService {
   async getUsedTradeChatList(email, chatRoomId) {
     const getChatList = this.messageModel
       .find({ chatRoomId })
-      .sort({ timestamp: 1 })
+      .sort({ 'details.timestamp': 1 })
       .exec();
     const getScheduleList = this.usedItemScheduleModel
       .find({ chatRoomId })
