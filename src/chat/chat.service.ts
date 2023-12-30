@@ -323,6 +323,7 @@ export class ChatService {
         _id: schedule._id,
         type: 'message',
         details: {
+          type: 'schedule',
           sender: schedule.writer,
           content: schedule.content,
           timestamp: schedule.timestamp,
