@@ -296,7 +296,7 @@ export class ChatService {
             acc.details.type,
             acc.details.timestamp
           ),
-          ...(acc.sender === email && { isMe: true }),
+          ...(acc.details.sender === email && { isMe: true }),
           ...(acc.details.type === 'petMate' && { user: acc.details.user }),
         },
       });
