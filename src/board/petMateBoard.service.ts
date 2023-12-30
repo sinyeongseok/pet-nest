@@ -503,15 +503,36 @@ export class PetMateBoardService {
 
   async getApplicationList(id: string) {
     try {
-      const applicationList = await this.participatingListModel.find({
-        boardId: id,
-        isApproved: false,
-      });
-      const result = await Promise.all(
+      const [applicationList, participationList, petMateBoardInfo] =
+        await Promise.all([
+          this.participatingListModel.find({
+            boardId: id,
+            isApproved: false,
+          }),
+          this.participatingListModel.find({
+            boardId: id,
+            isApproved: true,
+            $or: [{ isHostPet: { $exists: false } }, { isHostPet: false }],
+          }),
+          this.petMateBoardModel.findOne({
+            _id: id,
+          }),
+        ]);
+      const availableSlots = participationList.reduce(
+        (res, participationInfo) => {
+          res -= participationInfo.petIds.length;
+          return res;
+        },
+        petMateBoardInfo.maxPet
+      );
+      const newApplicationList = await Promise.all(
         this.formatApplicationList(applicationList)
       );
 
-      return { statusCode: 200, data: { applicationList: result } };
+      return {
+        statusCode: 200,
+        data: { availableSlots, applicationList: newApplicationList },
+      };
     } catch (error) {
       console.log(error);
 
