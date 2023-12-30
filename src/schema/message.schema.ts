@@ -35,7 +35,7 @@ export class Message {
     default: () => ({
       sender: '',
       content: '',
-      timestamp: Date.now,
+      timestamp: Date.now(),
     }),
   })
   details: MessageDetails;
