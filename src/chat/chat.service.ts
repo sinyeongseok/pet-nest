@@ -122,6 +122,16 @@ export class ChatService {
     const otherUser = chatRoom.users.filter((user: string[]) => user !== email);
     const userInfo = await this.userModel.findOne({ email: otherUser });
     const userAddress = await this.utilService.getUserRecentAddress(email);
+    const usedTradeImage = await (async () => {
+      if (chatRoom.type === 'usedTrade') {
+        const boardInfo = await this.usedItemBoardModel.findOne({
+          _id: chatRoom.boardId,
+        });
+        return boardInfo?.images[0];
+      }
+
+      return null;
+    })();
 
     return {
       id: chatRoom._id,
@@ -133,7 +143,7 @@ export class ChatService {
       isAlarm: chatRoom.isAlarm,
       isPinned: chatRoom.isPinned,
       ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
-      ...(!!chatRoom.images && { productImage: chatRoom.images[0] }),
+      ...(!!usedTradeImage && { productImage: usedTradeImage }),
     };
   }
 
@@ -176,19 +186,9 @@ export class ChatService {
           },
         },
         {
-          $lookup: {
-            from: 'useditemboards',
-            localField: 'boardId',
-            foreignField: '_id',
-            as: 'usedItemBoards',
-          },
-        },
-        {
-          $unwind: '$usedItemBoards',
-        },
-        {
           $project: {
             _id: 1,
+            boardId: 1,
             type: 1,
             users: 1,
             title: 1,
@@ -196,7 +196,6 @@ export class ChatService {
             lastChatAt: 1,
             isAlarm: '$chatRoomSettings.isAlarm',
             isPinned: '$chatRoomSettings.isPinned',
-            images: '$usedItemBoards.images',
           },
         },
         {
@@ -276,10 +275,6 @@ export class ChatService {
 
       if (res[date].length > 0) {
         const length = res[date].length;
-        console.log(
-          res[date][length - 1].details.timestamp,
-          dayjs(acc.timestamp).format('H:mm')
-        );
         if (
           res[date][length - 1].details.timestamp ==
             this.formatChatTimestamp(acc.details.type, acc.details.timestamp) &&
