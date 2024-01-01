@@ -312,13 +312,15 @@ export class PetMateBoardService {
           },
         },
       ]);
-      const [petMateBoardInfo, participatingList] = await Promise.all([
-        petMateBoardInfoQuery,
-        this.participatingListModel.find({
-          boardId: id,
-          isApproved: true,
-        }),
-      ]);
+      const [petMateBoardInfo, participatingList, requestedMate] =
+        await Promise.all([
+          petMateBoardInfoQuery,
+          this.participatingListModel.find({
+            boardId: id,
+            isApproved: true,
+          }),
+          this.participatingListModel.find({ boardId: id, isApproved: false }),
+        ]);
       const fomatParticipatingList = await Promise.all(
         this.formatParticipatingList(participatingList)
       );
@@ -330,6 +332,7 @@ export class PetMateBoardService {
           place: petMateBoardInfo[0].place,
           totalPets: petMateBoardInfo[0].totalPets,
           participatingPetsCount: petMateBoardInfo[0].participatingPetsCount,
+          requestedMateCount: requestedMate.length,
           status: petMateBoardInfo[0].status,
           ...(petMateBoardInfo[0].host === email && {
             isHost: petMateBoardInfo[0].host === email,
