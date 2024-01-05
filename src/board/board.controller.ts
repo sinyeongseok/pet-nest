@@ -270,6 +270,15 @@ export class BoardController {
     return res.status(result.statusCode).json(result.data);
   }
 
+  @Get('pet-mate/participants')
+  @UseGuards(JwtAccessAuthGuard)
+  async getWalkParticipation(@Req() req, @Res() res) {
+    const email = req.user.email;
+    const result = await this.petMateBoardService.getWalkParticipation(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Get('/pet-mate/:id')
   @UseGuards(JwtAccessAuthGuard)
   async getPetMateBoardInfo(@Req() req, @Res() res, @Param('id') id) {
