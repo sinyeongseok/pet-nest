@@ -639,4 +639,49 @@ export class PetMateBoardService {
       );
     }
   }
+
+  async getWalkParticipation(email: string) {
+    try {
+      const scheduledWalkInfo = await this.participatingListModel.aggregate([
+        {
+          $match: {
+            userEmail: email,
+          },
+        },
+        {
+          $lookup: {
+            from: 'petmateboards',
+            localField: 'boardId',
+            foreignField: '_id',
+            as: 'petMateBoard',
+          },
+        },
+        {
+          $unwind: '$petMateBoard',
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$petMateBoard._id',
+            date: '$petMateBoard.date',
+            address: '$petMateBoard.address',
+            title: '$petMateBoard.title',
+          },
+        },
+      ]);
+      const result = this.formatScheduledWalkInfo(scheduledWalkInfo);
+
+      return {
+        statusCode: 200,
+        data: { participationWalkScheduleList: result },
+      };
+    } catch (error) {
+      console.log(error);
+
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
