@@ -263,16 +263,9 @@ export class BoardController {
 
   @Get('pet-mate/walking-schedules')
   @UseGuards(JwtAccessAuthGuard)
-  async getScheduledWalkInfo(
-    @Req() req,
-    @Res() res,
-    @Query('limit') limit: string
-  ) {
+  async getScheduledWalkInfo(@Req() req, @Res() res) {
     const email = req.user.email;
-    const result = await this.petMateBoardService.getScheduledWalkInfo(
-      email,
-      limit
-    );
+    const result = await this.petMateBoardService.getScheduledWalkInfo(email);
 
     return res.status(result.statusCode).json(result.data);
   }

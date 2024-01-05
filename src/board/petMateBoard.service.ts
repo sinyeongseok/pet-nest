@@ -591,7 +591,7 @@ export class PetMateBoardService {
     });
   }
 
-  async getScheduledWalkInfo(email: string, limit: string) {
+  async getScheduledWalkInfo(email: string) {
     try {
       const todayStart = dayjs().toDate();
       const tomorrowEnd = dayjs().add(1, 'day').endOf('day').toDate();
@@ -626,13 +626,6 @@ export class PetMateBoardService {
             title: '$petMateBoard.title',
           },
         },
-        ...(!!limit
-          ? [
-              {
-                $limit: Number(limit),
-              },
-            ]
-          : []),
       ]);
       const result = this.formatScheduledWalkInfo(scheduledWalkInfo);
 
