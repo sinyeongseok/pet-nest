@@ -279,6 +279,15 @@ export class BoardController {
     return res.status(result.statusCode).json(result.data);
   }
 
+  @Get('pet-mate/posts')
+  @UseGuards(JwtAccessAuthGuard)
+  async getPetMatePosts(@Req() req, @Res() res) {
+    const email = req.user.email;
+    const result = await this.petMateBoardService.getPetMatePosts(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Get('/pet-mate/:id')
   @UseGuards(JwtAccessAuthGuard)
   async getPetMateBoardInfo(@Req() req, @Res() res, @Param('id') id) {
