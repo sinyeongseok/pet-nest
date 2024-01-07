@@ -684,4 +684,20 @@ export class PetMateBoardService {
       );
     }
   }
+
+  async getPetMatePosts(email: string) {
+    try {
+      const getPetMateList = await this.petMateBoardModel.find({ host: email });
+      const result = this.formatScheduledWalkInfo(getPetMateList);
+
+      return { statusCode: 200, data: { writtenPosts: result } };
+    } catch (error) {
+      console.log(error);
+
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
