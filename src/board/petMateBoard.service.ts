@@ -2,12 +2,18 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { Model, Types } from 'mongoose';
+import { ChatGateway } from 'src/chat/chat.gateway';
 import { ChatService } from 'src/chat/chat.service';
 import {
   ParticipatingList,
   ParticipatingListDocument,
 } from 'src/schema/ParticipatingList.schema';
 import { ChatRoom, ChatRoomDocument } from 'src/schema/chatRoom.schema';
+import {
+  ChatRoomSetting,
+  ChatRoomSettingDocument,
+} from 'src/schema/chatRoomSetting.schema';
+import { Message, MessageDocument } from 'src/schema/message.schema';
 import { Pet, PetDocument } from 'src/schema/pet.schema';
 import {
   PetMateBoard,
@@ -29,8 +35,13 @@ export class PetMateBoardService {
     private userModel: Model<UserDocument>,
     @InjectModel(ChatRoom.name)
     private chatRoomModel: Model<ChatRoomDocument>,
+    @InjectModel(ChatRoomSetting.name)
+    private chatRoomSettingModel: Model<ChatRoomSettingDocument>,
+    @InjectModel(Message.name)
+    private messageModel: Model<MessageDocument>,
     private utilService: UtilService,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private chatGateway: ChatGateway
   ) {}
 
   async createPetMateBoard({
@@ -701,6 +712,65 @@ export class PetMateBoardService {
       const result = this.formatScheduledWalkInfo(getPetMateList);
 
       return { statusCode: 200, data: { writtenPosts: result } };
+    } catch (error) {
+      console.log(error);
+
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async leavePetMate(email: string, boardId) {
+    try {
+      const [userInfo, chatRoomInfo] = await Promise.all([
+        this.userModel.findOne({ email }),
+        this.chatRoomModel.findOne({ boardId }),
+      ]);
+      console.log(chatRoomInfo);
+      const message = `${userInfo.nickname}님이 나갔습니다.`;
+      const timestamp = dayjs(
+        new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
+      ).toDate();
+      await Promise.all([
+        this.participatingListModel.deleteOne({ boardId, userEmail: email }),
+        this.chatRoomModel.updateOne(
+          { _id: chatRoomInfo._id },
+          { $pull: { users: email } }
+        ),
+        this.chatRoomSettingModel.deleteOne({
+          chatRoomId: chatRoomInfo._id,
+          userId: email,
+        }),
+        new this.messageModel({
+          chatRoomId: chatRoomInfo._id,
+          type: 'action',
+          details: {
+            timestamp,
+            type: 'comingAndGoing',
+            sender: email,
+            content: message,
+          },
+        }).save(),
+        this.chatRoomModel.updateOne(
+          {
+            _id: chatRoomInfo._id,
+          },
+          {
+            lastChat: message,
+            lastChatAt: timestamp,
+          }
+        ),
+      ]);
+
+      const [boardInfo, ...ignore] = await Promise.all([
+        this.getPetMateBoardInfo(email, boardId),
+        this.chatGateway.broadcastChatList(chatRoomInfo._id),
+        this.chatGateway.broadcastChatRoomList(chatRoomInfo._id),
+      ]);
+
+      return { statusCode: 200, data: boardInfo.data };
     } catch (error) {
       console.log(error);
 
