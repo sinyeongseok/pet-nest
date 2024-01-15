@@ -388,6 +388,7 @@ export class PetMateBoardService {
               {
                 $match: {
                   $expr: { $eq: ['$boardId', '$$boardId'] },
+                  isApproved: true,
                 },
               },
               {
@@ -769,6 +770,7 @@ export class PetMateBoardService {
         this.chatGateway.broadcastChatList(chatRoomInfo._id),
         this.chatGateway.broadcastChatRoomList(chatRoomInfo._id),
       ]);
+      // const boardInfo = await this.getPetMateBoardInfo(email, boardId);
 
       return { statusCode: 200, data: boardInfo.data };
     } catch (error) {
