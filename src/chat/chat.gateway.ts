@@ -9,6 +9,7 @@ import { Namespace } from 'socket.io';
 import { ChatService } from './chat.service';
 import { TokenService } from 'src/token/token.service';
 import { UsedItemBoardService } from 'src/board/usedItemBoard.service';
+import { PetMateBoardService } from 'src/board/petMateBoard.service';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -20,7 +21,8 @@ export class ChatGateway {
   constructor(
     private readonly chatService: ChatService,
     private tokenService: TokenService,
-    private usedItemBoardService: UsedItemBoardService
+    private usedItemBoardService: UsedItemBoardService,
+    private petMateBoardService: PetMateBoardService
   ) {}
   @WebSocketServer() nsp: Namespace;
 
@@ -239,10 +241,30 @@ export class ChatGateway {
 
     const email = validateTokenResult.user.email;
 
-    await this.chatService.LeaveChatRoom(email, chatRoomId);
+    const chatType = await this.chatService.LeaveChatRoom(email, chatRoomId);
     socket.leave(chatRoomId);
 
     const chatRoomList = await this.chatService.getChatRoomList(email);
+
+    if (chatType === 'petMate') {
+      const room = this.nsp.adapter.rooms.get(chatRoomId);
+      const sockets = Array.from(room);
+
+      const [chatRoomInfo, ignore] = await Promise.all([
+        this.chatService.getChatRoomInfo(chatRoomId),
+        this.broadcastChatList(sockets, chatRoomId),
+      ]);
+      const result = await this.petMateBoardService.getPetMateBoardInfo(
+        email,
+        chatRoomInfo.boardId
+      );
+
+      socket.emit('pet-mate/detail', {
+        statusCode: 200,
+        message: '성공',
+        data: result.data,
+      });
+    }
 
     socket.emit('room-list', {
       statusCode: 200,
