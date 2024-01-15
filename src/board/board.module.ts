@@ -37,6 +37,8 @@ import {
   UsedItemSchedule,
   UsedItemScheduleSchema,
 } from 'src/schema/usedItemSchedule.schema';
+import { ChatGateway } from 'src/chat/chat.gateway';
+import { TokenService } from 'src/token/token.service';
 
 @Module({
   imports: [
@@ -65,6 +67,8 @@ import {
     UtilService,
     PetMateBoardService,
     ChatService,
+    ChatGateway,
+    TokenService,
   ],
 })
 export class BoardModule {}
