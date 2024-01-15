@@ -490,15 +490,36 @@ export class ChatService {
 
   async LeaveChatRoom(email: string, chatRoomId: string) {
     try {
-      await this.chatRoomSettingModel.updateOne(
-        {
-          chatRoomId,
-          userId: email,
-        },
-        {
-          isLeave: true,
-        }
-      );
+      const chatRoomInfo = await this.chatRoomModel.findOne({
+        _id: chatRoomId,
+      });
+
+      if (chatRoomInfo.type === 'usedTrade') {
+        await this.chatRoomSettingModel.updateOne(
+          {
+            chatRoomId,
+            userId: email,
+          },
+          {
+            isLeave: true,
+          }
+        );
+
+        return;
+      } else if (chatRoomInfo.type === 'petMate') {
+        await Promise.all([
+          this.chatRoomModel.updateOne(
+            { _id: chatRoomId },
+            { $pull: { users: email } }
+          ),
+          this.chatRoomSettingModel.deleteOne({
+            chatRoomId,
+            userId: email,
+          }),
+        ]);
+
+        return;
+      }
 
       return;
     } catch (error) {
