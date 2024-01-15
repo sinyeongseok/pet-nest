@@ -155,7 +155,7 @@ export class ChatGateway {
     return { success: true, data: { chatList: result } };
   }
 
-  private async broadcastChatList(chatRoomId) {
+  async broadcastChatList(chatRoomId) {
     const room = this.nsp.adapter.rooms.get(chatRoomId);
     const sockets = Array.from(room);
 
@@ -174,7 +174,10 @@ export class ChatGateway {
     }
   }
 
-  private async broadcastChatRoomList(sockets) {
+  async broadcastChatRoomList(chatRoomId: string) {
+    const room = this.nsp.adapter.rooms.get(chatRoomId);
+    const sockets = Array.from(room);
+
     for await (const socket of sockets) {
       const userSocket: any = this.nsp.sockets.get(socket);
       const getChatRoomListresult = await this.chatService.getChatRoomList(
@@ -212,12 +215,9 @@ export class ChatGateway {
       sender: validateTokenResult.user.email,
     });
 
-    const room = this.nsp.adapter.rooms.get(chatRoomId);
-    const sockets = Array.from(room);
-
     await Promise.all([
       this.broadcastChatList(chatRoomId),
-      this.broadcastChatRoomList(sockets),
+      this.broadcastChatRoomList(chatRoomId),
     ]);
 
     return { success: true };
@@ -424,9 +424,6 @@ export class ChatGateway {
       writer: email,
     });
 
-    const room = this.nsp.adapter.rooms.get(chatRoomId);
-    const sockets = Array.from(room);
-
     socket.emit('create-schedule', {
       statusCode: 200,
       message: '성공',
@@ -435,7 +432,7 @@ export class ChatGateway {
 
     await Promise.all([
       this.broadcastChatList(chatRoomId),
-      this.broadcastChatRoomList(sockets),
+      this.broadcastChatRoomList(chatRoomId),
     ]);
 
     return { success: true };
@@ -498,12 +495,10 @@ export class ChatGateway {
 
     const email = validateTokenResult.user.email;
     const result = await this.chatService.deleteSchedule(email, scheduleId);
-    const room = this.nsp.adapter.rooms.get(result);
-    const sockets = Array.from(room);
 
     await Promise.all([
       this.broadcastChatList(result),
-      this.broadcastChatRoomList(sockets),
+      this.broadcastChatRoomList(result),
     ]);
 
     return { success: true };
