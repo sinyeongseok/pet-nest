@@ -9,7 +9,6 @@ import { Namespace } from 'socket.io';
 import { ChatService } from './chat.service';
 import { TokenService } from 'src/token/token.service';
 import { UsedItemBoardService } from 'src/board/usedItemBoard.service';
-import { PetMateBoardService } from 'src/board/petMateBoard.service';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -21,8 +20,7 @@ export class ChatGateway {
   constructor(
     private readonly chatService: ChatService,
     private tokenService: TokenService,
-    private usedItemBoardService: UsedItemBoardService,
-    private petMateBoardService: PetMateBoardService
+    private usedItemBoardService: UsedItemBoardService
   ) {}
   @WebSocketServer() nsp: Namespace;
 
@@ -157,7 +155,10 @@ export class ChatGateway {
     return { success: true, data: { chatList: result } };
   }
 
-  private async broadcastChatList(sockets, chatRoomId) {
+  private async broadcastChatList(chatRoomId) {
+    const room = this.nsp.adapter.rooms.get(chatRoomId);
+    const sockets = Array.from(room);
+
     for await (const socket of sockets) {
       const userSocket: any = this.nsp.sockets.get(socket);
       const getChatListresult = await this.chatService.getChatList(
@@ -215,7 +216,7 @@ export class ChatGateway {
     const sockets = Array.from(room);
 
     await Promise.all([
-      this.broadcastChatList(sockets, chatRoomId),
+      this.broadcastChatList(chatRoomId),
       this.broadcastChatRoomList(sockets),
     ]);
 
@@ -247,23 +248,7 @@ export class ChatGateway {
     const chatRoomList = await this.chatService.getChatRoomList(email);
 
     if (chatType === 'petMate') {
-      const room = this.nsp.adapter.rooms.get(chatRoomId);
-      const sockets = Array.from(room);
-
-      const [chatRoomInfo, ignore] = await Promise.all([
-        this.chatService.getChatRoomInfo(chatRoomId),
-        this.broadcastChatList(sockets, chatRoomId),
-      ]);
-      const result = await this.petMateBoardService.getPetMateBoardInfo(
-        email,
-        chatRoomInfo.boardId
-      );
-
-      socket.emit('pet-mate/detail', {
-        statusCode: 200,
-        message: '성공',
-        data: result.data,
-      });
+      await this.broadcastChatList(chatRoomId);
     }
 
     socket.emit('room-list', {
@@ -353,7 +338,7 @@ export class ChatGateway {
       });
     }
 
-    await this.broadcastChatList(sockets, chatRoomId);
+    await this.broadcastChatList(chatRoomId);
 
     return { success: true };
   }
@@ -394,7 +379,7 @@ export class ChatGateway {
       });
     }
 
-    await this.broadcastChatList(sockets, chatRoomId);
+    await this.broadcastChatList(chatRoomId);
 
     return { success: true };
   }
@@ -449,7 +434,7 @@ export class ChatGateway {
     });
 
     await Promise.all([
-      this.broadcastChatList(sockets, chatRoomId),
+      this.broadcastChatList(chatRoomId),
       this.broadcastChatRoomList(sockets),
     ]);
 
@@ -517,7 +502,7 @@ export class ChatGateway {
     const sockets = Array.from(room);
 
     await Promise.all([
-      this.broadcastChatList(sockets, result),
+      this.broadcastChatList(result),
       this.broadcastChatRoomList(sockets),
     ]);
 
@@ -563,10 +548,8 @@ export class ChatGateway {
       promiseAt,
       alarmTime,
     });
-    const room = this.nsp.adapter.rooms.get(result);
-    const sockets = Array.from(room);
 
-    await this.broadcastChatList(sockets, result);
+    await this.broadcastChatList(result);
 
     return { success: true };
   }
