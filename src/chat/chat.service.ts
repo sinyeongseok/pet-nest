@@ -132,17 +132,16 @@ export class ChatService {
 
       return null;
     })();
-
     return {
       id: chatRoom._id,
       type: chatRoom.type,
-      title: userInfo.nickname,
+      title: chatRoom.type === 'usedTrade' ? userInfo.nickname : 'test',
       lastChat: chatRoom.lastChat,
       lastChatAt: dayjs.computeTimeDifference(chatRoom.lastChatAt),
       region: userAddress.eupMyeonDong,
       isAlarm: chatRoom.isAlarm,
       isPinned: chatRoom.isPinned,
-      ...(!!userInfo.profileImage && { image: userInfo.profileImage }),
+      ...(!!userInfo?.profileImage && { image: userInfo.profileImage }),
       ...(!!usedTradeImage && { productImage: usedTradeImage }),
     };
   }
