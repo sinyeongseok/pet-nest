@@ -300,6 +300,15 @@ export class BoardController {
     return res.status(result.statusCode).json(result.data);
   }
 
+  @Patch('pet-mate/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async leavePetMate(@Req() req, @Res() res, @Param('id') id) {
+    const email = req.user.email;
+    const result = await this.petMateBoardService.leavePetMate(email, id);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Post('/pet-mate/attend/:id')
   @UseGuards(JwtAccessAuthGuard)
   async applyForParticipation(
