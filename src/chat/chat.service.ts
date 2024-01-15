@@ -488,6 +488,45 @@ export class ChatService {
     }
   }
 
+  async leavePetMateChatRoom(email: string, chatRoomId: string) {
+    const userInfo = await this.userModel.findOne({ email });
+    const message = `${userInfo.nickname}님이 나갔습니다.`;
+    const timestamp = dayjs(
+      new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
+    ).toDate();
+    await Promise.all([
+      this.chatRoomModel.updateOne(
+        { _id: chatRoomId },
+        { $pull: { users: email } }
+      ),
+      this.chatRoomSettingModel.deleteOne({
+        chatRoomId,
+        userId: email,
+      }),
+      new this.messageModel({
+        chatRoomId,
+        type: 'action',
+        details: {
+          timestamp,
+          type: 'comingAndGoing',
+          sender: email,
+          content: message,
+        },
+      }).save(),
+      this.chatRoomModel.updateOne(
+        {
+          _id: chatRoomId,
+        },
+        {
+          lastChat: message,
+          lastChatAt: timestamp,
+        }
+      ),
+    ]);
+
+    return;
+  }
+
   async LeaveChatRoom(email: string, chatRoomId: string) {
     try {
       const chatRoomInfo = await this.chatRoomModel.findOne({
@@ -505,20 +544,10 @@ export class ChatService {
           }
         );
 
-        return;
+        return 'usedTrade';
       } else if (chatRoomInfo.type === 'petMate') {
-        await Promise.all([
-          this.chatRoomModel.updateOne(
-            { _id: chatRoomId },
-            { $pull: { users: email } }
-          ),
-          this.chatRoomSettingModel.deleteOne({
-            chatRoomId,
-            userId: email,
-          }),
-        ]);
-
-        return;
+        await this.leavePetMateChatRoom(email, chatRoomId);
+        return 'petMate';
       }
 
       return;
@@ -917,6 +946,22 @@ export class ChatService {
       ]);
 
       return;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getChatRoomInfo(chatRoomId: string) {
+    try {
+      const chatRoomInfo = await this.chatRoomModel.findOne({
+        _id: chatRoomId,
+      });
+
+      return chatRoomInfo;
     } catch (error) {
       console.log(error);
       throw new HttpException(
