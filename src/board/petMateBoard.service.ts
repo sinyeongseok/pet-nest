@@ -321,6 +321,18 @@ export class PetMateBoardService {
           }),
           this.participatingListModel.find({ boardId: id, isApproved: false }),
         ]);
+      const role = (() => {
+        let result = 'visitor';
+        for (const participants of participatingList) {
+          if (participants.userEmail === email) {
+            participants.isHostPet
+              ? (result = 'host')
+              : (result = 'participants');
+          }
+        }
+
+        return result;
+      })();
       const fomatParticipatingList = await Promise.all(
         this.formatParticipatingList(participatingList)
       );
@@ -334,7 +346,7 @@ export class PetMateBoardService {
           participatingPetsCount: petMateBoardInfo[0].participatingPetsCount,
           requestedMateCount: requestedMate.length,
           status: petMateBoardInfo[0].status,
-          role: petMateBoardInfo[0].host === email ? 'host' : 'participants',
+          role,
         },
         participatingList: fomatParticipatingList,
       };
