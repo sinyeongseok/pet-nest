@@ -334,7 +334,7 @@ export class PetMateBoardService {
           participatingPetsCount: petMateBoardInfo[0].participatingPetsCount,
           requestedMateCount: requestedMate.length,
           status: petMateBoardInfo[0].status,
-          isHost: petMateBoardInfo[0].host === email,
+          role: petMateBoardInfo[0].host === email ? 'host' : 'participants',
         },
         participatingList: fomatParticipatingList,
       };
