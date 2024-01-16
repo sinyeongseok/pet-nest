@@ -929,7 +929,7 @@ export class ChatService {
           timestamp: dayjs(
             new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
           ).toDate(),
-          type: 'join',
+          type: 'comingAndGoing',
           sender: email,
           content: `${userInfo.nickname}님이 들어왔습니다.`,
         },
