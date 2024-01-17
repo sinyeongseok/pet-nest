@@ -400,10 +400,11 @@ export class ChatService {
         userId: email,
       });
       const result = {
-        id: userInfo.email,
-        nickname: userInfo.nickname,
+        id: userInfo?.email,
+        nickname: userInfo?.nickname,
         region: chatRoomInfo.region,
         isAlarm: chatRoomSetting.isAlarm,
+        type: chatRoomInfo.type,
       };
 
       return { statusCode: 200, data: { chatRoomHeaderInfo: result } };
