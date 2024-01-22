@@ -132,10 +132,21 @@ export class ChatService {
 
       return null;
     })();
+    const title = await (async () => {
+      if (chatRoom.type === 'petMate') {
+        const boardInfo = await this.petMateBoardModel.findOne({
+          _id: chatRoom.boardId,
+        });
+
+        return boardInfo?.title;
+      }
+
+      return userInfo.nickname;
+    })();
     return {
+      title,
       id: chatRoom._id,
       type: chatRoom.type,
-      title: chatRoom.type === 'usedTrade' ? userInfo.nickname : 'test',
       lastChat: chatRoom.lastChat,
       lastChatAt: dayjs.computeTimeDifference(chatRoom.lastChatAt),
       region: userAddress.eupMyeonDong,
@@ -393,15 +404,30 @@ export class ChatService {
       const chatRoomInfo = await this.chatRoomModel.findOne({
         _id: chatRoomId,
       });
-      const otherUser = chatRoomInfo.users.filter((user) => user !== email);
-      const userInfo = await this.userModel.findOne({ email: otherUser });
+
       const chatRoomSetting = await this.chatRoomSettingModel.findOne({
         chatRoomId,
         userId: email,
       });
+      const { id, title } = await (async () => {
+        if (chatRoomInfo.type === 'usedTrade') {
+          const otherUser = chatRoomInfo.users.filter((user) => user !== email);
+          const userInfo = await this.userModel.findOne({ email: otherUser });
+
+          return { id: userInfo.email, title: userInfo.nickname };
+        } else if (chatRoomInfo.type === 'petMate') {
+          const boardInfo = await this.petMateBoardModel.findOne({
+            _id: chatRoomInfo.boardId,
+          });
+
+          return { id: boardInfo._id, title: boardInfo.title };
+        }
+
+        return null;
+      })();
       const result = {
-        id: userInfo?.email,
-        title: userInfo?.nickname,
+        id,
+        title,
         region: chatRoomInfo.region,
         isAlarm: chatRoomSetting.isAlarm,
         type: chatRoomInfo.type,
