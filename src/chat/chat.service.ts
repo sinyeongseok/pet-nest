@@ -549,6 +549,13 @@ export class ChatService {
         }
       ),
     ]);
+    const chatRoomInfo = await this.chatRoomModel.findOne({ _id: chatRoomId });
+    if (!chatRoomInfo.users.length) {
+      await Promise.all([
+        this.chatRoomModel.deleteOne({ _id: chatRoomId }),
+        this.petMateBoardModel.deleteOne({ _id: chatRoomInfo.boardId }),
+      ]);
+    }
 
     return;
   }
