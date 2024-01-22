@@ -130,6 +130,7 @@ export class PetMateBoardService {
               {
                 $match: {
                   $expr: { $eq: ['$boardId', '$$boardId'] },
+                  isApproved: true,
                 },
               },
               {
