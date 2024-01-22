@@ -787,11 +787,36 @@ export class PetMateBoardService {
     }
   }
 
-  async test() {
-    try {
-      await this.petMateBoardModel.updateMany({}, { isDeleted: false });
+  async formatEditBoardInfo(boardInfo, email) {
+    const { petIds } = await this.participatingListModel.findOne({
+      boardId: boardInfo._id,
+      userEmail: email,
+    });
+    const petInfoList = await Promise.all(
+      petIds.map(async (petId) => {
+        return this.petModel.findOne({ _id: petId });
+      })
+    );
+    const pets = petInfoList.map((petInfo) => {
+      return { id: petInfo._id, name: petInfo.name };
+    });
 
-      return 1;
+    return {
+      pets,
+      title: boardInfo.title,
+      content: boardInfo.content,
+      date: boardInfo.date,
+      place: boardInfo.place,
+      maxPet: boardInfo.maxPet,
+    };
+  }
+
+  async getEditBoardInfo(id: string, email: string) {
+    try {
+      const boardInfo = await this.petMateBoardModel.findOne({ _id: id });
+      const result = await this.formatEditBoardInfo(boardInfo, email);
+
+      return { statusCode: 200, data: { editPetMateBoardInfo: result } };
     } catch (error) {
       console.log(error);
 
