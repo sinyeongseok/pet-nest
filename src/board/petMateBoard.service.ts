@@ -102,6 +102,11 @@ export class PetMateBoardService {
       const currentDate = new Date();
       const petMateBoardList = await this.petMateBoardModel.aggregate([
         {
+          $match: {
+            isDeleted: false,
+          },
+        },
+        {
           $geoNear: {
             maxDistance: 2000,
             near: {
