@@ -409,7 +409,7 @@ export class ChatService {
         chatRoomId,
         userId: email,
       });
-      const { id, title } = await (async () => {
+      const { id, title, isDeleted } = await (async () => {
         if (chatRoomInfo.type === 'usedTrade') {
           const otherUser = chatRoomInfo.users.filter((user) => user !== email);
           const userInfo = await this.userModel.findOne({ email: otherUser });
@@ -420,7 +420,11 @@ export class ChatService {
             _id: chatRoomInfo.boardId,
           });
 
-          return { id: boardInfo._id, title: boardInfo.title };
+          return {
+            id: boardInfo._id,
+            title: boardInfo.title,
+            isDeleted: boardInfo.isDeleted,
+          };
         }
 
         return null;
@@ -431,6 +435,7 @@ export class ChatService {
         region: chatRoomInfo.region,
         isAlarm: chatRoomSetting.isAlarm,
         type: chatRoomInfo.type,
+        ...(isDeleted && { isDeleted }),
       };
 
       return { statusCode: 200, data: { chatRoomHeaderInfo: result } };
