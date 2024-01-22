@@ -826,4 +826,44 @@ export class PetMateBoardService {
       );
     }
   }
+
+  async editPetMateBoard({
+    email,
+    boardId,
+    petIds,
+    title,
+    content,
+    walkDate,
+    place,
+    maxPet,
+  }) {
+    try {
+      await Promise.all([
+        this.petMateBoardModel.updateOne(
+          { _id: boardId },
+          {
+            title,
+            content,
+            place,
+            maxPet,
+            date: walkDate,
+          }
+        ),
+        this.participatingListModel.updateOne(
+          { boardId, userEmail: email },
+          {
+            petIds,
+          }
+        ),
+      ]);
+
+      return { statusCode: 201, data: { isUpdated: true } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
