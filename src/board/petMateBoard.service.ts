@@ -857,7 +857,7 @@ export class PetMateBoardService {
         ),
       ]);
 
-      return { statusCode: 201, data: { isUpdated: true } };
+      return { statusCode: 200, data: { isUpdated: true } };
     } catch (error) {
       console.log(error);
       throw new HttpException(
