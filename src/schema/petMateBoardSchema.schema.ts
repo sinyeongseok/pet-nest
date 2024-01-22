@@ -32,6 +32,9 @@ export class PetMateBoard {
   @Prop({ required: true, default: '모집중' })
   status: '모집중' | '모집마감';
 
+  @Prop({ required: true, default: false })
+  isDeleted: boolean;
+
   @Prop(
     raw({
       type: { type: String },
