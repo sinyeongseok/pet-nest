@@ -381,4 +381,22 @@ export class BoardController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Put('pet-mate/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async editPetMateBoard(
+    @Req() req,
+    @Res() res,
+    @Param('id') id: string,
+    @Body() petMateBoardInfo
+  ) {
+    const email = req.user.email;
+    const result = await this.petMateBoardService.editPetMateBoard({
+      email,
+      boardId: id,
+      ...petMateBoardInfo,
+    });
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
