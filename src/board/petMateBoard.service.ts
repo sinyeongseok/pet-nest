@@ -578,15 +578,19 @@ export class PetMateBoardService {
           { _id: participatingId },
           { isApproved: true }
         );
-      const [chatRoomInfo, _] = await Promise.all([
+      const [chatRoomInfo, participatingInfo, _] = await Promise.all([
         this.chatRoomModel.findOne({ boardId }),
+        this.participatingListModel.findOne({ _id: participatingId }),
         approveParticipantApplicationQuery,
       ]);
 
       if (!chatRoomInfo) {
         await this.chatService.createPetMateChatRoom(boardId);
       } else {
-        await this.chatService.joinPetMateChatRoom(participatingId, boardId);
+        await this.chatService.joinPetMateChatRoom(
+          participatingInfo.userEmail,
+          boardId
+        );
       }
 
       const result = await this.getApplicationList(boardId);
