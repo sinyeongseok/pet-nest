@@ -477,8 +477,7 @@ export class PetMateBoardService {
   async deletePetMateBoard(id: string) {
     try {
       await Promise.all([
-        this.petMateBoardModel.deleteOne({ _id: id }),
-        this.participatingListModel.deleteOne({ boardId: id }),
+        this.petMateBoardModel.updateOne({ _id: id }, { isDeleted: true }),
       ]);
 
       return { statusCode: 204, data: { isDeleted: true } };
@@ -773,6 +772,21 @@ export class PetMateBoardService {
       // const boardInfo = await this.getPetMateBoardInfo(email, boardId);
 
       return { statusCode: 200, data: boardInfo.data };
+    } catch (error) {
+      console.log(error);
+
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async test() {
+    try {
+      await this.petMateBoardModel.updateMany({}, { isDeleted: false });
+
+      return 1;
     } catch (error) {
       console.log(error);
 
