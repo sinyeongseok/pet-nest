@@ -10,6 +10,10 @@ import { TokenService } from '../token/token.service';
 import { UtilService } from 'src/utils/util.service';
 import { AuthService } from 'src/auth/auth.service';
 import { Pet, PetSchema } from 'src/schema/pet.schema';
+import {
+  BlockedUser,
+  BlockedUserSchema,
+} from 'src/schema/blockedUserSchema.schema';
 
 @Module({
   imports: [
@@ -18,6 +22,7 @@ import { Pet, PetSchema } from 'src/schema/pet.schema';
       { name: UserAddress.name, schema: UserAddressSchema },
       { name: CityAddress.name, schema: CityAddressSchema },
       { name: Pet.name, schema: PetSchema },
+      { name: BlockedUser.name, schema: BlockedUserSchema },
     ]),
   ],
   controllers: [UserController],
