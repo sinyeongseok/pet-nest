@@ -10,6 +10,10 @@ import { AuthService } from 'src/auth/auth.service';
 import * as dayjs from 'dayjs';
 import { Pet, PetDocument } from 'src/schema/pet.schema';
 import { v4 as uuid } from 'uuid';
+import {
+  BlockedUser,
+  BlockedUserDocument,
+} from 'src/schema/blockedUserSchema.schema';
 
 @Injectable()
 export class UserService {
@@ -21,6 +25,8 @@ export class UserService {
     private CityAddressModel: Model<CityAddressDocument>,
     @InjectModel(Pet.name)
     private petModel: Model<PetDocument>,
+    @InjectModel(BlockedUser.name)
+    private blockedUserModel: Model<BlockedUserDocument>,
     private awsService: AwsService,
     private tokenService: TokenService,
     private authService: AuthService
@@ -302,6 +308,42 @@ export class UserService {
       await this.petModel.updateOne({ _id: saveResult._id }, { images });
 
       return { statusCode: 201, data: { isCreated: true } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async formatBlockedUserList(blockList) {
+    return await Promise.all(
+      blockList.map(async (blockUser) => {
+        const userInfo = await this.UserModel.findOne({
+          email: blockUser,
+        });
+
+        return {
+          id: userInfo.email,
+          nickname: userInfo.nickname,
+          blockStatus: 'block',
+          ...(!!userInfo.profileImage && {
+            profileImage: userInfo.profileImage,
+          }),
+        };
+      })
+    );
+  }
+
+  async getBlockedUserList(email: string) {
+    try {
+      const blockList = await this.blockedUserModel
+        .find({ userId: email })
+        .distinct('blockedBy');
+      const result = await this.formatBlockedUserList(blockList);
+
+      return { statusCode: 200, data: { blockList: result } };
     } catch (error) {
       console.log(error);
       throw new HttpException(
