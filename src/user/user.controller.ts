@@ -124,4 +124,13 @@ export class UserController {
 
     return res.status(result.statusCode).json(result.data);
   }
+
+  @Get('blocked')
+  @UseGuards(JwtAccessAuthGuard)
+  async getBlockList(@Req() req, @Res() res) {
+    const email = req.user.email;
+    const result = await this.userService.getBlockedUserList(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
 }
