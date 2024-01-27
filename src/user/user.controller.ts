@@ -12,6 +12,7 @@ import {
   UseGuards,
   Req,
   UploadedFiles,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
@@ -130,6 +131,24 @@ export class UserController {
   async getBlockList(@Req() req, @Res() res) {
     const email = req.user.email;
     const result = await this.userService.getBlockedUserList(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Patch('block')
+  @UseGuards(JwtAccessAuthGuard)
+  async blockUser(@Req() req, @Res() res, @Query('blockedBy') blockedBy) {
+    const email = req.user.email;
+    const result = await this.userService.blockUser(email, blockedBy);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Patch('unblock')
+  @UseGuards(JwtAccessAuthGuard)
+  async unblockUser(@Req() req, @Res() res, @Query('blockedBy') blockedBy) {
+    const email = req.user.email;
+    const result = await this.userService.unblockUser(email, blockedBy);
 
     return res.status(result.statusCode).json(result.data);
   }
