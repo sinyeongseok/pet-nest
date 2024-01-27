@@ -66,6 +66,15 @@ export class BoardController {
     return res.status(result.statusCode).json({ data: result.data });
   }
 
+  @Get('used-item/likes')
+  @UseGuards(JwtAccessAuthGuard)
+  async getLikeBoardList(@Req() req, @Res() res) {
+    const email = req.user.email;
+    const result = await this.usedItemBoardService.getLikeBoardList(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Get('used-item/:id')
   @UseGuards(JwtAccessAuthGuard)
   async getDetailUsedItemBoard(
