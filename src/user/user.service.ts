@@ -352,4 +352,40 @@ export class UserService {
       );
     }
   }
+
+  async blockUser(email: string, blockedBy: string) {
+    try {
+      const blockedUserQuery = new this.blockedUserModel({
+        blockedBy,
+        userId: email,
+      });
+
+      await blockedUserQuery.save();
+
+      return { statusCode: 200, data: { blockStatus: 'block' } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async unblockUser(email: string, blockedBy: string) {
+    try {
+      await this.blockedUserModel.deleteOne({
+        blockedBy,
+        userId: email,
+      });
+
+      return { statusCode: 200, data: { blockStatus: 'unblock' } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
