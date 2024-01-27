@@ -133,9 +133,25 @@ export class UsedItemBoardService {
     };
   }
 
+  async formatLikeUsedItemBoard(email: string, usedItemBoardInfo) {
+    const isLike = await this.isBoardLikedByUser(email, usedItemBoardInfo._id);
+    const boards = this.formatUsedItemBoard(usedItemBoardInfo);
+
+    return { ...boards, isLike };
+  }
+
   formatUsedItemBoardList(usedItemBoardList) {
     return usedItemBoardList.map((usedItemBoard) =>
       this.formatUsedItemBoard(usedItemBoard)
+    );
+  }
+
+  async formatLikeUsedItemBoardList(email: string, usedItemBoardList) {
+    return await Promise.all(
+      usedItemBoardList.map(
+        async (usedItemBoard) =>
+          await this.formatLikeUsedItemBoard(email, usedItemBoard)
+      )
     );
   }
 
@@ -759,6 +775,36 @@ export class UsedItemBoardService {
       );
 
       return { statusCode: 200, data: { chatRoomList: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getLikeBoardList(email: string) {
+    try {
+      const likeBoards = await this.userModel
+        .aggregate([
+          { $match: { email } },
+          {
+            $lookup: {
+              from: 'useditemboards',
+              localField: 'likedBoards',
+              foreignField: '_id',
+              as: 'likedBoardsInfo',
+            },
+          },
+          { $unwind: '$likedBoardsInfo' },
+          { $replaceRoot: { newRoot: '$likedBoardsInfo' } },
+        ])
+        .exec();
+
+      const result = await this.formatLikeUsedItemBoardList(email, likeBoards);
+
+      return { statusCode: 200, data: { likeBoards: result } };
     } catch (error) {
       console.log(error);
       throw new HttpException(
