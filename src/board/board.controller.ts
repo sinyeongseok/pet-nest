@@ -75,6 +75,24 @@ export class BoardController {
     return res.status(result.statusCode).json(result.data);
   }
 
+  @Get('used-item/sales-history')
+  @UseGuards(JwtAccessAuthGuard)
+  async usedItemSalesHistory(@Req() req, @Res() res) {
+    const email = req.user.email;
+    const result = await this.usedItemBoardService.salesHistory(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
+  @Get('used-item/purchase-history')
+  @UseGuards(JwtAccessAuthGuard)
+  async usedItemPurchaseHistory(@Req() req, @Res() res) {
+    const email = req.user.email;
+    const result = await this.usedItemBoardService.purchaseHistory(email);
+
+    return res.status(result.statusCode).json(result.data);
+  }
+
   @Get('used-item/:id')
   @UseGuards(JwtAccessAuthGuard)
   async getDetailUsedItemBoard(
