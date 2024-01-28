@@ -813,4 +813,61 @@ export class UsedItemBoardService {
       );
     }
   }
+
+  async salesHistory(email: string) {
+    try {
+      const salesHistory = await this.usedItemBoardModel.find({
+        'seller.email': email,
+      });
+      const result = this.formatUsedItemBoardList(salesHistory);
+
+      return { statusCode: 200, data: { salesHistory: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async purchaseHistory(email: string) {
+    try {
+      const purchaseHistory = await this.chatRoomModel.aggregate([
+        { $match: { type: 'usedTrade', users: email } },
+        {
+          $lookup: {
+            from: 'useditemschedules',
+            localField: '_id',
+            foreignField: 'chatRoomId',
+            as: 'usedItemSchedules',
+          },
+        },
+        {
+          $unwind: '$usedItemSchedules',
+        },
+        {
+          $lookup: {
+            from: 'useditemboards',
+            localField: 'boardId',
+            foreignField: '_id',
+            as: 'usedItemBoards',
+          },
+        },
+        {
+          $unwind: '$usedItemBoards',
+        },
+        { $replaceRoot: { newRoot: '$usedItemBoards' } },
+      ]);
+      const result = this.formatUsedItemBoardList(purchaseHistory);
+
+      return { statusCode: 200, data: { purchaseHistory: result } };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        '서버요청 실패.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
