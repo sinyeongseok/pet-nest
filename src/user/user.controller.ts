@@ -137,7 +137,7 @@ export class UserController {
 
   @Patch('block')
   @UseGuards(JwtAccessAuthGuard)
-  async blockUser(@Req() req, @Res() res, @Query('blockedBy') blockedBy) {
+  async blockUser(@Req() req, @Res() res, @Body('blockedBy') blockedBy) {
     const email = req.user.email;
     const result = await this.userService.blockUser(email, blockedBy);
 
@@ -146,7 +146,7 @@ export class UserController {
 
   @Patch('unblock')
   @UseGuards(JwtAccessAuthGuard)
-  async unblockUser(@Req() req, @Res() res, @Query('blockedBy') blockedBy) {
+  async unblockUser(@Req() req, @Res() res, @Body('blockedBy') blockedBy) {
     const email = req.user.email;
     const result = await this.userService.unblockUser(email, blockedBy);
 
